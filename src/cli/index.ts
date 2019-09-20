@@ -1,4 +1,4 @@
-#!/usr/bin / env node
+#!/usr/bin/env node
 
 import 'ts-node/register';
 import { join, dirname } from 'path';
