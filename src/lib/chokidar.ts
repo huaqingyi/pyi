@@ -18,13 +18,11 @@ export class PYIChokidar {
     private watcher: FSWatcher;
     private files: { [x: string]: any };
     private app!: Server;
-    private port: number;
     private application: any;
 
     constructor(dirname: string, application: any, config: AppConfigOption) {
         this.dirname = dirname;
         this.config = config;
-        this.port = config.server.port || 4003;
         this.config.entry = dirname;
         this.config.output = join(dirname, 'runtime');
         this.files = {};
@@ -57,27 +55,8 @@ export class PYIChokidar {
                     watch: this.config.watch
                 });
             }
-            if (!comp[i]._extends) { return comp[i]; }
-            if (comp[i]._extends() === PYIAutoAppConfiguration) {
-                const Setting = comp[i];
-                const { props } = comp[i].prototype;
-                const config = (new Setting(this.config, props))._runtime(this.config);
-                if (!config.entry) { delete config.entry; }
-                if (!config.output) { delete config.output; }
-                if (
-                    process.argv.indexOf('-p') !== -1 ||
-                    process.argv.indexOf('--port') !== -1 ||
-                    process.argv.indexOf('--p') !== -1
-                ) {
-                    console.log(green(`listen use command port: ${this.config.server.port}`));
-                    delete config.port;
-                }
-                this.config = extend(this.config, config);
-                this.port = this.config.server.port || 4003;
-                PYIArgs.reset(this.config);
-            }
+            this.files[`${i}_${path}`] = comp[i];
         });
-        this.files[path] = comp;
         console.log(blue(`File ${path} has been added ...`));
     }
 
@@ -92,6 +71,18 @@ export class PYIChokidar {
             if (comp._extends() === PYIController) { controllers.push(comp); }
             if (comp._extends() === PYIMiddleware) { middlewares.push(comp); }
             if (comp._extends() === PYIInterceptor) { interceptors.push(comp); }
+            if (comp._extends() === PYIAutoAppConfiguration) {
+                const Setting = comp;
+                const { props } = comp.prototype;
+                const instance = new Setting(this.config, props);
+                map(comp.prototype, (o, i) => instance[i] = o);
+                const config = instance._runtime(this.config);
+                if (!config.entry) { delete config.entry; }
+                if (!config.output) { delete config.output; }
+                this.config = extend(this.config, config);
+                this.config = PYIArgs.reset(this.config);
+                console.log(green(`listen use command port: ${this.config.server.port}`));
+            }
         });
 
         const app = createKoaServer({
@@ -99,6 +90,10 @@ export class PYIChokidar {
             controllers,
             middlewares,
             interceptors
+        });
+
+        app.on('error', (err: any) => {
+            console.log(err);
         });
 
         app.use(bodyParser());
@@ -109,13 +104,9 @@ export class PYIChokidar {
             host = this.config.server.host || 'localhost';
         }
 
-        try {
-            this.app = await createServer(app.callback()).listen(this.port);
-        } catch (err) {
-            ++this.port;
-            await this.loadApplication();
-        }
-        console.log(magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.port}`));
+        this.app = await createServer(app.callback()).listen(this.config.server.port, host);
+
+        console.log(magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
     }
 

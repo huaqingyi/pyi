@@ -2,18 +2,14 @@ import args from 'args';
 import { AppConfigOption } from '../core';
 
 export abstract class PYIArgsOption {
-    public mode: string;
-    public watch: boolean;
-    public runtime: boolean;
-    public port: number;
+    public mode!: string;
+    public watch?: boolean;
+    public runtime?: boolean;
+    public port?: number;
     public config: AppConfigOption;
 
     constructor() {
         this.config = new AppConfigOption();
-        this.mode = this.config.mode || 'development';
-        this.watch = this.config.watch || false;
-        this.runtime = this.config.runtime || false;
-        this.port = (this.config.server || { port: 4003 }).port || 4003;
     }
 }
 
@@ -31,24 +27,25 @@ export class PYIArgs extends PYIArgsOption {
     }
 
     public static reset(config: AppConfigOption) {
+        if (PYIArgs._this.mode) { config.mode = PYIArgs._this.mode; }
+        if (PYIArgs._this.port) { config.server.port = PYIArgs._this.port; }
+        if (PYIArgs._this.watch) { config.watch = PYIArgs._this.watch; }
+        if (PYIArgs._this.runtime) { config.runtime = PYIArgs._this.runtime; }
         return PYIArgs._this.config = config;
     }
 
     constructor() {
         super();
         args.option('mode', 'The application running type, default is development [development, production, ${your mode}]', 'development')
-            .option('watch', 'The application running watch, default false', false)
-            .option('port', 'The application listen port, default app config or 4003', 4003)
-            .option('runtime', 'The application runing build to es5 .', false);
+            .option('watch', 'The application running watch, default app config')
+            .option('port', 'The application listen port, default app config')
+            .option('runtime', 'The application runing build to es5, default app config .');
 
         const { mode, watch, port, runtime } = args.parse(process.argv);
         this.mode = mode;
         this.port = port;
         this.watch = Boolean(watch);
         this.runtime = Boolean(runtime);
-        this.config.server.port = this.port;
         this.config.mode = this.mode;
-        this.config.watch = this.watch;
-        this.config.runtime = this.runtime;
     }
 }

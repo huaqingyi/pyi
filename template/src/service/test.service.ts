@@ -15,7 +15,8 @@ export class TestService extends PYIService {
     }
 
     public async testQuery() {
-        const [data] = await this.db.instance().query(`SELECT * FROM test`);
+        let data: any = {};
+        [data] = await this.db.instance().query(`SELECT * FROM test1`);
         return data;
     }
 }
