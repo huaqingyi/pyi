@@ -36,10 +36,17 @@ export class PYIArgs extends PYIArgsOption {
 
     constructor() {
         super();
-        args.option('mode', 'The application running type, default is development [development, production, ${your mode}]', 'development')
-            .option('watch', 'The application running watch, default app config')
-            .option('port', 'The application listen port, default app config')
-            .option('runtime', 'The application runing build to es5, default app config .');
+        args.option(
+            'mode',
+            'The application running type, default is development [development, production, ${your mode}]',
+            'development'
+        ).option(
+            'watch',
+            'The application running watch, default app config'
+        ).option(
+            'port',
+            'The application listen port, default app config'
+        ).option('runtime', 'The application runing build to es5, default app config .');
 
         const { mode, watch, port, runtime } = args.parse(process.argv);
         this.mode = mode;

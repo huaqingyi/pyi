@@ -7,6 +7,7 @@ import { Server, createServer } from 'http';
 import bodyParser from 'koa-bodyparser';
 import { join } from 'path';
 import { PYIArgs } from './pyi.args';
+import { isFunction } from 'lodash';
 
 export class PYIChokidar {
     public static runtime(dirname: string, application: any) {
@@ -75,7 +76,13 @@ export class PYIChokidar {
                 const Setting = comp;
                 const { props } = comp.prototype;
                 const instance = new Setting(this.config, props);
-                map(comp.prototype, (o, i) => instance[i] = o);
+                map(comp.prototype, (o, i) => {
+                    if (isFunction(o)) {
+                        instance[i] = o.bind(instance);
+                    } else {
+                        instance[i] = o;
+                    }
+                });
                 const config = instance._runtime(this.config);
                 if (!config.entry) { delete config.entry; }
                 if (!config.output) { delete config.output; }
