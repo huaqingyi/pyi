@@ -1,3 +1,4 @@
+import { Context } from 'koa';
 import { AppConfigOption } from './config';
 
 export abstract class PYIBase {
@@ -7,6 +8,8 @@ export abstract class PYIBase {
     public static _baisc() {
         return PYIBase;
     }
+
+    public ctx!: Context;
 }
 
 export interface RuntimeAutoChange {

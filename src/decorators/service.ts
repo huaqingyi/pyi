@@ -15,6 +15,6 @@ export abstract class PYIService extends PYIBase {
  * @param key off
  */
 // tslint:disable-next-line:no-empty
-export function Service(target: PYIService, key?: string) {
+export function Service<UsePYIService = PYIService>(target: UsePYIService, key?: string) {
 
 }

@@ -1,3 +1,4 @@
+import { AfterMiddleware, BeforeMiddleware } from './../helper';
 import chokidar, { FSWatcher } from 'chokidar';
 import { blue, magenta, green } from 'colors';
 import { map, extend } from 'lodash';
@@ -92,15 +93,22 @@ export class PYIChokidar {
             }
         });
 
+        BeforeMiddleware.prototype.comps = this.files;
+        middlewares.unshift(BeforeMiddleware);
+        middlewares.push(AfterMiddleware);
+
         const app = createKoaServer({
             ...this.config.pyi,
+            development: false,
+            defaultErrorHandler: false,
             controllers,
             middlewares,
             interceptors
         });
 
         app.on('error', (err: any) => {
-            console.log(err);
+            // console.log(err);
+            console.log('err');
         });
 
         app.use(bodyParser());

@@ -1,4 +1,11 @@
-import { Controller, RequestMapping, RequestMappingMethod, autowired, PYIController, HttpError } from '../../../src';
+import { TestDto } from './../dto/test.dto';
+import {
+    RequestMappingMethod, autowired,
+    Controller, RequestMapping,
+    PYIController, throws,
+    ThrowsError,
+    Execption
+} from '../../../src';
 import { TestService } from '../service/test.service';
 import { Nest } from '../components/nest';
 
@@ -24,7 +31,7 @@ export class TestController extends PYIController {
         prefix: '/test',
         methods: [RequestMappingMethod.GET, RequestMappingMethod.POST]
     })
-    public async test() {
+    public async test(@Execption(TestDto) execption: any) {
         // const data = await this.service.testFindAll();
         // console.log(`findAll: `, data);
         // return data;
@@ -32,6 +39,6 @@ export class TestController extends PYIController {
         console.log(`test query: `, data1);
         return data1;
 
-        return await 'Hello World For Test ...';
+        // return await 'Hello World For Test ...';
     }
 }
