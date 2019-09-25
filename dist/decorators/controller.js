@@ -23,18 +23,6 @@ class PYIController extends pyi_base_1.PYIBase {
     static _extends() {
         return PYIController;
     }
-    static Execption(execption, Vo) {
-        execption.bind(PYIController._this);
-        const exinstance = new execption();
-        const ex = exinstance.throws();
-        return ex.then((resp) => {
-            return new Vo(resp);
-        }).catch((err) => {
-            const { errno, errmsg } = exinstance;
-            return (new Vo()).throws(err, errno, errmsg);
-        });
-        // return PYIController._this.ctx.vo = vo;
-    }
 }
 exports.PYIController = PYIController;
 /**

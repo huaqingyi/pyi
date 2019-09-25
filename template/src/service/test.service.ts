@@ -1,7 +1,6 @@
 import { Service, autowired, PYIService, PYIExecption } from '../../../src';
 import { DataBase } from '../components/database';
 import { Test } from '../model/test.model';
-import { TestVo } from '../vo/test.vo';
 
 @Service
 export class TestService extends PYIService {
