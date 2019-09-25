@@ -261,8 +261,8 @@ import {
     RequestMappingMethod, autowired,
     Controller, RequestMapping,
     Ctx, Req, Res, Params, Body,
-    PYIController,
-    PYIExecption
+    PYIExecption, PYIThrows,
+    PYIController
 } from 'pyi';
 import { TestService } from '../service/test.service';
 import { Nest } from '../components/nest';
@@ -283,7 +283,7 @@ export class TestController extends PYIController {
     })
     public async index() {
         // tslint:disable-next-line:max-classes-per-file
-        return TestController.Execption(class extends TestController implements PYIExecption {
+        return TestController.Execption(class extends TestController implements PYIThrows {
             public async throws() {
                 console.log(this.service);
                 console.log(this.nest.merge());
@@ -296,15 +296,15 @@ export class TestController extends PYIController {
         prefix: '/test',
         methods: [RequestMappingMethod.GET, RequestMappingMethod.POST]
     })
-    public async test(
+    public test(
         @Ctx() ctx: Context,
         @Req() req: Request,
         @Res() res: Response,
         @Params() params: any,
         @Body() body: any
-    ) {
+    ): TestVo {
         // tslint:disable-next-line:max-classes-per-file
-        return TestController.Execption(class extends TestController implements PYIExecption {
+        return PYIExecption(class extends TestController implements PYIThrows {
             public errno!: number;
             public errmsg!: string;
             public async throws() {
@@ -320,7 +320,7 @@ export class TestController extends PYIController {
                 throw new Error('test ...');
                 return data;
             }
-        }, TestVo);
+        });
     }
 }
 ```
@@ -387,9 +387,9 @@ export class TestService extends PYIService {
     }
 }
 ```
-#### src/service/test.service.ts 自动捕获
+#### src/service/test.service.ts 自动捕获1
 ```
-import { Service, autowired, PYIService, PYIExecption } from 'pyi';
+import { Service, autowired, PYIService, PYIThrows } from 'pyi';
 import { DataBase } from '../components/database';
 import { Test } from '../model/test.model';
 
@@ -401,7 +401,7 @@ export class TestService extends PYIService {
 
     public async testFindAll() {
         // tslint:disable-next-line:max-classes-per-file
-        return TestService.Execption(class extends TestService implements PYIExecption {
+        return TestService.Execption(class extends TestService implements PYIThrows {
             public async throws() {
                 throw new Error('不开心 ...');
                 return await this.db.table(Test).findAll().then((row) => {
@@ -420,6 +420,42 @@ export class TestService extends PYIService {
         return data;
     }
 }
+```
+#### src/service/test.service.ts 自动捕获2
+```
+import { Service, autowired, PYIService, PYIThrows, PYIExecption, throws } from 'pyi';
+import { DataBase } from '../components/database';
+import { Test } from '../model/test.model';
+
+@Service
+export class TestService extends PYIService {
+
+    @autowired
+    public db!: DataBase;
+
+    @throws
+    public async testFindAll() {
+        // tslint:disable-next-line:max-classes-per-file
+        return PYIExecption(class extends TestService implements PYIThrows {
+            public async throws() {
+                throw new Error('不开心 ...');
+                return await this.db.table(Test).findAll().then((row) => {
+                    return row.map((resp) => resp.toJSON());
+                });
+            }
+        });
+        return await this.db.table(Test).findAll().then((row) => {
+            return row.map((resp) => resp.toJSON());
+        });
+    }
+
+    public async testQuery() {
+        let data: any = {};
+        [data] = await this.db.instance().query(`SELECT * FROM test1`);
+        return data;
+    }
+}
+
 ```
 #### 捕获结果
 ```

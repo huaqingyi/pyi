@@ -4,3 +4,4 @@ export * from './configuration';
 export * from './service';
 export * from './pyi';
 export * from './impl';
+export * from './execption';

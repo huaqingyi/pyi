@@ -9,5 +9,6 @@ __export(require("./configuration"));
 __export(require("./service"));
 __export(require("./pyi"));
 __export(require("./impl"));
+__export(require("./execption"));
 
 //# sourceMappingURL=../sourcemaps/decorators/index.js.map

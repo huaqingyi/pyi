@@ -10,8 +10,3 @@ export declare abstract class PYIVo extends PYIBase {
     throws(err: Error, errno?: number, errmsg?: string): Promise<this>;
 }
 export declare function Vo<UsePYIVo = PYIVo>(target: UsePYIVo, key?: string): void;
-export interface PYIExecption {
-    errno?: number;
-    errmsg?: string;
-    throws: (...args: any) => Promise<any>;
-}

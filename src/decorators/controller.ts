@@ -3,6 +3,7 @@ export * from 'routing-controllers';
 import { JsonController, Method, Middleware as RMiddleware, Interceptor as RInterceptor } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 import { PYIBase } from '../core/pyi.base';
+import { throws } from './execption';
 
 /**
  * Controller ================================
@@ -60,12 +61,21 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
     } else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target: any, key: string) => {
-            const Vo = Reflect.getMetadata('design:returntype', target, key);
-            // console.log(vo);
+            // const Vo = Reflect.getMetadata('design:returntype', target, key);
             const { prefix, methods } = config as ControllerRequestConfiguration;
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 Method(m as ActionType, prefix)(target, key);
             });
+            return throws(target, key);
+            // const merge = target.constructor.prototype[key];
+            // target.constructor.prototype[key] = async function(...props: any) {
+            //     const execption = await merge.bind(this)(...props);
+            //     if (isFunction(execption)) {
+            //         return await execption.apply(this, [Vo]);
+            //     }
+            //     return await execption;
+            // };
+            // return target.constructor.prototype[key];
         };
     }
 }

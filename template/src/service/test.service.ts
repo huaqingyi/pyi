@@ -1,4 +1,4 @@
-import { Service, autowired, PYIService, PYIExecption } from '../../../src';
+import { Service, autowired, PYIService, PYIThrows, PYIExecption, throws } from '../../../src';
 import { DataBase } from '../components/database';
 import { Test } from '../model/test.model';
 
@@ -8,9 +8,10 @@ export class TestService extends PYIService {
     @autowired
     public db!: DataBase;
 
+    @throws
     public async testFindAll() {
         // tslint:disable-next-line:max-classes-per-file
-        return TestService.Execption(class extends TestService implements PYIExecption {
+        return PYIExecption(class extends TestService implements PYIThrows {
             public async throws() {
                 throw new Error('不开心 ...');
                 return await this.db.table(Test).findAll().then((row) => {

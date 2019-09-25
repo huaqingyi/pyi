@@ -7,6 +7,7 @@ const lodash_1 = require("lodash");
 __export(require("routing-controllers"));
 const routing_controllers_1 = require("routing-controllers");
 const pyi_base_1 = require("../core/pyi.base");
+const execption_1 = require("./execption");
 /**
  * Controller ================================
  */
@@ -54,12 +55,21 @@ function RequestMapping(config, key) {
     else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target, key) => {
-            const Vo = Reflect.getMetadata('design:returntype', target, key);
-            // console.log(vo);
+            // const Vo = Reflect.getMetadata('design:returntype', target, key);
             const { prefix, methods } = config;
             lodash_1.map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 routing_controllers_1.Method(m, prefix)(target, key);
             });
+            return execption_1.throws(target, key);
+            // const merge = target.constructor.prototype[key];
+            // target.constructor.prototype[key] = async function(...props: any) {
+            //     const execption = await merge.bind(this)(...props);
+            //     if (isFunction(execption)) {
+            //         return await execption.apply(this, [Vo]);
+            //     }
+            //     return await execption;
+            // };
+            // return target.constructor.prototype[key];
         };
     }
 }

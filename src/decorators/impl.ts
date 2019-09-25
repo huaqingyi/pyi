@@ -34,10 +34,3 @@ export abstract class PYIVo extends PYIBase {
 export function Vo<UsePYIVo = PYIVo>(target: UsePYIVo, key?: string) {
     // console.log('dto', target);
 }
-
-// tslint:disable-next-line:max-classes-per-file
-export interface PYIExecption {
-    errno?: number;
-    errmsg?: string;
-    throws: (...args: any) => Promise<any>;
-}
