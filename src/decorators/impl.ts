@@ -1,10 +1,9 @@
-import { Context } from 'koa';
 import { PYIBase } from '../core';
 
-export abstract class PYIDto extends PYIBase {
+export abstract class PYIVo extends PYIBase {
     public static _pyi: () => any;
     public static _extends() {
-        return PYIDto;
+        return PYIVo;
     }
 
     public err?: boolean;
@@ -18,20 +17,27 @@ export abstract class PYIDto extends PYIBase {
         this.data = data || {};
     }
 
-    public async throws(err: Error, errno?: number) {
+    public async throws(err: Error, errno?: number, errmsg?: string) {
         this.err = true;
         this.errno = errno || 1003;
-        this.errmsg = `${err.name}${err.message}${err.stack ? `(${err.stack})` : ''}`;
+        if (errmsg) {
+            this.errmsg = errmsg;
+            console.error(err);
+        } else {
+            this.errmsg = `${err.name}${err.message}${err.stack ? `(${err.stack})` : ''}`;
+        }
         this.data = {};
+        return this;
     }
 }
 
-export function Dto<UsePYIDto = PYIDto>(target: UsePYIDto, key?: string) {
-    console.log('dto', target);
+export function Vo<UsePYIVo = PYIVo>(target: UsePYIVo, key?: string) {
+    // console.log('dto', target);
 }
 
-export function Execption<ExecptionDto = PYIDto>(dto: ExecptionDto) {
-    return (target: any, key: string, descriptor: any) => {
-        console.log(dto);
-    };
+// tslint:disable-next-line:max-classes-per-file
+export interface PYIExecption {
+    errno?: number;
+    errmsg?: string;
+    throws: (...args: any) => Promise<any>;
 }

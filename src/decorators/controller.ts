@@ -3,6 +3,7 @@ export * from 'routing-controllers';
 import { JsonController, Method, Middleware as RMiddleware, Interceptor as RInterceptor } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 import { PYIBase } from '../core/pyi.base';
+import { PYIVo } from './impl';
 
 /**
  * Controller ================================
@@ -28,6 +29,21 @@ export abstract class PYIController extends PYIBase {
     public static _pyi: () => any;
     public static _extends() {
         return PYIController;
+    }
+
+    public static Execption<UseParentClass = any, UsePYIVo = PYIVo>(
+        execption: UseParentClass & any, Vo: UsePYIVo & any
+    ): any {
+        execption.bind(PYIController._this);
+        const exinstance = new execption();
+        const ex: Promise<any> = exinstance.throws();
+        return ex.then((resp) => {
+            return new Vo(resp);
+        }).catch((err) => {
+            const { errno, errmsg } = exinstance;
+            return (new Vo()).throws(err, errno, errmsg);
+        });
+        // return PYIController._this.ctx.vo = vo;
     }
 
     constructor(...props: any) { super(); }
@@ -60,6 +76,8 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
     } else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target: any, key: string) => {
+            const Vo = Reflect.getMetadata('design:returntype', target, key);
+            // console.log(vo);
             const { prefix, methods } = config as ControllerRequestConfiguration;
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 Method(m as ActionType, prefix)(target, key);

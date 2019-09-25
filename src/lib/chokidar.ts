@@ -9,6 +9,7 @@ import bodyParser from 'koa-bodyparser';
 import { join } from 'path';
 import { PYIArgs } from './pyi.args';
 import { isFunction } from 'lodash';
+import { Context } from 'koa';
 
 export class PYIChokidar {
     public static runtime(dirname: string, application: any) {
@@ -106,9 +107,9 @@ export class PYIChokidar {
             interceptors
         });
 
-        app.on('error', (err: any) => {
-            // console.log(err);
-            console.log('err');
+        app.on('error', (err: any, ctx: Context) => {
+            console.log(err);
+            // console.log(ctx.vo.throws(err));
         });
 
         app.use(bodyParser());
