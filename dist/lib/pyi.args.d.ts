@@ -1,9 +1,9 @@
 import { AppConfigOption } from '../core';
 export declare abstract class PYIArgsOption {
     mode: string;
-    watch: boolean;
-    runtime: boolean;
-    port: number;
+    watch?: boolean;
+    runtime?: boolean;
+    port?: number;
     config: AppConfigOption;
     constructor();
 }

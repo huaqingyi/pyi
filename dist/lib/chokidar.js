@@ -10,6 +10,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const helper_1 = require("./../helper");
 const chokidar_1 = __importDefault(require("chokidar"));
 const colors_1 = require("colors");
 const lodash_1 = require("lodash");
@@ -19,11 +20,11 @@ const http_1 = require("http");
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const path_1 = require("path");
 const pyi_args_1 = require("./pyi.args");
+const lodash_2 = require("lodash");
 class PYIChokidar {
     constructor(dirname, application, config) {
         this.dirname = dirname;
         this.config = config;
-        this.port = config.server.port || 4003;
         this.config.entry = dirname;
         this.config.output = path_1.join(dirname, 'runtime');
         this.files = {};
@@ -62,31 +63,8 @@ class PYIChokidar {
                     watch: this.config.watch
                 });
             }
-            if (!comp[i]._extends) {
-                return comp[i];
-            }
-            if (comp[i]._extends() === core_1.PYIAutoAppConfiguration) {
-                const Setting = comp[i];
-                const { props } = comp[i].prototype;
-                const config = (new Setting(this.config, props))._runtime(this.config);
-                if (!config.entry) {
-                    delete config.entry;
-                }
-                if (!config.output) {
-                    delete config.output;
-                }
-                if (process.argv.indexOf('-p') !== -1 ||
-                    process.argv.indexOf('--port') !== -1 ||
-                    process.argv.indexOf('--p') !== -1) {
-                    console.log(colors_1.green(`listen use command port: ${this.config.server.port}`));
-                    delete config.port;
-                }
-                this.config = lodash_1.extend(this.config, config);
-                this.port = this.config.server.port || 4003;
-                pyi_args_1.PYIArgs.reset(this.config);
-            }
+            this.files[`${i}_${path}`] = comp[i];
         });
-        this.files[path] = comp;
         console.log(colors_1.blue(`File ${path} has been added ...`));
     }
     async loadApplication() {
@@ -107,26 +85,52 @@ class PYIChokidar {
             if (comp._extends() === decorators_1.PYIInterceptor) {
                 interceptors.push(comp);
             }
+            if (comp._extends() === core_1.PYIAutoAppConfiguration) {
+                const Setting = comp;
+                const { props } = comp.prototype;
+                const instance = new Setting(this.config, props);
+                lodash_1.map(comp.prototype, (o, i) => {
+                    if (lodash_2.isFunction(o)) {
+                        instance[i] = o.bind(instance);
+                    }
+                    else {
+                        instance[i] = o;
+                    }
+                });
+                const config = instance._runtime(this.config);
+                if (!config.entry) {
+                    delete config.entry;
+                }
+                if (!config.output) {
+                    delete config.output;
+                }
+                this.config = lodash_1.extend(this.config, config);
+                this.config = pyi_args_1.PYIArgs.reset(this.config);
+                console.log(colors_1.green(`listen use command port: ${this.config.server.port}`));
+            }
         });
+        helper_1.BeforeMiddleware.prototype.comps = this.files;
+        middlewares.unshift(helper_1.BeforeMiddleware);
+        middlewares.push(helper_1.AfterMiddleware);
         const app = decorators_1.createKoaServer({
             ...this.config.pyi,
+            development: false,
+            defaultErrorHandler: false,
             controllers,
             middlewares,
             interceptors
+        });
+        app.on('error', (err, ctx) => {
+            console.log(err);
+            // console.log(ctx.vo.throws(err));
         });
         app.use(koa_bodyparser_1.default());
         let host = 'localhost';
         if (this.config.server) {
             host = this.config.server.host || 'localhost';
         }
-        try {
-            this.app = await http_1.createServer(app.callback()).listen(this.port);
-        }
-        catch (err) {
-            ++this.port;
-            await this.loadApplication();
-        }
-        console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.port}`));
+        this.app = await http_1.createServer(app.callback()).listen(this.config.server.port, host);
+        console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
     }
     async ready() {

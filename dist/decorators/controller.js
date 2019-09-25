@@ -23,6 +23,18 @@ class PYIController extends pyi_base_1.PYIBase {
     static _extends() {
         return PYIController;
     }
+    static Execption(execption, Vo) {
+        execption.bind(PYIController._this);
+        const exinstance = new execption();
+        const ex = exinstance.throws();
+        return ex.then((resp) => {
+            return new Vo(resp);
+        }).catch((err) => {
+            const { errno, errmsg } = exinstance;
+            return (new Vo()).throws(err, errno, errmsg);
+        });
+        // return PYIController._this.ctx.vo = vo;
+    }
 }
 exports.PYIController = PYIController;
 /**
@@ -54,6 +66,8 @@ function RequestMapping(config, key) {
     else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target, key) => {
+            const Vo = Reflect.getMetadata('design:returntype', target, key);
+            // console.log(vo);
             const { prefix, methods } = config;
             lodash_1.map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 routing_controllers_1.Method(m, prefix)(target, key);

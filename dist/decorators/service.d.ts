@@ -9,4 +9,4 @@ export declare abstract class PYIService extends PYIBase {
  * @param target service component
  * @param key off
  */
-export declare function Service(target: PYIService, key?: string): void;
+export declare function Service<UsePYIService = PYIService>(target: UsePYIService, key?: string): void;

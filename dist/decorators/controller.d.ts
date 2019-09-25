@@ -1,6 +1,7 @@
 export * from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 import { PYIBase } from '../core/pyi.base';
+import { PYIVo } from './impl';
 /**
  * Controller ================================
  */
@@ -21,6 +22,7 @@ export interface ControllerRequestConfiguration extends ControllerConfiguration 
 export declare abstract class PYIController extends PYIBase {
     static _pyi: () => any;
     static _extends(): typeof PYIController;
+    static Execption<UseParentClass = any, UsePYIVo = PYIVo>(execption: UseParentClass & any, Vo: UsePYIVo & any): any;
     constructor(...props: any);
 }
 /**

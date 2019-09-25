@@ -8,7 +8,6 @@ export declare class PYIChokidar {
     private watcher;
     private files;
     private app;
-    private port;
     private application;
     constructor(dirname: string, application: any, config: AppConfigOption);
     authFileExt(path: string): Promise<boolean>;

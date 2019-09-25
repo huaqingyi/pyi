@@ -213,6 +213,125 @@ export class TestController extends PYIController {
     }
 }
 ```
+### Vo层自动捕获
+#### src/vo/test.vo.ts
+```
+import { PYIVo, Vo } from 'pyi';
+
+@Vo
+export class TestVo extends PYIVo {
+    public err!: boolean;
+    public data!: any;
+}
+```
+#### src/vo/test.vo.ts 字段自定义
+```
+import { PYIVo, Vo } from 'pyi';
+
+@Vo
+export class TestVo extends PYIVo {
+    public error!: boolean;
+    public result!: any;
+    public errorMsg!: any;
+
+    constructor(data?: any) {
+        super();
+        this.error = false;
+        this.result = data || {};
+    }
+
+    public async throws(err: Error, errno?: number, errmsg?: string) {
+        this.error = true;
+        this.errno = errno || 1003;
+        if (errmsg) {
+            this.errorMsg = errmsg;
+            console.error(err);
+        } else {
+            this.errorMsg = `${err.name}${err.message}${err.stack ? `(${err.stack})` : ''}`;
+        }
+        this.result = {};
+        return this;
+    }
+}
+```
+
+#### src/controller/test.controller.ts
+```
+import {
+    RequestMappingMethod, autowired,
+    Controller, RequestMapping,
+    Ctx, Req, Res, Params, Body,
+    PYIController,
+    PYIExecption
+} from 'pyi';
+import { TestService } from '../service/test.service';
+import { Nest } from '../components/nest';
+import { TestVo } from './../vo/test.vo';
+import { Context, Request, Response } from 'koa';
+
+@Controller
+export class TestController extends PYIController {
+
+    @autowired
+    public service!: TestService;
+
+    @autowired
+    public nest!: Nest;
+
+    @RequestMapping({
+        prefix: '/'
+    })
+    public async index() {
+        // tslint:disable-next-line:max-classes-per-file
+        return TestController.Execption(class extends TestController implements PYIExecption {
+            public async throws() {
+                console.log(this.service);
+                console.log(this.nest.merge());
+                return await 'Hello World ...';
+            }
+        }, TestVo);
+    }
+
+    @RequestMapping({
+        prefix: '/test',
+        methods: [RequestMappingMethod.GET, RequestMappingMethod.POST]
+    })
+    public async test(
+        @Ctx() ctx: Context,
+        @Req() req: Request,
+        @Res() res: Response,
+        @Params() params: any,
+        @Body() body: any
+    ) {
+        // tslint:disable-next-line:max-classes-per-file
+        return TestController.Execption(class extends TestController implements PYIExecption {
+            public errno!: number;
+            public errmsg!: string;
+            public async throws() {
+                this.errno = 1004;
+                this.errmsg = 'service query findAll sql err.';
+                let data = await this.service.testFindAll();
+                console.log('all', data);
+                this.errno = 1005;
+                this.errmsg = 'service query test sql err.';
+                data = await this.service.testQuery();
+                this.errno = 1006;
+                this.errmsg = 'service query test sql success try err.';
+                throw new Error('test ...');
+                return data;
+            }
+        }, TestVo);
+    }
+}
+```
+#### 自动生成ViewObjec类型数据, 并且自动捕获异常, 异常可以自定义 code 与 message 
+```
+自动捕获返回的异常
+{"err":true,"data":{},"errno":1005,"errmsg":"service query test sql err."}
+自动map的viewobject
+{"err":false,"data":"Hello World ..."}
+```
+
 ### 支持所有 routing-controllers 包扩展 . Middleware 修饰的基类为 PYIMiddleware, Interceptor 修饰器基类为 PYIInterceptor
 
 ## Model
