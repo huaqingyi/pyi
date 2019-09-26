@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 const pyi_base_1 = require("../core/pyi.base");
-const core_1 = require("../core");
+const config_1 = require("../config");
 /**
  * Component base
  */
@@ -35,7 +35,7 @@ function Configuration(config) {
      */
     if (_extends && lodash_1.isFunction(_extends)) {
         if (_extends() === PYIAutoConfiguration ||
-            _extends() === core_1.PYIAutoAppConfiguration) {
+            _extends() === config_1.PYIAutoAppConfiguration) {
             return config;
         }
         else {

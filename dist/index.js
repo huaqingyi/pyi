@@ -4,8 +4,10 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
+__export(require("./config"));
 __export(require("./core"));
 __export(require("./decorators"));
+__export(require("./helper"));
 __export(require("./lib"));
 
 //# sourceMappingURL=sourcemaps/index.js.map

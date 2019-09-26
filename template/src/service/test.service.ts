@@ -13,15 +13,15 @@ export class TestService extends PYIService {
         // tslint:disable-next-line:max-classes-per-file
         return PYIExecption(class extends TestService implements PYIThrows {
             public async throws() {
-                throw new Error('不开心 ...');
+                // throw new Error('不开心 ...');
                 return await this.db.table(Test).findAll().then((row) => {
                     return row.map((resp) => resp.toJSON());
                 });
             }
         });
-        return await this.db.table(Test).findAll().then((row) => {
-            return row.map((resp) => resp.toJSON());
-        });
+        // return await this.db.table(Test).findAll().then((row) => {
+        //     return row.map((resp) => resp.toJSON());
+        // });
     }
 
     public async testQuery() {

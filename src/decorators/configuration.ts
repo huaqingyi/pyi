@@ -1,6 +1,6 @@
 import { isFunction } from 'lodash';
 import { PYIBase, RuntimeAutoChange } from '../core/pyi.base';
-import { PYIAutoAppConfiguration, AppConfigOption } from '../core';
+import { PYIAutoAppConfiguration, AppConfigOption } from '../config';
 import { PYIArgs } from '../lib';
 
 /**

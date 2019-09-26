@@ -1,5 +1,5 @@
 import { PYIBase, RuntimeAutoChange } from '../core/pyi.base';
-import { AppConfigOption } from '../core';
+import { AppConfigOption } from '../config';
 /**
  * Component base
  */

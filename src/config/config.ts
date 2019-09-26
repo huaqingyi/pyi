@@ -4,6 +4,7 @@ import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { ValidatorOptions } from 'class-validator';
 import { ClassTransformOptions } from 'class-transformer';
 import { PYIAutoConfiguration } from '../decorators/configuration';
+import { PYIVo, Vo } from '../decorators';
 
 export interface ServerConfig {
 
@@ -82,6 +83,8 @@ export interface ServerConfig {
             required?: boolean;
         };
     };
+
+    defaultVo?: (data: any, err?: Error, errno?: number) => Promise<PYIVo>;
 }
 
 export class ConfigurationServer {
@@ -118,6 +121,18 @@ export class AppConfigOption extends ConfigurationServer {
             extensions: ['.js', '.jsx', '.vue', '.ts', '.tsx']
         };
         this.pyi = {};
+        this.pyi.defaultVo = async (data: any, err?: Error, errno?: number) => {
+            const DefaultVo = (class extends PYIVo {
+                public err!: boolean;
+                public data!: any;
+            });
+            Vo(DefaultVo);
+            let resp = new DefaultVo(data);
+            if (err) {
+                resp = await resp.throws(err, errno);
+            }
+            return resp;
+        };
         this.compilerOptions = {
             charset: 'utf8',
             declaration: false,

@@ -4,6 +4,7 @@ import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { ValidatorOptions } from 'class-validator';
 import { ClassTransformOptions } from 'class-transformer';
 import { PYIAutoConfiguration } from '../decorators/configuration';
+import { PYIVo } from '../decorators';
 export interface ServerConfig {
     /**
      * Indicates if cors are enabled.
@@ -80,6 +81,7 @@ export interface ServerConfig {
             required?: boolean;
         };
     };
+    defaultVo?: (data: any, err?: Error, errno?: number) => Promise<PYIVo>;
 }
 export declare class ConfigurationServer {
     entry: string;

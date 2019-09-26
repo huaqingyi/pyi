@@ -1,95 +1,59 @@
 #!/usr/bin/env node
 
-import 'ts-node/register';
-import { join, dirname } from 'path';
-import { filter, map } from 'lodash';
-import { PYIApplication } from '../decorators';
-import { yellow, green } from 'colors';
-import { src, dest } from 'gulp';
-import { init, write } from 'gulp-sourcemaps';
-import { createProject } from 'gulp-typescript';
-import merge from 'merge2';
-import install from 'gulp-install';
-import nodemon from 'gulp-nodemon';
+import { fork } from 'child_process';
+import { join } from 'path';
+import args from 'args';
+import { prompt } from 'inquirer';
+import fuzzy from 'fuzzy';
+import { random } from 'lodash';
 
-const rootpath = join(process.cwd(), process.argv[2]);
-const fileinfo = (process.argv[2].split('/').pop() || '').split('.');
-fileinfo.pop();
+const states = [
+    'Application',
+    'Component'
+];
 
-(async () => {
-    const packs = await import(rootpath);
-    const [Application] = filter(packs, (comp) => comp.isApplication || false);
-    const app: PYIApplication = new Application();
-    // tslint:disable-next-line: no-shadowed-variable
-    app.runtime(async ({ config, watcher, starter }) => {
-        console.log(yellow('import project all file success ...'));
-        if (config.runtime === true) {
-            if (config.watch === true) {
-                watcher.on('all', async (type, path) => {
-                    console.log(`${yellow(type)}: ${green(path)}`);
-                    const tsr = src(path).pipe(init()).pipe(createProject(config.compilerOptions)());
-                    const projectpath = dirname(rootpath);
-                    const filepath = dirname(path);
-                    const outpath = filepath.replace(projectpath, config.output);
-                    const tscr = await merge([
-                        tsr.dts.pipe(dest(outpath)),
-                        tsr.js.pipe(write('./sourcemaps'))
-                            .pipe(dest(outpath))
-                    ]).pipe(install());
-                    return await tscr;
+args.command('create', 'create new project ...', async (name, sub, options) => {
+    const answers = await prompt([
+        {
+            type: 'autocomplete',
+            name: 'type',
+            message: '请问需要什么模版类型?',
+            source: (_answers: any, input: any) => {
+                input = input || '';
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const fuzzyResult = fuzzy.filter(input, states);
+                        resolve(
+                            fuzzyResult.map((el: any) => {
+                                return el.original;
+                            })
+                        );
+                    }, random(30, 500));
                 });
-            } else {
-                watcher.close();
             }
-
-            const tstask = src([
-                ...map(config.resolve.extensions, (ext) => join(config.entry, `**/*${ext}`)),
-                rootpath
-            ]);
-            const tsResult = tstask.pipe(init()).pipe(createProject(config.compilerOptions)());
-
-            const ts = await merge([
-                tsResult.dts.pipe(dest(config.output)),
-                tsResult.js.pipe(write('./sourcemaps'))
-                    .pipe(dest(config.output))
-            ]).on('end', async () => {
-                console.log(yellow('build success'));
-                await new Promise((r) => setTimeout(r, 2000));
-
-                nodemon({
-                    script: join(__dirname, 'starter.js'),
-                    args: [
-                        join(config.output, [...fileinfo, 'js'].join('.')),
-                        ...process.argv.slice(3, process.argv.length)
-                    ],
-                    ext: config.resolve.extensions.join(' '),
-                    watch: [
-                        ...map(config.resolve.extensions, (ext) => join(config.entry, `**/*${ext}`)),
-                        rootpath
-                    ],
-                    stdin: true,
-                    stdout: true
-                });
-            }).pipe(install());
-
-            return await ts;
-        } else {
-            if (config.watch === true) {
-                watcher.close();
-                nodemon({
-                    script: join(__dirname, 'starter.js'),
-                    args: [rootpath, ...process.argv.slice(3, process.argv.length)],
-                    ext: config.resolve.extensions.join(' '),
-                    watch: [
-                        ...map(config.resolve.extensions, (ext) => join(config.entry, `**/*${ext}`)),
-                        rootpath
-                    ],
-                    stdin: true,
-                    stdout: true
-                });
-            } else {
-                starter();
-            }
+        },
+        {
+            type: 'input',
+            name: 'name',
+            message: '请给项目命名(可不填,除非生成包名与库名不同):'
+        },
+        {
+            type: 'input',
+            name: 'git',
+            message: '请输入git地址:'
+        },
+        {
+            type: 'input',
+            name: 'author',
+            message: '请输入作者名字:'
         }
+    ]);
+}).command('run', 'run appliaction ...', (name, sub, options) => {
+    fork(
+        join(__dirname, 'run.js'),
+        process.argv.slice(3, process.argv.length), {
+        stdio: 'inherit'
     });
-})();
+});
+
+args.parse(process.argv);

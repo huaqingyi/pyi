@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const configuration_1 = require("../decorators/configuration");
+const decorators_1 = require("../decorators");
 class ConfigurationServer {
 }
 exports.ConfigurationServer = ConfigurationServer;
@@ -14,6 +15,16 @@ class AppConfigOption extends ConfigurationServer {
             extensions: ['.js', '.jsx', '.vue', '.ts', '.tsx']
         };
         this.pyi = {};
+        this.pyi.defaultVo = async (data, err, errno) => {
+            const DefaultVo = (class extends decorators_1.PYIVo {
+            });
+            decorators_1.Vo(DefaultVo);
+            let resp = new DefaultVo(data);
+            if (err) {
+                resp = await resp.throws(err, errno);
+            }
+            return resp;
+        };
         this.compilerOptions = {
             charset: 'utf8',
             declaration: false,
@@ -46,4 +57,4 @@ class PYIAutoAppConfiguration extends configuration_1.PYIAutoConfiguration {
 }
 exports.PYIAutoAppConfiguration = PYIAutoAppConfiguration;
 
-//# sourceMappingURL=../sourcemaps/core/config.js.map
+//# sourceMappingURL=../sourcemaps/config/config.js.map

@@ -14,11 +14,13 @@ export function PYIExecption<UseParentClass = any, UsePYIVo = PYIVo>(this: any,
         const ex: Promise<any> = exinstance.throws();
         if (Vo) {
             return ex.then((resp) => {
-                return this.ctx = new Vo(resp);
+                this.ctx = new Vo(resp);
+                return this.ctx;
                 // return new Vo(resp);
             }).catch((err) => {
                 const { errno, errmsg } = exinstance;
-                return this.ctx = (new Vo()).throws(err, errno, errmsg);
+                this.ctx = (new Vo()).throws(err, errno, errmsg);
+                return this.ctx;
                 // return (new Vo()).throws(err, errno, errmsg);
             });
         } else {

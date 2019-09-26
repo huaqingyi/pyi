@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 const pyi_base_1 = require("../core/pyi.base");
 const configuration_1 = require("./configuration");
-const core_1 = require("../core");
+const config_1 = require("../config");
 const lib_1 = require("../lib");
 /**
  * Component base
@@ -62,7 +62,7 @@ function autowired(target, key) {
         let instance = new params(props);
         if (params._extends && lodash_1.isFunction(params._extends)) {
             if (params._extends() === configuration_1.PYIAutoConfiguration ||
-                params._extends() === core_1.PYIAutoAppConfiguration) {
+                params._extends() === config_1.PYIAutoAppConfiguration) {
                 instance = instance._runtime(lib_1.PYIArgs.reflact().config);
             }
         }

@@ -1,5 +1,5 @@
 import args from 'args';
-import { AppConfigOption } from '../core';
+import { AppConfigOption } from '../config';
 
 export abstract class PYIArgsOption {
     public mode!: string;

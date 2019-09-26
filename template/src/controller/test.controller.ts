@@ -67,4 +67,11 @@ export class TestController extends PYIController {
             }
         });
     }
+
+    @RequestMapping({
+        prefix: '/show'
+    })
+    public show() {
+        return 'test show ...';
+    }
 }

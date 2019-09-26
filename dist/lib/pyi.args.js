@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const args_1 = __importDefault(require("args"));
-const core_1 = require("../core");
+const config_1 = require("../config");
 class PYIArgsOption {
     constructor() {
-        this.config = new core_1.AppConfigOption();
+        this.config = new config_1.AppConfigOption();
     }
 }
 exports.PYIArgsOption = PYIArgsOption;

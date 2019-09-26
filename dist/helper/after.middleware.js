@@ -9,7 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const routing_controllers_1 = require("routing-controllers");
 let AfterMiddleware = class AfterMiddleware {
     async use(ctx, next) {
-        // console.log('after');
+        if (ctx.body && this.chokider.isViewObject === false) {
+            if (this.chokider.config.pyi.defaultVo) {
+                ctx.body = await this.chokider.config.pyi.defaultVo(ctx.body);
+            }
+        }
+        // console.log('after', ctx.body);
         return await next(ctx);
     }
 };

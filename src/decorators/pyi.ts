@@ -2,7 +2,7 @@ import { PYIChokidar, PYIArgs } from '../lib';
 import Application from 'koa';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { AppConfigOption } from '../core';
+import { AppConfigOption } from '../config';
 import { FSWatcher } from 'chokidar';
 
 /**

@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import { AppConfigOption } from './config';
+import { AppConfigOption } from '../config';
 import { PYIVo } from '../decorators';
 
 export abstract class PYIBase {

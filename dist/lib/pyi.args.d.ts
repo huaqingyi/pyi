@@ -1,4 +1,4 @@
-import { AppConfigOption } from '../core';
+import { AppConfigOption } from '../config';
 export declare abstract class PYIArgsOption {
     mode: string;
     watch?: boolean;

@@ -1,7 +1,7 @@
 /// <reference types="koa-bodyparser" />
 import Application from 'koa';
 import { Observable } from 'rxjs';
-import { AppConfigOption } from '../core';
+import { AppConfigOption } from '../config';
 import { FSWatcher } from 'chokidar';
 /**
  * base mian

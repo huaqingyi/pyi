@@ -1,4 +1,5 @@
 import { PYIBase } from '../core';
+import { yellow } from 'colors';
 
 export abstract class PYIVo extends PYIBase {
     public static _pyi: () => any;
@@ -15,6 +16,7 @@ export abstract class PYIVo extends PYIBase {
         super();
         this.err = false;
         this.data = data || {};
+        if (this.ctx && this.ctx.app) { this.ctx.app.emit('vo', true, this.ctx); }
     }
 
     public async throws(err: Error, errno?: number, errmsg?: string) {
@@ -22,9 +24,10 @@ export abstract class PYIVo extends PYIBase {
         this.errno = errno || 1003;
         if (errmsg) {
             this.errmsg = errmsg;
-            console.error(err);
+            console.log(yellow(`${err.name}: ${err.message} ${err.stack ? `(${err.stack})` : ''}`));
+            // console.error(err);
         } else {
-            this.errmsg = `${err.name}${err.message}${err.stack ? `(${err.stack})` : ''}`;
+            this.errmsg = `${err.name}: ${err.message} ${err.stack ? `(${err.stack})` : ''}`;
         }
         this.data = {};
         return this;
