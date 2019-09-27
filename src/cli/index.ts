@@ -3,52 +3,35 @@
 import { fork } from 'child_process';
 import { join } from 'path';
 import args from 'args';
-import { prompt } from 'inquirer';
-import fuzzy from 'fuzzy';
-import { random } from 'lodash';
-
-const states = [
-    'Application',
-    'Component'
-];
+import { src, dest } from 'gulp';
+import install from 'gulp-install';
+import { readFileSync, writeFileSync } from 'fs';
+import { green, yellow, red } from 'colors';
 
 args.command('create', 'create new project ...', async (name, sub, options) => {
-    const answers = await prompt([
-        {
-            type: 'autocomplete',
-            name: 'type',
-            message: '请问需要什么模版类型?',
-            source: (_answers: any, input: any) => {
-                input = input || '';
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        const fuzzyResult = fuzzy.filter(input, states);
-                        resolve(
-                            fuzzyResult.map((el: any) => {
-                                return el.original;
-                            })
-                        );
-                    }, random(30, 500));
-                });
-            }
-        },
-        {
-            type: 'input',
-            name: 'name',
-            message: '请给项目命名(可不填,除非生成包名与库名不同):'
-        },
-        {
-            type: 'input',
-            name: 'git',
-            message: '请输入git地址:'
-        },
-        {
-            type: 'input',
-            name: 'author',
-            message: '请输入作者名字:'
-        }
-    ]);
-}).command('run', 'run appliaction ...', (name, sub, options) => {
+    const copy = async (srcpath: string | string[], destpath: string) => {
+        const task = src(srcpath);
+        return await new Promise((r) => {
+            task.pipe(dest(destpath)).on('end', r).pipe(install());
+        });
+    };
+    if (sub.length === 1) {
+        const [project] = sub;
+        const path = join(process.cwd(), project);
+        await copy(join(__dirname, '../../template/**/*.*'), path);
+        let config = readFileSync(
+            join(__dirname, '../../template/package.json'),
+            { encoding: 'utf-8' }
+        ).toString();
+        config = config.replace(`"name": "pyi",`, `"name": "${project}",`);
+        writeFileSync(join(join(process.cwd(), project), 'package.json'), config, { encoding: 'utf-8' });
+        console.log(green('create project files success ...'));
+        console.log(green('use: '));
+        console.log(yellow(`    cd ${project} && npm i`));
+    } else {
+        console.log(red('input project name ...'));
+    }
+}).command('run', 'run appliaction ...', () => {
     fork(
         join(__dirname, 'run.js'),
         process.argv.slice(3, process.argv.length), {

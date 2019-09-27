@@ -4,7 +4,7 @@ import { blue, magenta, green } from 'colors';
 import { map, extend } from 'lodash';
 import { AppConfigOption, PYIAutoAppConfiguration } from '../config';
 import { createKoaServer, PYIController, PYIMiddleware, PYIInterceptor } from '../decorators';
-import { Server, createServer } from 'http';
+import { Server, createServer, ServerResponse, IncomingMessage } from 'http';
 import bodyParser from 'koa-bodyparser';
 import { join } from 'path';
 import { PYIArgs } from './pyi.args';
@@ -111,7 +111,21 @@ export class PYIChokidar {
             host = this.config.server.host || 'localhost';
         }
 
-        this.app = await createServer(app.callback()).listen(this.config.server.port, host);
+        this.app = await createServer(app.callback());
+        this.app.on('connection', (sock) => {
+            // sock.write(Buffer.from('hello'));
+            // sock.end();
+            // console.log(sock);
+            const req = new IncomingMessage(sock);
+            const res = new ServerResponse(req);
+            res.writeHead(200, {
+                'content-type': 'text/plain'
+            });
+            res.write('hello nodejs');
+            console.log(res.statusMessage);
+            res.end();
+        });
+        this.app.listen(this.config.server.port, host);
 
         console.log(magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;

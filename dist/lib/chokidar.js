@@ -106,6 +106,9 @@ class PYIChokidar {
         if (this.config.server) {
             host = this.config.server.host || 'localhost';
         }
+        app.on('connection', (...args) => {
+            console.log(args);
+        });
         this.app = await http_1.createServer(app.callback()).listen(this.config.server.port, host);
         console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
