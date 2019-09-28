@@ -65,6 +65,7 @@
   "include": [
     "src/**/*.ts",
     "example/**/*.ts",
+    "test/**/*.ts",
     "template/**/*.ts",
     "gulpfile.ts"
   ],

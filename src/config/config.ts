@@ -85,6 +85,21 @@ export interface ServerConfig {
     };
 
     defaultVo?: (data: any, err?: Error, errno?: number) => Promise<PYIVo>;
+
+    workers: {
+        /**
+         * cluster 模式
+         */
+        cluster: boolean;
+        /**
+         * 线程数
+         */
+        thread: number;
+        /**
+         * 每个server max content, 溢出进入队列
+         */
+        max: number;
+    };
 }
 
 export class ConfigurationServer {
@@ -120,7 +135,13 @@ export class AppConfigOption extends ConfigurationServer {
         this.resolve = {
             extensions: ['.js', '.jsx', '.vue', '.ts', '.tsx']
         };
-        this.pyi = {};
+        this.pyi = {
+            workers: {
+                cluster: false,
+                thread: 0,
+                max: 0
+            }
+        };
         this.pyi.defaultVo = async (data: any, err?: Error, errno?: number) => {
             const DefaultVo = (class extends PYIVo {
                 public err!: boolean;

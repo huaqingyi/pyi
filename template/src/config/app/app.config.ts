@@ -24,7 +24,7 @@ export class AppConfiguration extends PYIAutoAppConfiguration<any> {
 
     constructor(config: AppConfigOption, props: any) {
         super(config, props);
-        
+
         this.development.output = join(config.entry, '../runtime');
         this.production.output = join(config.entry, '../runtime');
 
@@ -32,5 +32,28 @@ export class AppConfiguration extends PYIAutoAppConfiguration<any> {
          * 赋值注入
          */
         // this.usemode = new AppConfigOption();
+    }
+
+    public setCluster(config: {} & AppConfigOption, cluster: boolean) {
+        return {
+            ...config,
+            pyi: {
+                ...config.pyi,
+                workers: {
+                    /**
+                     * 开启cluster
+                     */
+                    cluster,
+                    /**
+                     * 开启分布式线程数
+                     */
+                    thread: 4,
+                    /**
+                     * 最大同时链接数, 超出排队
+                     */
+                    max: 200
+                }
+            }
+        } as AppConfigOption;
     }
 }
