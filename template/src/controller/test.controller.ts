@@ -4,7 +4,7 @@ import {
     Ctx, Req, Res, Params, Body,
     PYIExecption, PYIThrows,
     PYIController
-} from '../../../src';
+} from 'pyi';
 import { TestService } from '../service/test.service';
 import { Nest } from '../components/nest';
 import { TestVo } from './../vo/test.vo';
@@ -28,8 +28,8 @@ export class TestController extends PYIController {
             public async throws() {
                 console.log(this.service);
                 console.log(this.nest.merge());
-                // {"err":false,"data":"Hello World ..."}
-                return await 'Hello World ...';
+                // {"err":false,"data":"Hello PYI ..."}
+                return await 'Hello PYI ...';
             }
         });
     }

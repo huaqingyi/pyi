@@ -1,4 +1,4 @@
-import { Configuration, PYIAutoConfiguration } from '../../../../src';
+import { Configuration, PYIAutoConfiguration } from 'pyi';
 import { SequelizeOptions } from 'sequelize-typescript';
 
 @Configuration

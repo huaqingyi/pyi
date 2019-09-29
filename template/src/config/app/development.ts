@@ -1,4 +1,4 @@
-import { AppConfigOption, Configuration } from '../../../../src';
+import { AppConfigOption, Configuration } from 'pyi';
 
 @Configuration
 export class Development extends AppConfigOption {

@@ -28,7 +28,9 @@ class PYIChokidar {
         this.config.entry = dirname;
         this.config.output = path_1.join(dirname, 'runtime');
         this.files = {};
-        this.watcher = chokidar_1.default.watch(this.dirname);
+        this.watcher = chokidar_1.default.watch(this.dirname, {
+            ignored: [/node_modules/, '*.d.ts'],
+        });
         this.application = application;
         this.isViewObject = false;
         this.watcher.on('add', this.addFile.bind(this));
@@ -72,8 +74,11 @@ class PYIChokidar {
         }
         console.log(colors_1.green(`File ${path} has been added ...`));
     }
-    async loadApplication(controllers, middlewares, interceptors) {
+    async loadApplication(controllers, middlewares, interceptors, config) {
         await this.watcher.close();
+        if (config) {
+            this.config = config;
+        }
         helper_1.BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) {
             helper_1.BeforeMiddleware.prototype.error = this.loadFileError;
@@ -106,10 +111,21 @@ class PYIChokidar {
         if (this.config.server) {
             host = this.config.server.host || 'localhost';
         }
-        app.on('connection', (...args) => {
-            console.log(args);
+        this.app = await http_1.createServer(app.callback());
+        this.app.on('connection', (sock) => {
+            // sock.write(Buffer.from('hello'));
+            // sock.end();
+            // console.log(sock);
+            const req = new http_1.IncomingMessage(sock);
+            const res = new http_1.ServerResponse(req);
+            res.writeHead(200, {
+                'content-type': 'text/plain'
+            });
+            res.write('hello nodejs');
+            console.log(res.statusMessage);
+            res.end();
         });
-        this.app = await http_1.createServer(app.callback()).listen(this.config.server.port, host);
+        this.app.listen(this.config.server.port, host);
         console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
     }
@@ -156,7 +172,9 @@ class PYIChokidar {
             return await comp;
         }));
         await this.application.complete.next({
-            starter: this.loadApplication.bind(this, controllers, middlewares, interceptors),
+            starter: (config) => {
+                return this.loadApplication(controllers, middlewares, interceptors, config);
+            },
             config: this.config,
             watcher: this.watcher
         });

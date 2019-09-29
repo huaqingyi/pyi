@@ -1,4 +1,4 @@
-import { Component, PYIComponent } from '../../../src';
+import { Component, PYIComponent } from 'pyi';
 
 @Component
 export class Comp1 extends PYIComponent<Comp1> {

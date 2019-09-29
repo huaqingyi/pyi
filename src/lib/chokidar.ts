@@ -34,7 +34,9 @@ export class PYIChokidar {
         this.config.entry = dirname;
         this.config.output = join(dirname, 'runtime');
         this.files = {};
-        this.watcher = chokidar.watch(this.dirname);
+        this.watcher = chokidar.watch(this.dirname, {
+            ignored: [/node_modules/, '*.d.ts'],
+        });
         this.application = application;
         this.isViewObject = false;
 
@@ -72,8 +74,14 @@ export class PYIChokidar {
         console.log(green(`File ${path} has been added ...`));
     }
 
-    public async loadApplication(controllers: any[], middlewares: any[], interceptors: any[]) {
+    public async loadApplication(
+        controllers: any[],
+        middlewares: any[],
+        interceptors: any[],
+        config?: AppConfigOption
+    ) {
         await this.watcher.close();
+        if (config) { this.config = config; }
 
         BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) { BeforeMiddleware.prototype.error = this.loadFileError; }
@@ -162,7 +170,9 @@ export class PYIChokidar {
         }));
 
         await this.application.complete.next({
-            starter: this.loadApplication.bind(this, controllers, middlewares, interceptors),
+            starter: (config?: AppConfigOption) => {
+                return this.loadApplication(controllers, middlewares, interceptors, config);
+            },
             config: this.config,
             watcher: this.watcher
         });

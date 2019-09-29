@@ -1,5 +1,5 @@
-import { PYIBootstrap, PYIApplication, autowired } from '../src';
-import { Schedule } from './src/components/schedule';
+import { PYIBootstrap, PYIApplication, autowired } from 'pyi';
+import { Schedule } from './components/schedule';
 
 @PYIBootstrap
 export class Application extends PYIApplication {

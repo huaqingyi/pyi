@@ -1,4 +1,4 @@
-import { Service, autowired, PYIService, PYIThrows, PYIExecption, throws } from '../../../src';
+import { Service, autowired, PYIService, PYIThrows, PYIExecption, throws } from 'pyi';
 import { DataBase } from '../components/database';
 import { Test } from '../model/test.model';
 

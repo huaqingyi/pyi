@@ -1,4 +1,4 @@
-import { Component, PYIComponent, autowired } from '../../../src';
+import { Component, PYIComponent, autowired } from 'pyi';
 import { Comp } from './comp';
 import { Comp1 } from './comp1';
 

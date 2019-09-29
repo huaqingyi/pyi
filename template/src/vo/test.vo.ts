@@ -1,4 +1,4 @@
-import { PYIVo, Vo } from '../../../src';
+import { PYIVo, Vo } from 'pyi';
 
 @Vo
 export class TestVo extends PYIVo {

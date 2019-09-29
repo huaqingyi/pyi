@@ -14,6 +14,6 @@ export declare class PYIChokidar {
     constructor(dirname: string, application: any, config: AppConfigOption);
     authFileExt(path: string): Promise<boolean>;
     addFile(path: string): Promise<false | undefined>;
-    loadApplication(controllers: any[], middlewares: any[], interceptors: any[]): Promise<Server>;
+    loadApplication(controllers: any[], middlewares: any[], interceptors: any[], config?: AppConfigOption): Promise<Server>;
     ready(): Promise<void>;
 }

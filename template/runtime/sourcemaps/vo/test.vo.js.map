@@ -1,0 +1,1 @@
+{"version":3,"sources":["vo/test.vo.ts"],"names":[],"mappings":";;;;;;;;AAAA,6BAAgC;AAGhC,IAAa,MAAM,GAAnB,MAAa,MAAO,SAAQ,WAAK;CAGhC,CAAA;AAHY,MAAM;IADlB,QAAE;GACU,MAAM,CAGlB;AAHY,wBAAM","file":"../../vo/test.vo.js","sourcesContent":["import { PYIVo, Vo } from 'pyi';\n\n@Vo\nexport class TestVo extends PYIVo {\n    public err!: boolean;\n    public data!: any;\n}\n"]}

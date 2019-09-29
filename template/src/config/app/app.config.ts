@@ -1,4 +1,4 @@
-import { AppConfigOption, Configuration, autowired, PYIAutoAppConfiguration } from '../../../../src';
+import { AppConfigOption, Configuration, autowired, PYIAutoAppConfiguration } from 'pyi';
 import { Development } from './development';
 import { Production } from './production';
 import { join } from 'path';
@@ -24,7 +24,7 @@ export class AppConfiguration extends PYIAutoAppConfiguration<any> {
 
     constructor(config: AppConfigOption, props: any) {
         super(config, props);
-        
+
         this.development.output = join(config.entry, '../runtime');
         this.production.output = join(config.entry, '../runtime');
 

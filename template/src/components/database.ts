@@ -1,4 +1,4 @@
-import { Component, PYIComponent, autowired } from '../../../src';
+import { Component, PYIComponent, autowired } from 'pyi';
 import { Sequelize, SequelizeOptions, ModelCtor } from 'sequelize-typescript';
 import { DataBaseConfiguration } from '../config/database/database.config';
 

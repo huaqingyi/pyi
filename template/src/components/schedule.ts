@@ -1,4 +1,4 @@
-import { Component, PYIComponent } from '../../../src';
+import { Component, PYIComponent } from 'pyi';
 import { scheduleJob } from 'node-schedule';
 import { red } from 'colors';
 
