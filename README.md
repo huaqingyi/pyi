@@ -1,10 +1,60 @@
 # pyi
+
 This Typescript MVC Server Framework ...
 轻量级 restful 快速开发
 
 ## Quick Start
+
 ### npm i pyi typescript --save && npm i -g pyi
+
+#### Command
+```
+  Usage: pyi [options] [command]
+
+  Commands:
+    create   create new project ...
+    help     Display help
+    run      run appliaction ...
+    version  Display version
+
+  Options:
+    -h, --help     Output usage information
+    -v, --version  Output the version number
+
+```
+
+#### Create Application
+```
+pyi create pyi-test
+cd pyi-test && npm i
+
+pyi run src/application.ts
+或
+npm run serve 开发模式
+npm run rserve runtime 开发模式
+npm run prod production 模式
+自定义模式
+node runtime/application.js -h
+或
+ts-node src/application.ts -h
+
+Usage: application.ts [options] [command]
+
+Commands:
+help     Display help
+version  Display version
+
+Options:
+-h, --help          Output usage information
+-m, --mode [value]  The application running type, default is development [development, production, ${your mode}] (defaults to "development")
+-p, --port          The application listen port, default app config
+-r, --runtime       The application runing build to es5, default app config .
+-v, --version       Output the version number
+-w, --watch         The application running watch, default app config
+```
+
 #### src/application.ts 程序入口
+
 ```
 import { PYIBootstrap, PYIApplication } from 'pyi';
 
@@ -18,14 +68,16 @@ export class Application extends PYIApplication {
     }
 }
 ```
+
 ##### ts-node src/application.ts -h || node -r ts-node/register src/application.ts -h
+
 ```
   Usage: application.ts [options] [command]
-  
+
   Commands:
     help     Display help
     version  Display version
-  
+
   Options:
     -h, --help          Output usage information 帮助
     -m, --mode [value]  The application running type, default is development [development, production, ${your mode}] (defaults to "development") 开发模式, 自动更具开发模式自动注入 configuration 类 . 默认模式为 development 开发模式
@@ -35,12 +87,12 @@ export class Application extends PYIApplication {
     -w, --watch         The application running watch, default false (disabled by default) 是否热更新, 可在 configuration 中设置
 ```
 
-
-
 ## Configuration 含有 PYIAutoAppConfiguration[自动反射系统配置] 和 PYIAutoConfiguration[自动反射应用配置]
 
 ### PYIAutoAppConfiguration 自动反射当前 mode 对应的 系统配置, 参考如下配置
+
 #### src/config/app/app.config.ts
+
 ```
 import { AppConfigOption, Configuration, autowired, PYIAutoAppConfiguration } from 'pyi';
 import { Development } from './development';
@@ -68,7 +120,7 @@ export class AppConfiguration extends PYIAutoAppConfiguration<any> {
 
     constructor(config: AppConfigOption, props: any) {
         super(config, props);
-        
+
         this.development.output = join(config.entry, '../runtime');
         this.production.output = join(config.entry, '../runtime');
 
@@ -79,8 +131,11 @@ export class AppConfiguration extends PYIAutoAppConfiguration<any> {
     }
 }
 ```
+
 #### src/config/app/development.ts
+
 #### src/config/app/production.ts
+
 ```
 import { AppConfigOption, Configuration } from 'pyi';
 
@@ -92,10 +147,13 @@ export class Development extends AppConfigOption {
     }
 }
 ```
-##### @autowired 注入下会自动返回当前mode模式所用的config, 如 mode 为 production 则使用 AppConfiguration 的 production
+
+##### @autowired 注入下会自动返回当前 mode 模式所用的 config, 如 mode 为 production 则使用 AppConfiguration 的 production
 
 ### PYIAutoConfiguration @autowired 时自动反射当前 mode 对应的 应用配置
+
 #### src/config/database/database.config.ts
+
 ```
 import { Configuration, PYIAutoConfiguration } from 'pyi';
 import { SequelizeOptions } from 'sequelize-typescript';
@@ -126,8 +184,11 @@ export class DataBaseConfiguration extends PYIAutoConfiguration<any> {
 ### 如果配置中没有对应 mode 下的配置, 将会直接启用 default
 
 ## Component 一些辅助库, 如 sequelize 等
+
 ### PYIComponent 当修饰器 Component 中传入 option 时, 会自动注入到 PYIComponent 的 props 以及 constructor 中
+
 #### src/components/database.ts
+
 ```
 import { Component, PYIComponent, autowired } from 'pyi';
 import { Sequelize, SequelizeOptions, ModelCtor } from 'sequelize-typescript';
@@ -169,11 +230,15 @@ export class DataBase extends PYIComponent<DataBaseConfiguration> {
     }
 }
 ```
+
 ### 可以扩展任何你需要的包
 
 ## Controller
+
 ### 继承于 routing-controllers [https://github.com/typestack/routing-controllers]
+
 #### src/controller/test.controller.ts
+
 ```
 import { Controller, RequestMapping, RequestMappingMethod, autowired, PYIController } from 'pyi';
 import { TestService } from '../service/test.service';
@@ -213,8 +278,11 @@ export class TestController extends PYIController {
     }
 }
 ```
-### Vo层自动捕获
+
+### Vo 层自动捕获
+
 #### src/vo/test.vo.ts
+
 ```
 import { PYIVo, Vo } from 'pyi';
 
@@ -224,7 +292,9 @@ export class TestVo extends PYIVo {
     public data!: any;
 }
 ```
+
 #### src/vo/test.vo.ts 字段自定义
+
 ```
 import { PYIVo, Vo } from 'pyi';
 
@@ -256,6 +326,7 @@ export class TestVo extends PYIVo {
 ```
 
 #### src/controller/test.controller.ts
+
 ```
 import {
     RequestMappingMethod, autowired,
@@ -324,7 +395,9 @@ export class TestController extends PYIController {
     }
 }
 ```
-#### 自动生成ViewObjec类型数据, 并且自动捕获异常, 异常可以自定义 code 与 message 
+
+#### 自动生成 ViewObjec 类型数据, 并且自动捕获异常, 异常可以自定义 code 与 message
+
 ```
 自动捕获返回的异常
 {"err":true,"data":{},"errno":1005,"errmsg":"service query test sql err."}
@@ -335,8 +408,11 @@ export class TestController extends PYIController {
 ### 支持所有 routing-controllers 包扩展 . Middleware 修饰的基类为 PYIMiddleware, Interceptor 修饰器基类为 PYIInterceptor
 
 ## Model
+
 ### 使用 sequelize [https://sequelize.org/master/manual/typescript.html]
+
 #### src/model/test.model.ts
+
 ```
 import { Table, Column, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, Model } from 'sequelize-typescript';
 
@@ -360,10 +436,13 @@ export class Test extends Model<Test> {
     public readonly updated_at!: Date;
 }
 ```
+
 ### 完全使用 sequelize 也可自行更换
 
 ## Service
+
 #### src/service/test.service.ts
+
 ```
 import { Service, autowired, PYIService } from 'pyi';
 import { DataBase } from '../components/database';
@@ -387,7 +466,9 @@ export class TestService extends PYIService {
     }
 }
 ```
-#### src/service/test.service.ts 自动捕获1
+
+#### src/service/test.service.ts 自动捕获 1
+
 ```
 import { Service, autowired, PYIService, PYIThrows } from 'pyi';
 import { DataBase } from '../components/database';
@@ -421,7 +502,9 @@ export class TestService extends PYIService {
     }
 }
 ```
-#### src/service/test.service.ts 自动捕获2
+
+#### src/service/test.service.ts 自动捕获 2
+
 ```
 import { Service, autowired, PYIService, PYIThrows, PYIExecption, throws } from 'pyi';
 import { DataBase } from '../components/database';
@@ -457,24 +540,34 @@ export class TestService extends PYIService {
 }
 
 ```
+
 #### 捕获结果
+
 ```
 {"err":true,"data":{},"errno":1004,"errmsg":"service query findAll sql err."}
 ```
+
 ### 这里可以当成数据层或者服务
 
 ## 项目运行
+
 ```
-pyi ${project}/application.ts -r -w -p 1234 -m test
+pyi run ${project}/application.ts -r -w -p 1234 -m test
 ```
+
 ## 代码手动运行
+
 ```
 import { Application } from './${project}/application';
 
 const app = new Application();
-app.runtime(({ starter }) => {
-    starter();
+app.runtime(({ starter, watcher, config }) => {
+    // edit watcher
+    // edit config
+    starter(config);
 });
 ```
-## example 运行 ts-node example/${demo}/starter.ts
-### 编译项目 pyi example/${demo}/src/${app entry class}.ts -r [runtime 模式] -w [监听模式] -p [端口设置] -m [开发模式] -h [help文档]
+
+## example 运行 ts-node example/\${demo}/starter.ts
+
+### 编译项目 pyi run example/${demo}/src/${app entry class}.ts -r [runtime 模式] -w [监听模式] -p [端口设置] -m [开发模式] -h [help 文档]
