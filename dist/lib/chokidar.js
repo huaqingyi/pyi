@@ -112,19 +112,21 @@ class PYIChokidar {
             host = this.config.server.host || 'localhost';
         }
         this.app = await http_1.createServer(app.callback());
-        this.app.on('connection', (sock) => {
-            // sock.write(Buffer.from('hello'));
-            // sock.end();
-            // console.log(sock);
-            const req = new http_1.IncomingMessage(sock);
-            const res = new http_1.ServerResponse(req);
-            res.writeHead(200, {
-                'content-type': 'text/plain'
-            });
-            res.write('hello nodejs');
-            console.log(res.statusMessage);
-            res.end();
-        });
+        // this.app.on('connection', (sock) => {
+        //     // sock.write(Buffer.from('hello'));
+        //     // sock.end();
+        //     // console.log(sock);
+        //     sock.on('data', async (data) => {
+        //         console.log('client request =========================================');
+        //         console.log(data.toString('utf8'));
+        //         const req = new IncomingMessage(sock);
+        //         const res = new ServerResponse(req);
+        //         const resp = await app.callback()(req, res);
+        //         console.log('response ===============================================');
+        //         console.log(resp);
+        //         console.log('end ========================================');
+        //     });
+        // });
         this.app.listen(this.config.server.port, host);
         console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;

@@ -82,6 +82,20 @@ export interface ServerConfig {
         };
     };
     defaultVo?: (data: any, err?: Error, errno?: number) => Promise<PYIVo>;
+    workers: {
+        /**
+         * cluster 模式
+         */
+        cluster: boolean;
+        /**
+         * 线程数
+         */
+        thread: number;
+        /**
+         * 每个server max content, 溢出进入队列
+         */
+        max: number;
+    };
 }
 export declare class ConfigurationServer {
     entry: string;

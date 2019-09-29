@@ -14,7 +14,13 @@ class AppConfigOption extends ConfigurationServer {
         this.resolve = {
             extensions: ['.js', '.jsx', '.vue', '.ts', '.tsx']
         };
-        this.pyi = {};
+        this.pyi = {
+            workers: {
+                cluster: false,
+                thread: 0,
+                max: 0
+            }
+        };
         this.pyi.defaultVo = async (data, err, errno) => {
             const DefaultVo = (class extends decorators_1.PYIVo {
             });
