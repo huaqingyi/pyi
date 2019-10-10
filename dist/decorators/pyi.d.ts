@@ -1,8 +1,18 @@
 /// <reference types="koa-bodyparser" />
+/// <reference types="node" />
 import Application from 'koa';
 import { Observable } from 'rxjs';
 import { AppConfigOption } from '../config';
 import { FSWatcher } from 'chokidar';
+import { Socket } from 'net';
+export interface PYIApplicationHook {
+    addComponent?: (comp: any) => Promise<any>;
+    didLoadAllComponent?: (comp: any) => any;
+    didLoadConfig?: (config: AppConfigOption) => AppConfigOption;
+    didInitApp?: (app: Application) => any;
+    didRunApp?: (err?: any) => any;
+    connection?: (sock: Socket, app: any) => any;
+}
 /**
  * base mian
  */

@@ -10,6 +10,7 @@ import { join } from 'path';
 import { PYIArgs } from './pyi.args';
 import { isFunction } from 'lodash';
 import Koa, { Context } from 'koa';
+import { PYIServerConnection } from '../decorators/connection';
 
 export class PYIChokidar {
     public static runtime(dirname: string, application: any) {
@@ -64,6 +65,8 @@ export class PYIChokidar {
                     comp[i]._pyi = () => ({ ..._pyi, path });
                 }
                 this.files[`${i}_${path}`] = comp[i];
+                const { addComponent } = this.application.prototype;
+                if (addComponent) { addComponent(comp[i]); }
             });
         } catch (err) {
             this.loadFileError = {
@@ -78,10 +81,14 @@ export class PYIChokidar {
         controllers: any[],
         middlewares: any[],
         interceptors: any[],
+        connections: any[],
         config?: AppConfigOption
     ) {
         await this.watcher.close();
         if (config) { this.config = config; }
+
+        const { didLoadConfig } = this.application.prototype;
+        if (didLoadConfig) { this.config = await didLoadConfig(this.config); }
 
         BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) { BeforeMiddleware.prototype.error = this.loadFileError; }
@@ -90,7 +97,7 @@ export class PYIChokidar {
         AfterMiddleware.prototype.chokider = this;
         middlewares.push(AfterMiddleware);
 
-        const app: Koa = createKoaServer({
+        let app: Koa = createKoaServer({
             ...this.config.pyi,
             development: false,
             defaultErrorHandler: false,
@@ -112,6 +119,9 @@ export class PYIChokidar {
         });
 
         app.use(bodyParser());
+
+        const { didInitApp } = this.application.prototype;
+        if (didInitApp) { app = await didInitApp(app); }
 
         let host = 'localhost';
 
@@ -135,7 +145,19 @@ export class PYIChokidar {
         //         console.log('end ========================================');
         //     });
         // });
+
+        this.app.on('connection', async (sock) => {
+            const { connection } = this.application.prototype;
+            if (connection) { await connection(sock, app); }
+            await Promise.all(map(connections, async (conn) => {
+                return await new conn(sock, app);
+            }));
+        });
+
         this.app.listen(this.config.server.port, host);
+
+        const { didRunApp } = this.application.prototype;
+        if (didRunApp) { await didRunApp(app); }
 
         console.log(magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
@@ -145,11 +167,13 @@ export class PYIChokidar {
         const controllers: Function[] = [];
         const middlewares: Function[] = [];
         const interceptors: Function[] = [];
-        await Promise.all(map(this.files, async (comp) => {
+        const connections: Function[] = [];
+        const comps = await Promise.all(map(this.files, async (comp) => {
             if (!comp._extends) { return comp; }
             if (comp._extends() === PYIController) { controllers.push(comp); }
             if (comp._extends() === PYIMiddleware) { middlewares.push(comp); }
             if (comp._extends() === PYIInterceptor) { interceptors.push(comp); }
+            if (comp._extends() === PYIServerConnection) { connections.push(comp); }
             if (comp._extends() === PYIAutoAppConfiguration) {
                 const Setting = comp;
                 const { props } = comp.prototype;
@@ -171,9 +195,12 @@ export class PYIChokidar {
             return await comp;
         }));
 
+        const { didLoadAllComponent } = this.application.prototype;
+        if (didLoadAllComponent) { didLoadAllComponent(comps); }
+
         await this.application.complete.next({
             starter: (config?: AppConfigOption) => {
-                return this.loadApplication(controllers, middlewares, interceptors, config);
+                return this.loadApplication(controllers, middlewares, interceptors, connections, config);
             },
             config: this.config,
             watcher: this.watcher

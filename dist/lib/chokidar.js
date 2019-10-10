@@ -21,6 +21,7 @@ const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const path_1 = require("path");
 const pyi_args_1 = require("./pyi.args");
 const lodash_2 = require("lodash");
+const connection_1 = require("../decorators/connection");
 class PYIChokidar {
     constructor(dirname, application, config) {
         this.dirname = dirname;
@@ -64,6 +65,10 @@ class PYIChokidar {
                     comp[i]._pyi = () => ({ ..._pyi, path });
                 }
                 this.files[`${i}_${path}`] = comp[i];
+                const { addComponent } = this.application.prototype;
+                if (addComponent) {
+                    addComponent(comp[i]);
+                }
             });
         }
         catch (err) {
@@ -74,10 +79,14 @@ class PYIChokidar {
         }
         console.log(colors_1.green(`File ${path} has been added ...`));
     }
-    async loadApplication(controllers, middlewares, interceptors, config) {
+    async loadApplication(controllers, middlewares, interceptors, connections, config) {
         await this.watcher.close();
         if (config) {
             this.config = config;
+        }
+        const { didLoadConfig } = this.application.prototype;
+        if (didLoadConfig) {
+            this.config = await didLoadConfig(this.config);
         }
         helper_1.BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) {
@@ -87,7 +96,7 @@ class PYIChokidar {
         middlewares.unshift(helper_1.BeforeMiddleware);
         helper_1.AfterMiddleware.prototype.chokider = this;
         middlewares.push(helper_1.AfterMiddleware);
-        const app = decorators_1.createKoaServer({
+        let app = decorators_1.createKoaServer({
             ...this.config.pyi,
             development: false,
             defaultErrorHandler: false,
@@ -107,6 +116,10 @@ class PYIChokidar {
             this.isViewObject = isvo;
         });
         app.use(koa_bodyparser_1.default());
+        const { didInitApp } = this.application.prototype;
+        if (didInitApp) {
+            app = await didInitApp(app);
+        }
         let host = 'localhost';
         if (this.config.server) {
             host = this.config.server.host || 'localhost';
@@ -127,7 +140,20 @@ class PYIChokidar {
         //         console.log('end ========================================');
         //     });
         // });
+        this.app.on('connection', async (sock) => {
+            const { connection } = this.application.prototype;
+            if (connection) {
+                await connection(sock, app);
+            }
+            await Promise.all(lodash_1.map(connections, async (conn) => {
+                return await new conn(sock, app);
+            }));
+        });
         this.app.listen(this.config.server.port, host);
+        const { didRunApp } = this.application.prototype;
+        if (didRunApp) {
+            await didRunApp(app);
+        }
         console.log(colors_1.magenta(`Hello Starter PYI Server: Listen on http://${host}:${this.config.server.port}`));
         return await this.app;
     }
@@ -135,7 +161,8 @@ class PYIChokidar {
         const controllers = [];
         const middlewares = [];
         const interceptors = [];
-        await Promise.all(lodash_1.map(this.files, async (comp) => {
+        const connections = [];
+        const comps = await Promise.all(lodash_1.map(this.files, async (comp) => {
             if (!comp._extends) {
                 return comp;
             }
@@ -147,6 +174,9 @@ class PYIChokidar {
             }
             if (comp._extends() === decorators_1.PYIInterceptor) {
                 interceptors.push(comp);
+            }
+            if (comp._extends() === connection_1.PYIServerConnection) {
+                connections.push(comp);
             }
             if (comp._extends() === config_1.PYIAutoAppConfiguration) {
                 const Setting = comp;
@@ -173,9 +203,13 @@ class PYIChokidar {
             }
             return await comp;
         }));
+        const { didLoadAllComponent } = this.application.prototype;
+        if (didLoadAllComponent) {
+            didLoadAllComponent(comps);
+        }
         await this.application.complete.next({
             starter: (config) => {
-                return this.loadApplication(controllers, middlewares, interceptors, config);
+                return this.loadApplication(controllers, middlewares, interceptors, connections, config);
             },
             config: this.config,
             watcher: this.watcher

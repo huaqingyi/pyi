@@ -11,15 +11,13 @@ const lodash_1 = require("lodash");
 let BeforeMiddleware = class BeforeMiddleware {
     async use(ctx, next) {
         this.chokider.isViewObject = false;
+        lodash_1.map(this.comps, (comp) => {
+            if (comp.prototype) {
+                comp.prototype.ctx = ctx;
+            }
+        });
         if (this.error) {
             ctx.app.emit('error', this.error.use || this.error.detail, ctx);
-        }
-        else {
-            lodash_1.map(this.comps, (comp) => {
-                if (comp.prototype) {
-                    comp.prototype.ctx = ctx;
-                }
-            });
         }
         return await next(ctx);
     }

@@ -12,15 +12,16 @@ export class BeforeMiddleware implements ExpressMiddlewareInterface {
 
     public async use(ctx: Context, next: (ctx: Context) => any) {
         this.chokider.isViewObject = false;
+        map(this.comps, (comp) => {
+            if (comp.prototype) {
+                comp.prototype.ctx = ctx;
+            }
+        });
+        
         if (this.error) {
             ctx.app.emit('error', this.error.use || this.error.detail, ctx);
-        } else {
-            map(this.comps, (comp) => {
-                if (comp.prototype) {
-                    comp.prototype.ctx = ctx;
-                }
-            });
         }
+
         return await next(ctx);
     }
 }
