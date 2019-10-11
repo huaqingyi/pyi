@@ -10,6 +10,7 @@ export interface PYIApplicationHook {
     addComponent?: (comp: any) => Promise<any>;
     didLoadAllComponent?: (comp: any) => any;
     didLoadConfig?: (config: AppConfigOption) => AppConfigOption;
+    willInitApp?: (app: Application) => any;
     didInitApp?: (app: Application) => any;
     didRunApp?: (err?: any) => any;
     connection?: (sock: Socket, app: any) => any;

@@ -3,7 +3,7 @@ import chokidar, { FSWatcher } from 'chokidar';
 import { blue, magenta, green } from 'colors';
 import { map, extend } from 'lodash';
 import { AppConfigOption, PYIAutoAppConfiguration } from '../config';
-import { createKoaServer, PYIController, PYIMiddleware, PYIInterceptor } from '../decorators';
+import { useKoaServer, PYIController, PYIMiddleware, PYIInterceptor } from '../decorators';
 import { Server, createServer, ServerResponse, IncomingMessage } from 'http';
 import bodyParser from 'koa-bodyparser';
 import { join } from 'path';
@@ -90,20 +90,24 @@ export class PYIChokidar {
         const { didLoadConfig } = this.application.prototype;
         if (didLoadConfig) { this.config = await didLoadConfig(this.config); }
 
+        const koa = new Koa();
+
+        const { willInitApp } = this.application.prototype;
+        if (willInitApp) { await willInitApp(koa); }
+
         BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) { BeforeMiddleware.prototype.error = this.loadFileError; }
         BeforeMiddleware.prototype.chokider = this;
-        middlewares.unshift(BeforeMiddleware);
+        await middlewares.unshift(BeforeMiddleware);
         AfterMiddleware.prototype.chokider = this;
-        middlewares.push(AfterMiddleware);
+        await middlewares.push(AfterMiddleware);
 
-        let app: Koa = createKoaServer({
+        let app: Koa = useKoaServer(koa, {
             ...this.config.pyi,
-            development: false,
             defaultErrorHandler: false,
             controllers,
             middlewares,
-            interceptors
+            ...interceptors ? { interceptors } : {}
         });
 
         app.on('error', async (err: any, ctx: Context) => {

@@ -21,6 +21,7 @@ const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const path_1 = require("path");
 const pyi_args_1 = require("./pyi.args");
 const lodash_2 = require("lodash");
+const koa_1 = __importDefault(require("koa"));
 const connection_1 = require("../decorators/connection");
 class PYIChokidar {
     constructor(dirname, application, config) {
@@ -88,21 +89,25 @@ class PYIChokidar {
         if (didLoadConfig) {
             this.config = await didLoadConfig(this.config);
         }
+        const koa = new koa_1.default();
+        const { willInitApp } = this.application.prototype;
+        if (willInitApp) {
+            await willInitApp(koa);
+        }
         helper_1.BeforeMiddleware.prototype.comps = this.files;
         if (this.loadFileError) {
             helper_1.BeforeMiddleware.prototype.error = this.loadFileError;
         }
         helper_1.BeforeMiddleware.prototype.chokider = this;
-        middlewares.unshift(helper_1.BeforeMiddleware);
+        await middlewares.unshift(helper_1.BeforeMiddleware);
         helper_1.AfterMiddleware.prototype.chokider = this;
-        middlewares.push(helper_1.AfterMiddleware);
-        let app = decorators_1.createKoaServer({
+        await middlewares.push(helper_1.AfterMiddleware);
+        let app = decorators_1.useKoaServer(koa, {
             ...this.config.pyi,
-            development: false,
             defaultErrorHandler: false,
             controllers,
             middlewares,
-            interceptors
+            ...interceptors ? { interceptors } : {}
         });
         app.on('error', async (err, ctx) => {
             if (this.config.pyi.defaultVo) {
