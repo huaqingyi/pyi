@@ -1,6 +1,4 @@
-export * from 'routing-controllers';
-import { ActionType } from 'routing-controllers/metadata/types/ActionType';
-import { PYIBase } from '../core/pyi.base';
+import { PYICore } from '../core';
 /**
  * Controller ================================
  */
@@ -16,30 +14,24 @@ export interface ControllerConfiguration {
 }
 export interface ControllerRequestConfiguration extends ControllerConfiguration {
     prefix?: string;
-    methods?: string[] | ActionType[];
+    methods?: string[] | RequestMappingMethod[];
 }
-export declare abstract class PYIController extends PYIBase {
+export declare abstract class PYIController extends PYICore {
     static _pyi: () => any;
-    static _extends(): typeof PYIController;
-    constructor(...props: any);
+    static _root(): typeof PYIController;
 }
 /**
  * Extends for routing-controllers JsonController
  * @param config extends routing-controllers config(继承于 routing-controllers 参数)
  */
 export declare function Controller<Props = ControllerConfiguration | PYIController>(config: Props): any;
-/**
- * Extends for routing-controllers ActionType
- * @param config extends routing-controllers config(继承于 routing-controllers 参数)
- */
 export declare function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any;
 /**
  * Middleware ===============================================
  */
-export declare abstract class PYIMiddleware extends PYIBase {
+export declare abstract class PYIMiddleware extends PYICore {
     static _pyi: () => any;
-    static _extends(): typeof PYIMiddleware;
-    constructor(...props: any);
+    static _root(): typeof PYIMiddleware;
 }
 /**
  * Extends for routing-controllers middleware
@@ -49,9 +41,9 @@ export declare function Middleware(options: {
     type: 'after' | 'before';
     priority?: number;
 }): (target: any, key?: string | undefined) => void;
-export declare abstract class PYIInterceptor extends PYIBase {
+export declare abstract class PYIInterceptor extends PYICore {
     static _pyi: () => any;
-    static _extends(): typeof PYIInterceptor;
+    static _root(): typeof PYIInterceptor;
     constructor(...props: any);
 }
 /**

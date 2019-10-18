@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.ts"],"names":[],"mappings":";;;;;AAAA,sCAAiC;AACjC,kCAA6B;AAC7B,+BAA0B","file":"../index.js","sourcesContent":["export * from './swagger.object';\nexport * from './decorators';\nexport * from './swagger';\n"]}

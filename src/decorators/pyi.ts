@@ -1,66 +1,68 @@
-import { PYIChokidar, PYIArgs } from '../lib';
-import Application from 'koa';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { AppConfigOption } from '../config';
-import { FSWatcher } from 'chokidar';
-import { Socket } from 'net';
+import { Application } from '../core';
+import { PYIChokidar, Maker } from '../libs';
+import { green } from 'colors';
+import { useKoaServer } from 'routing-controllers';
 
-export interface PYIApplicationHook {
-    addComponent?: (comp: any) => Promise<any>;
-    didLoadAllComponent?: (comp: any) => any;
-    didLoadConfig?: (config: AppConfigOption) => AppConfigOption;
-    willInitApp?: (app: Application) => any;
-    didInitApp?: (app: Application) => any;
-    didRunApp?: (err?: any) => any;
-    connection?: (sock: Socket, app: any) => any;
+export interface PYIApplicationImpl {
+    [x: string]: any;
+    onInit?: () => any;
+    didLoad?: () => any;
+    onInitComponent?: () => any;
+    didInitComponent?: () => any;
+    didMakeConfig?: () => any;
+    didRuntime?: () => any;
 }
 
-/**
- * base mian
- */
-export abstract class PYIApplication extends Application {
-
-    public static complete: Observable<any>;
-
-    public static isApplication: boolean = true;
-
-    public static _pyi() {
-        return {};
-    }
-
-    public static _extends() {
+export abstract class PYIApplication extends Application implements PYIApplicationImpl {
+    public static _pyi: () => any;
+    public static _root() {
         return PYIApplication;
     }
 
-    public static main(args: string[]): any {
-        return 0;
+    public async run(path: string | string[]) {
+        const { onInit, didLoad, onInitComponent, didInitComponent, didMakeConfig } = this;
+        await console.log(green(`start load project files ...`));
+        // tslint:disable-next-line:no-unused-expression
+        onInit && await onInit.apply(this);
+        const chokidar: PYIChokidar = await PYIChokidar.runtime(path, this.mode).setup();
+        await console.log(green(`load end project files success ...`));
+        // tslint:disable-next-line:no-unused-expression
+        didLoad && await didLoad.apply(this);
+        const comps = await chokidar.comps;
+        const config = await chokidar.appconfig;
+        this.config = config;
+        await console.log(green(`will load app to all components and config ...`));
+        // tslint:disable-next-line:no-unused-expression
+        onInitComponent && await onInitComponent.apply(this);
+        await comps.forEach((comp) => {
+            const { _root } = comp;
+            if (_root && _root() === PYIApplication) { return comp; }
+            comp.prototype.app = this;
+        });
+        await console.log(green(`did load app to all components success ...`));
+        // tslint:disable-next-line:no-unused-expression
+        didInitComponent && await didInitComponent.apply(this);
+        await Maker.runtime(this).setup(comps);
+        await console.log(green(`make components to app config success ...`));
+        // tslint:disable-next-line:no-unused-expression
+        didMakeConfig && await didMakeConfig.apply(this);
+        this.config.controllers = (this.config.controllers || []).concat(this.controllers);
+        this.config.middlewares = (this.config.middlewares || []).concat(this.middlewares);
+        this.config.interceptors = (this.config.interceptors || []).concat(this.interceptors);
+        if (this.config.enableDto === true) { this.config.defaultErrorHandler = false; }
+        const app = useKoaServer(this, {
+            ...(this.config as any),
+            defaultErrorHandler: false
+        });
+        this._setup.next(this);
+        return app;
     }
 
-    /**
-     * runtime bootstrap
-     * @param projectpath application path
-     * @param args cmd args
-     */
-    public static runtime(projectpath: string) {
-        PYIApplication.complete = (new BehaviorSubject(null)).pipe(filter((o) => o !== null));
-        PYIChokidar.runtime(projectpath, this);
-    }
-
-    constructor() { super(); }
-
-    public async runtime(callback: (props: { starter: Function, config: AppConfigOption, watcher: FSWatcher }) => any) {
-        PYIApplication.complete.subscribe(callback);
-    }
+    [x: string]: any;
 }
 
-/**
- * application main class
- * @param target application bootstrap classes(启动类)
- * @param key off
- */
 export function PYIBootstrap(target: any, key?: string) {
-    PYIArgs.register();
-    target.main(process.argv);
-    target.runtime.bind(target);
+    let mode: string = 'development';
+    if (process.env.NODE_ENV) { mode = process.env.NODE_ENV; }
+    target.prototype.mode = mode;
 }

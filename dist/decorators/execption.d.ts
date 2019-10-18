@@ -1,5 +1,5 @@
-import { PYIVo } from './impl';
-export declare function PYIExecption<UseParentClass = any, UsePYIVo = PYIVo>(this: any, execption: UseParentClass & any, Vo?: UsePYIVo & any): any;
+import { PYIDto } from './dto';
+export declare function PYIExecption<UseParentClass = any, UsePYIDto = PYIDto>(this: any, execption: UseParentClass & any, Vo?: UsePYIDto & any): any;
 export interface PYIThrows {
     errno?: number;
     errmsg?: string;

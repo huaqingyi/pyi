@@ -1,13 +1,13 @@
-import { PYIVo } from './impl';
+import { PYIDto } from './dto';
 import { isFunction } from 'lodash';
 
-export function PYIExecption<UseParentClass = any, UsePYIVo = PYIVo>(this: any,
-    execption: UseParentClass & any, Vo?: UsePYIVo & any
+export function PYIExecption<UseParentClass = any, UsePYIDto = PYIDto>(this: any,
+    execption: UseParentClass & any, Vo?: UsePYIDto & any
 ): any {
-    return (NVo?: UsePYIVo & any) => {
+    return (NVo?: UsePYIDto & any) => {
         if (
-            NVo && NVo._extends &&
-            isFunction(NVo._extends) && NVo._extends() === PYIVo
+            NVo && NVo._root &&
+            isFunction(NVo._root) && NVo._root() === PYIDto
         ) { Vo = NVo; }
         execption.bind(this);
         const exinstance = new execption();
@@ -16,12 +16,10 @@ export function PYIExecption<UseParentClass = any, UsePYIVo = PYIVo>(this: any,
             return ex.then((resp) => {
                 this.ctx = new Vo(resp);
                 return this.ctx;
-                // return new Vo(resp);
             }).catch((err) => {
                 const { errno, errmsg } = exinstance;
                 this.ctx = (new Vo()).throws(err, errno, errmsg);
                 return this.ctx;
-                // return (new Vo()).throws(err, errno, errmsg);
             });
         } else {
             return ex;
@@ -36,12 +34,12 @@ export interface PYIThrows {
 }
 
 export function throws(target: any, key: string): any {
-    const Vo = Reflect.getMetadata('design:returntype', target, key);
+    const Dto = Reflect.getMetadata('design:returntype', target, key);
     const merge = target.constructor.prototype[key];
     target.constructor.prototype[key] = async function(...props: any) {
         const execption = await merge.bind(this)(...props);
         if (isFunction(execption)) {
-            return await execption.apply(this, [Vo]);
+            return await execption.apply(this, [Dto]);
         }
         return await execption;
     };

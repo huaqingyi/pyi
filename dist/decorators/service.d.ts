@@ -1,12 +1,11 @@
-import { PYIBase } from '../core/pyi.base';
-export declare abstract class PYIService extends PYIBase {
+import { PYICore } from '../core';
+export declare abstract class PYIService extends PYICore {
     static _pyi: () => any;
-    static _extends(): typeof PYIService;
-    constructor(...props: any);
+    static _root(): typeof PYIService;
 }
 /**
  * 服务组件
  * @param target service component
  * @param key off
  */
-export declare function Service<UsePYIService = PYIService>(target: UsePYIService, key?: string): void;
+export declare function Service(target: any & PYIService, key?: string): void;

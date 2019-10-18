@@ -1,31 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-const pyi_base_1 = require("../core/pyi.base");
+const core_1 = require("../core");
 const configuration_1 = require("./configuration");
-const config_1 = require("../config");
-const lib_1 = require("../lib");
 /**
  * Component base
  */
-class PYIComponent extends pyi_base_1.PYIBase {
+class PYIComponent extends core_1.PYICore {
     constructor(...props) { super(); }
-    static _extends() {
+    static _root() {
         return PYIComponent;
     }
 }
 exports.PYIComponent = PYIComponent;
-/**
- * This's application plugin or libs, use extends. (插件或者包, 自行扩展)
- * @param config This is contructor argv and classes props, working is auto inject.
- * (config是实例化的参数, 同时也是我们的props, 自动注入类实例.)
- */
 function Component(config) {
-    const { _extends } = config;
+    const { _root } = config;
     /**
      * 如果是直接修饰类
      */
-    if (_extends && lodash_1.isFunction(_extends) && _extends() === PYIComponent) {
+    if (_root && lodash_1.isFunction(_root) && _root() === PYIComponent) {
         return config;
     }
     else {
@@ -60,13 +53,16 @@ function autowired(target, key) {
     if (!params._pyi || !params._pyi().autowired) {
         const { props } = params.prototype;
         let instance = new params(props);
-        if (params._extends && lodash_1.isFunction(params._extends)) {
-            if (params._extends() === configuration_1.PYIAutoConfiguration ||
-                params._extends() === config_1.PYIAutoAppConfiguration) {
-                instance = instance._runtime(lib_1.PYIArgs.reflact().config);
+        target.constructor.prototype[key] = instance;
+        if (params._root && lodash_1.isFunction(params._root)) {
+            if (params._root() === configuration_1.PYIAutoConfiguration ||
+                params._root() === configuration_1.PYIAutoAppConfiguration) {
+                (async () => {
+                    instance = await instance._runtime();
+                    target.constructor.prototype[key] = await instance;
+                })();
             }
         }
-        target.constructor.prototype[key] = instance;
     }
     else {
         /**

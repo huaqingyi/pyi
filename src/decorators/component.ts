@@ -1,34 +1,26 @@
 import { isFunction } from 'lodash';
-import { PYIBase } from '../core/pyi.base';
-import { PYIAutoConfiguration } from './configuration';
-import { PYIAutoAppConfiguration } from '../config';
-import { PYIArgs } from '../lib';
+import { PYICore } from '../core';
+import { PYIAutoConfiguration, PYIAutoAppConfiguration } from './configuration';
 
 /**
  * Component base
  */
-export abstract class PYIComponent<Props> extends PYIBase {
-    public static _pyi: () => any;
-    public static _extends() {
+export abstract class PYIComponent<Props = {}> extends PYICore {
+    public static _root() {
         return PYIComponent;
     }
 
-    public props?: Props;
+    public props!: Props;
 
     constructor(...props: any) { super(); }
 }
 
-/**
- * This's application plugin or libs, use extends. (插件或者包, 自行扩展)
- * @param config This is contructor argv and classes props, working is auto inject.
- * (config是实例化的参数, 同时也是我们的props, 自动注入类实例.)
- */
 export function Component<Props = any>(config: Props): any {
-    const { _extends } = (config as any);
+    const { _root } = (config as any);
     /**
      * 如果是直接修饰类
      */
-    if (_extends && isFunction(_extends) && _extends() === PYIComponent) {
+    if (_root && isFunction(_root) && _root() === PYIComponent) {
         return config;
     } else {
         /**
@@ -60,15 +52,18 @@ export function autowired(target: any, key: string) {
     if (!params._pyi || !params._pyi().autowired) {
         const { props } = params.prototype;
         let instance = new params(props);
-        if (params._extends && isFunction(params._extends)) {
+        target.constructor.prototype[key] = instance;
+        if (params._root && isFunction(params._root)) {
             if (
-                params._extends() === PYIAutoConfiguration ||
-                params._extends() === PYIAutoAppConfiguration
+                params._root() === PYIAutoConfiguration ||
+                params._root() === PYIAutoAppConfiguration
             ) {
-                instance = instance._runtime(PYIArgs.reflact().config);
+                (async () => {
+                    instance = await instance._runtime();
+                    target.constructor.prototype[key] = await instance;
+                })();
             }
         }
-        target.constructor.prototype[key] = instance;
     } else {
         /**
          * 嵌套依赖

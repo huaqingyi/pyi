@@ -1,19 +1,29 @@
-import { PYIBase, RuntimeAutoChange } from '../core/pyi.base';
-import { AppConfigOption } from '../config';
+import { PYICore } from '../core';
+import { RoutingControllersOptions } from 'routing-controllers';
+import { PYIDto } from './dto';
+export interface PYIApplicationConfiguration extends RoutingControllersOptions {
+    [x: string]: any;
+    enableDto?: boolean;
+    globalDto?: PYIDto;
+}
 /**
  * Component base
  */
-export declare abstract class PYIAutoConfiguration<Props> extends PYIBase implements RuntimeAutoChange {
+export declare abstract class PYIAutoConfiguration<Props = {}> extends PYICore {
     [x: string]: any;
     static _pyi: () => any;
-    static _extends(): typeof PYIAutoConfiguration;
+    static _root(): typeof PYIAutoConfiguration;
     props?: Props;
-    constructor(...props: any);
-    _runtime(config: AppConfigOption): any;
+    _runtime(): Promise<this>;
 }
-/**
- * This's application plugin or libs, use extends. (插件或者包, 自行扩展)
- * @param config This is contructor argv and classes props, working is auto inject.
- * (config是实例化的参数, 同时也是我们的props, 自动注入类实例.)
- */
+export declare abstract class PYIAutoAppConfiguration<Props = {}> extends PYICore implements PYIApplicationConfiguration {
+    [x: string]: any;
+    static _pyi: () => any;
+    static _root(): typeof PYIAutoAppConfiguration;
+    props?: Props;
+    enableDto: boolean;
+    globalDto: any & PYIDto;
+    constructor();
+    _runtime(): Promise<this>;
+}
 export declare function Configuration<Props = any>(config: Props): any;

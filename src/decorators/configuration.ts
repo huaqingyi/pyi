@@ -1,48 +1,65 @@
 import { isFunction } from 'lodash';
-import { PYIBase, RuntimeAutoChange } from '../core/pyi.base';
-import { PYIAutoAppConfiguration, AppConfigOption } from '../config';
-import { PYIArgs } from '../lib';
+import { PYICore } from '../core';
+import { RoutingControllersOptions } from 'routing-controllers';
+import { PYIDto, PYIGDto } from './dto';
+
+export interface PYIApplicationConfiguration extends RoutingControllersOptions {
+    [x: string]: any;
+    enableDto?: boolean;
+    globalDto?: PYIDto;
+}
 
 /**
  * Component base
  */
-export abstract class PYIAutoConfiguration<Props> extends PYIBase implements RuntimeAutoChange {
+export abstract class PYIAutoConfiguration<Props = {}> extends PYICore {
     [x: string]: any;
     public static _pyi: () => any;
-    public static _extends() {
+    public static _root() {
         return PYIAutoConfiguration;
     }
 
     public props?: Props;
-
-    constructor(...props: any) { super(); }
-
-    public _runtime(config: AppConfigOption) {
-        const current: string = config.mode;
-        if (!this[current]) {
-            if (!this.default) {
-                throw Error('configuration not use mode and not have default .');
-            }
-            return this.default;
-        }
-        return this[current];
+    public async _runtime() {
+        if (this[this.mode]) { await this[this.mode](); }
+        return await this;
     }
 }
 
-/**
- * This's application plugin or libs, use extends. (插件或者包, 自行扩展)
- * @param config This is contructor argv and classes props, working is auto inject.
- * (config是实例化的参数, 同时也是我们的props, 自动注入类实例.)
- */
+// tslint:disable-next-line:max-classes-per-file
+export abstract class PYIAutoAppConfiguration<Props = {}> extends PYICore implements PYIApplicationConfiguration {
+    [x: string]: any;
+    public static _pyi: () => any;
+    public static _root() {
+        return PYIAutoAppConfiguration;
+    }
+
+    public props?: Props;
+
+    public enableDto: boolean;
+    public globalDto: any & PYIDto;
+    constructor() {
+        super();
+        this.enableDto = true;
+        this.defaultErrorHandler = false;
+        this.globalDto = PYIGDto;
+    }
+
+    public async _runtime() {
+        if (this[this.mode]) { await this[this.mode](); }
+        return await this;
+    }
+}
+
 export function Configuration<Props = any>(config: Props): any {
-    const { _extends } = (config as any);
+    const { _root } = (config as any);
     /**
      * 如果是直接修饰类
      */
-    if (_extends && isFunction(_extends)) {
+    if (_root && isFunction(_root)) {
         if (
-            _extends() === PYIAutoConfiguration ||
-            _extends() === PYIAutoAppConfiguration
+            _root() === PYIAutoConfiguration ||
+            _root() === PYIAutoAppConfiguration
         ) {
             return config;
         } else {

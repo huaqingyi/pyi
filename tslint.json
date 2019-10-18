@@ -41,8 +41,7 @@
         "no-console":false,
         "variable-name":false,
         "ban-types":false,
-        "interface-name":false,
-        "max-classes-per-file":false
+        "interface-name":false
     },
     "rulesDirectory": [
     ]

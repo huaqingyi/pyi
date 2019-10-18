@@ -1,12 +1,10 @@
-import { PYIBase } from '../core/pyi.base';
+import { PYICore } from '../core';
 
-export abstract class PYIService extends PYIBase {
+export abstract class PYIService extends PYICore {
     public static _pyi: () => any;
-    public static _extends() {
+    public static _root() {
         return PYIService;
     }
-
-    constructor(...props: any) { super(); }
 }
 
 /**
@@ -15,6 +13,6 @@ export abstract class PYIService extends PYIBase {
  * @param key off
  */
 // tslint:disable-next-line:no-empty
-export function Service<UsePYIService = PYIService>(target: UsePYIService, key?: string) {
+export function Service(target: any & PYIService, key?: string) {
 
 }

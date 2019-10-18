@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const impl_1 = require("./impl");
+const dto_1 = require("./dto");
 const lodash_1 = require("lodash");
 function PYIExecption(execption, Vo) {
     return (NVo) => {
-        if (NVo && NVo._extends &&
-            lodash_1.isFunction(NVo._extends) && NVo._extends() === impl_1.PYIVo) {
+        if (NVo && NVo._root &&
+            lodash_1.isFunction(NVo._root) && NVo._root() === dto_1.PYIDto) {
             Vo = NVo;
         }
         execption.bind(this);
@@ -15,12 +15,10 @@ function PYIExecption(execption, Vo) {
             return ex.then((resp) => {
                 this.ctx = new Vo(resp);
                 return this.ctx;
-                // return new Vo(resp);
             }).catch((err) => {
                 const { errno, errmsg } = exinstance;
                 this.ctx = (new Vo()).throws(err, errno, errmsg);
                 return this.ctx;
-                // return (new Vo()).throws(err, errno, errmsg);
             });
         }
         else {
@@ -30,12 +28,12 @@ function PYIExecption(execption, Vo) {
 }
 exports.PYIExecption = PYIExecption;
 function throws(target, key) {
-    const Vo = Reflect.getMetadata('design:returntype', target, key);
+    const Dto = Reflect.getMetadata('design:returntype', target, key);
     const merge = target.constructor.prototype[key];
     target.constructor.prototype[key] = async function (...props) {
         const execption = await merge.bind(this)(...props);
         if (lodash_1.isFunction(execption)) {
-            return await execption.apply(this, [Vo]);
+            return await execption.apply(this, [Dto]);
         }
         return await execption;
     };

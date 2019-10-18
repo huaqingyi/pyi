@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const pyi_base_1 = require("../core/pyi.base");
-class PYIService extends pyi_base_1.PYIBase {
-    constructor(...props) { super(); }
-    static _extends() {
+const core_1 = require("../core");
+class PYIService extends core_1.PYICore {
+    static _root() {
         return PYIService;
     }
 }

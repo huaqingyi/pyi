@@ -1,41 +1,50 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-const pyi_base_1 = require("../core/pyi.base");
-const config_1 = require("../config");
+const core_1 = require("../core");
+const dto_1 = require("./dto");
 /**
  * Component base
  */
-class PYIAutoConfiguration extends pyi_base_1.PYIBase {
-    constructor(...props) { super(); }
-    static _extends() {
+class PYIAutoConfiguration extends core_1.PYICore {
+    static _root() {
         return PYIAutoConfiguration;
     }
-    _runtime(config) {
-        const current = config.mode;
-        if (!this[current]) {
-            if (!this.default) {
-                throw Error('configuration not use mode and not have default .');
-            }
-            return this.default;
+    async _runtime() {
+        if (this[this.mode]) {
+            await this[this.mode]();
         }
-        return this[current];
+        return await this;
     }
 }
 exports.PYIAutoConfiguration = PYIAutoConfiguration;
-/**
- * This's application plugin or libs, use extends. (插件或者包, 自行扩展)
- * @param config This is contructor argv and classes props, working is auto inject.
- * (config是实例化的参数, 同时也是我们的props, 自动注入类实例.)
- */
+// tslint:disable-next-line:max-classes-per-file
+class PYIAutoAppConfiguration extends core_1.PYICore {
+    constructor() {
+        super();
+        this.enableDto = true;
+        this.defaultErrorHandler = false;
+        this.globalDto = dto_1.PYIGDto;
+    }
+    static _root() {
+        return PYIAutoAppConfiguration;
+    }
+    async _runtime() {
+        if (this[this.mode]) {
+            await this[this.mode]();
+        }
+        return await this;
+    }
+}
+exports.PYIAutoAppConfiguration = PYIAutoAppConfiguration;
 function Configuration(config) {
-    const { _extends } = config;
+    const { _root } = config;
     /**
      * 如果是直接修饰类
      */
-    if (_extends && lodash_1.isFunction(_extends)) {
-        if (_extends() === PYIAutoConfiguration ||
-            _extends() === config_1.PYIAutoAppConfiguration) {
+    if (_root && lodash_1.isFunction(_root)) {
+        if (_root() === PYIAutoConfiguration ||
+            _root() === PYIAutoAppConfiguration) {
             return config;
         }
         else {

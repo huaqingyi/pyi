@@ -1,12 +1,8 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-__export(require("routing-controllers"));
+const core_1 = require("../core");
 const routing_controllers_1 = require("routing-controllers");
-const pyi_base_1 = require("../core/pyi.base");
 const execption_1 = require("./execption");
 /**
  * Controller ================================
@@ -19,9 +15,8 @@ var RequestMappingMethod;
     RequestMappingMethod["PUT"] = "PUT";
     RequestMappingMethod["PATCH"] = "PATCH";
 })(RequestMappingMethod = exports.RequestMappingMethod || (exports.RequestMappingMethod = {}));
-class PYIController extends pyi_base_1.PYIBase {
-    constructor(...props) { super(); }
-    static _extends() {
+class PYIController extends core_1.PYICore {
+    static _root() {
         return PYIController;
     }
 }
@@ -42,34 +37,21 @@ function Controller(config) {
     }
 }
 exports.Controller = Controller;
-/**
- * Extends for routing-controllers ActionType
- * @param config extends routing-controllers config(继承于 routing-controllers 参数)
- */
 function RequestMapping(config, key) {
     if (key) {
         lodash_1.map(RequestMappingMethod, (m) => {
             routing_controllers_1.Method(m, undefined)(config, key);
         });
+        return execption_1.throws(config, key);
     }
     else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target, key) => {
-            // const Vo = Reflect.getMetadata('design:returntype', target, key);
             const { prefix, methods } = config;
             lodash_1.map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 routing_controllers_1.Method(m, prefix)(target, key);
             });
             return execption_1.throws(target, key);
-            // const merge = target.constructor.prototype[key];
-            // target.constructor.prototype[key] = async function(...props: any) {
-            //     const execption = await merge.bind(this)(...props);
-            //     if (isFunction(execption)) {
-            //         return await execption.apply(this, [Vo]);
-            //     }
-            //     return await execption;
-            // };
-            // return target.constructor.prototype[key];
         };
     }
 }
@@ -78,9 +60,8 @@ exports.RequestMapping = RequestMapping;
  * Middleware ===============================================
  */
 // tslint:disable-next-line:max-classes-per-file
-class PYIMiddleware extends pyi_base_1.PYIBase {
-    constructor(...props) { super(); }
-    static _extends() {
+class PYIMiddleware extends core_1.PYICore {
+    static _root() {
         return PYIMiddleware;
     }
 }
@@ -96,9 +77,9 @@ function Middleware(options) {
 }
 exports.Middleware = Middleware;
 // tslint:disable-next-line:max-classes-per-file
-class PYIInterceptor extends pyi_base_1.PYIBase {
+class PYIInterceptor extends core_1.PYICore {
     constructor(...props) { super(); }
-    static _extends() {
+    static _root() {
         return PYIInterceptor;
     }
 }
