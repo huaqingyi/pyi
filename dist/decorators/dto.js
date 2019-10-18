@@ -8,7 +8,6 @@ class PYIDto extends core_1.PYICore {
         this.err = false;
         this.data = data || {};
         this.app.dto = true;
-        // if (this.ctx && this.ctx.app) { this.ctx.app.emit('vo', true, this.ctx); }
     }
     static _root() {
         return PYIDto;

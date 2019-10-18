@@ -2,7 +2,7 @@
 import Koa from 'koa';
 import { PYICoreApp } from './pyi.core';
 import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIAutoAppConfiguration } from '../decorators';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 export declare class Application extends Koa implements PYICoreApp {
     static __proto__: any;
     static _pyi(): {};
@@ -23,5 +23,5 @@ export declare class Application extends Koa implements PYICoreApp {
     protected app: this;
     constructor();
     setup(app: Application, callback?: () => any): Promise<this>;
-    starter(callback?: () => any): Subscription;
+    starter(callback?: () => any): import("rxjs").Subscription;
 }
