@@ -20,6 +20,13 @@ export declare class Application extends Koa implements PYICoreApp {
     mode: string;
     dto: boolean;
     _setup: BehaviorSubject<any>;
+    success: (...args: any) => any;
+    debug: (...args: any) => any;
+    pending: (...args: any) => any;
+    fatal: (...args: any) => any;
+    watch: (...args: any) => any;
+    complete: (...args: any) => any;
+    error: (...args: any) => any;
     protected app: this;
     constructor();
     setup(app: Application, callback?: () => any): Promise<this>;

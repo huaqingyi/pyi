@@ -25,6 +25,13 @@ export abstract class PYICore implements PYICoreApp {
 
     protected static _this: PYICore;
     public mode!: string;
+    public success!: (...args: any) => any;
+    public debug!: (...args: any) => any;
+    public pending!: (...args: any) => any;
+    public fatal!: (...args: any) => any;
+    public watch!: (...args: any) => any;
+    public complete!: (...args: any) => any;
+    public error!: (...args: any) => any;
 
     public app!: Application;
     private _dto!: boolean;

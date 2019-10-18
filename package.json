@@ -32,6 +32,7 @@
     "cross-env": "^6.0.3",
     "koa": "^2.10.0",
     "koa-bodyparser": "^4.2.1",
+    "koa-logger": "^3.2.1",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "mysql2": "^1.7.0",
@@ -41,13 +42,16 @@
     "routing-controllers": "^0.8.0",
     "rxjs": "^6.5.3",
     "sequelize": "^5.19.6",
-    "sequelize-typescript": "^1.0.0"
+    "sequelize-typescript": "^1.0.0",
+    "signale": "^1.4.0"
   },
   "devDependencies": {
     "@types/koa": "^2.0.50",
     "@types/koa-bodyparser": "^5.0.1",
+    "@types/koa-logger": "^3.1.1",
     "@types/lodash": "^4.14.144",
     "@types/node-schedule": "^1.2.4",
+    "@types/signale": "^1.2.1",
     "gyi": "^1.0.3"
   }
 }

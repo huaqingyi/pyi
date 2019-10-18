@@ -4,4 +4,5 @@ export declare class Maker {
     private app;
     constructor(app: PYIApplication);
     setup(comps: any[]): PYIApplication;
+    useLoagger(comp: any): void;
 }

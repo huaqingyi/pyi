@@ -5,6 +5,7 @@ import { green } from 'colors';
 import { BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import bodyParser from 'koa-bodyparser';
+import logger from 'koa-logger';
 
 export class Application extends Koa implements PYICoreApp {
     public static __proto__: any;
@@ -40,6 +41,13 @@ export class Application extends Koa implements PYICoreApp {
     public mode!: string;
     public dto: boolean;
     public _setup: BehaviorSubject<any>;
+    public success!: (...args: any) => any;
+    public debug!: (...args: any) => any;
+    public pending!: (...args: any) => any;
+    public fatal!: (...args: any) => any;
+    public watch!: (...args: any) => any;
+    public complete!: (...args: any) => any;
+    public error!: (...args: any) => any;
 
     protected app!: this;
 
@@ -56,6 +64,7 @@ export class Application extends Koa implements PYICoreApp {
 
     public async setup(app: Application, callback?: () => any) {
         this.config.globalDto.prototype.app = this;
+        // this.use(this.logger);
         this.on('error', async (err: any, ctx: Context) => {
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
@@ -65,6 +74,29 @@ export class Application extends Koa implements PYICoreApp {
             }
         });
         this.use(async (ctx, next) => {
+            const code = ctx.response.status;
+            console.log(code);
+            switch (code) {
+                case 500:
+                case 404: return await logger((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.error(str);
+                })(ctx, next);
+                case 200: return await logger((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.success(str);
+                })(ctx, next);
+                default:  return await logger((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.pending(str);
+                })(ctx, next);
+            }
+        });
+        this.use(async (ctx, next) => {
+            if (ctx.response.status !== 200) { return await next(); }
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
                 const trys = await new Dto(ctx.body);

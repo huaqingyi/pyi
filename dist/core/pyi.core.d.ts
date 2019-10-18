@@ -10,6 +10,13 @@ export declare abstract class PYICore implements PYICoreApp {
     static _runtime(): typeof PYICore;
     protected static _this: PYICore;
     mode: string;
+    success: (...args: any) => any;
+    debug: (...args: any) => any;
+    pending: (...args: any) => any;
+    fatal: (...args: any) => any;
+    watch: (...args: any) => any;
+    complete: (...args: any) => any;
+    error: (...args: any) => any;
     app: Application;
     private _dto;
     dto: boolean;

@@ -8,6 +8,7 @@ const colors_1 = require("colors");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
+const koa_logger_1 = __importDefault(require("koa-logger"));
 class Application extends koa_1.default {
     constructor() {
         super();
@@ -39,6 +40,7 @@ class Application extends koa_1.default {
     }
     async setup(app, callback) {
         this.config.globalDto.prototype.app = this;
+        // this.use(this.logger);
         this.on('error', async (err, ctx) => {
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
@@ -49,6 +51,31 @@ class Application extends koa_1.default {
             }
         });
         this.use(async (ctx, next) => {
+            const code = ctx.response.status;
+            console.log(code);
+            switch (code) {
+                case 500:
+                case 404: return await koa_logger_1.default((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.error(str);
+                })(ctx, next);
+                case 200: return await koa_logger_1.default((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.success(str);
+                })(ctx, next);
+                default: return await koa_logger_1.default((str, args) => {
+                    // redirect koa logger to other output pipe
+                    // default is process.stdout(by console.log function)
+                    this.pending(str);
+                })(ctx, next);
+            }
+        });
+        this.use(async (ctx, next) => {
+            if (ctx.response.status !== 200) {
+                return await next();
+            }
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
                 const trys = await new Dto(ctx.body);

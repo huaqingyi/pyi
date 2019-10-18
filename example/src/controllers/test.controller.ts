@@ -41,7 +41,7 @@ export class TestController extends PYIController {
     @RequestMapping({
         prefix: '/error'
     })
-    public error(): TestDto {
+    public err(): TestDto {
         // tslint:disable-next-line:max-classes-per-file
         return PYIExecption(class extends TestController implements PYIThrows {
             public errno!: number;
