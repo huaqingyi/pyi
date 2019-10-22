@@ -1,7 +1,6 @@
-import Koa from 'koa';
 import { map } from 'lodash';
 import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIApplication } from '../decorators';
-import { Signale } from 'signale';
+import signale from 'signale';
 
 export class Maker {
 
@@ -13,30 +12,6 @@ export class Maker {
 
     constructor(app: PYIApplication) {
         this.app = app;
-        const options = {
-            disabled: false,
-            interactive: false,
-            logLevel: 'info',
-            scope: 'custom',
-            secrets: [],
-            stream: process.stdout,
-            types: {
-                success: {
-                    badge: '🥰',
-                    color: 'green',
-                    label: 'success',
-                    logLevel: 'info'
-                },
-                error: {
-                    badge: '😂',
-                    color: 'red',
-                    label: 'error',
-                    logLevel: 'info'
-                },
-            }
-        };
-
-        const signale = new Signale(options);
         this.app.success = signale.success;
         this.app.debug = signale.debug;
         this.app.pending = signale.pending;
@@ -44,9 +19,6 @@ export class Maker {
         this.app.watch = signale.watch;
         this.app.complete = signale.complete;
         this.app.error = signale.error;
-        // this.app.logger = createLogger({
-        //     timestamp: true
-        // });
     }
 
     public setup(comps: any[]) {

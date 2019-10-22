@@ -3,10 +3,15 @@ import { PYICore } from '../core';
 import {
     JsonController, Method,
     Middleware as RMiddleware,
-    Interceptor as RInterceptor
+    Interceptor as RInterceptor,
+    Body as RBody,
+    BodyOptions
 } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
-import { throws } from './execption';
+import { throws, PYIExecption, PYIThrows } from './execption';
+import { ValidationError } from 'class-validator';
+
+export * from 'routing-controllers';
 
 /**
  * Controller ================================
@@ -112,5 +117,21 @@ export abstract class PYIInterceptor extends PYICore {
 export function Interceptor(options?: { priority?: number; }) {
     return (target: any, key?: string) => {
         RInterceptor(options)(target);
+    };
+}
+
+export function Body(options: BodyOptions) {
+    return (target: any, key: string, idx: number) => {
+        RBody({ ...options, validate: false })(target, key, idx);
+        const fn = target[key];
+        // tslint:disable-next-line:only-arrow-functions
+        target[key] = function(...args: any[]) {
+            const valid = args[idx];
+            return valid.validate().then((errors: ValidationError[]) => {
+                if (errors.length === 0) { return fn(...args); }
+                return valid.throws.apply(this, errors);
+            });
+        };
+        return target[key];
     };
 }

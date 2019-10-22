@@ -6,6 +6,9 @@ import { BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import bodyParser from 'koa-bodyparser';
 import logger from 'koa-logger';
+import session from 'koa-session';
+import jwt from 'koa-jwt';
+import { isString } from 'lodash';
 
 export class Application extends Koa implements PYICoreApp {
     public static __proto__: any;
@@ -24,11 +27,6 @@ export class Application extends Koa implements PYICoreApp {
 
     public static _runtime() {
         return this;
-    }
-
-    public static bootstrap(): Application {
-        if (!this._this) { this._this = new this(); }
-        return this._this;
     }
 
     protected static _this: Application;
@@ -59,11 +57,48 @@ export class Application extends Koa implements PYICoreApp {
         this.interceptors = [];
         this.components = [];
         this.dto = false;
-        this.use(bodyParser());
+    }
+
+    public async addUse() {
+        /**
+         * body formatter
+         */
+        await this.use(bodyParser());
+
+        /**
+         * session
+         */
+        const sconfig = { ...this.config.session };
+        if (!this.keys) { this.keys = sconfig.keys || ['pyi secret hurr']; }
+        this.config.session.keys = this.keys;
+        delete sconfig.keys;
+        await this.use(session(this.config.session as any, this));
+
+        /**
+         * jwt
+         */
+        if (this.config.jwt) {
+            // Custom 401 handling if you don't want to expose koa-jwt errors to users
+            this.use(async (ctx, next) => {
+                return await next().catch((err) => {
+                    if (401 === err.status) {
+                        ctx.status = 401;
+                        ctx.body = 'Protected resource, use Authorization header to get access\n';
+                    } else {
+                        throw err;
+                    }
+                });
+            });
+            this.use(jwt(this.config.jwt).unless({
+                path: this.config.jwt.path
+            }));
+        }
     }
 
     public async setup(app: Application, callback?: () => any) {
         this.config.globalDto.prototype.app = this;
+        this.addUse();
+
         // this.use(this.logger);
         this.on('error', async (err: any, ctx: Context) => {
             if (this.dto === false && this.config.enableDto === true) {
@@ -75,7 +110,6 @@ export class Application extends Koa implements PYICoreApp {
         });
         this.use(async (ctx, next) => {
             const code = ctx.response.status;
-            console.log(code);
             switch (code) {
                 case 500:
                 case 404: return await logger((str, args) => {
@@ -88,7 +122,7 @@ export class Application extends Koa implements PYICoreApp {
                     // default is process.stdout(by console.log function)
                     this.success(str);
                 })(ctx, next);
-                default:  return await logger((str, args) => {
+                default: return await logger((str, args) => {
                     // redirect koa logger to other output pipe
                     // default is process.stdout(by console.log function)
                     this.pending(str);
@@ -108,7 +142,10 @@ export class Application extends Koa implements PYICoreApp {
 
         // tslint:disable-next-line:no-unused-expression
         callback && callback.apply(this);
+        return this;
+    }
 
+    public async starter() {
         this.listen(this.config.port, () => {
             // tslint:disable-next-line:no-unused-expression
             this.didRuntime && this.didRuntime.apply(this);
@@ -116,10 +153,9 @@ export class Application extends Koa implements PYICoreApp {
                 `PYI Server runtime listen: http://${this.config.host || 'localhost'}:${this.config.port}`
             ));
         });
-        return this;
     }
 
-    public starter(callback?: () => any) {
+    public bootstrap(callback?: () => any) {
         return this._setup.subscribe((app) => {
             this.setup(app, callback);
         });

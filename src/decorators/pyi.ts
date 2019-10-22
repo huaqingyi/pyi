@@ -24,7 +24,7 @@ export abstract class PYIApplication extends Application implements PYIApplicati
         await console.log(green(`start load project files ...`));
         // tslint:disable-next-line:no-unused-expression
         onInit && await onInit.apply(this);
-        const chokidar: PYIChokidar = await PYIChokidar.runtime(path, this.mode).setup();
+        const chokidar: PYIChokidar = await PYIChokidar.runtime(path, this.mode).setup(this);
         await console.log(green(`load end project files success ...`));
         // tslint:disable-next-line:no-unused-expression
         didLoad && await didLoad.apply(this);
@@ -34,11 +34,6 @@ export abstract class PYIApplication extends Application implements PYIApplicati
         await console.log(green(`will load app to all components and config ...`));
         // tslint:disable-next-line:no-unused-expression
         onInitComponent && await onInitComponent.apply(this);
-        await comps.forEach((comp) => {
-            const { _root } = comp;
-            if (_root && _root() === PYIApplication) { return comp; }
-            comp.prototype.app = this;
-        });
         await console.log(green(`did load app to all components success ...`));
         // tslint:disable-next-line:no-unused-expression
         didInitComponent && await didInitComponent.apply(this);

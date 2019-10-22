@@ -1,13 +1,17 @@
 import {
     Controller, RequestMapping, RequestMappingMethod,
     PYIController, autowired, PYIExecption,
-    PYIThrows
+    PYIThrows, Header,
+    Res, QueryParams, Body, Ctx
 } from '../../../src';
 import { TestService } from '../services/test.service';
 import { TestDto } from '../dto/test.dto';
-import { Req, Res, QueryParams, Body } from 'routing-controllers';
-import { Request, Response } from 'koa';
-import { tags, request, summary } from 'pyi-swagger';
+import { Response, Context } from 'koa';
+import { tags, request, summary, body } from 'pyi-swagger';
+import send from 'koa-send';
+import { join } from 'path';
+import { LoginValidation } from '../validation/login.validation';
+import jwt from 'jsonwebtoken';
 
 const tag = tags(['TestController']);
 const userSchema = {
@@ -22,13 +26,49 @@ export class TestController extends PYIController {
     public service!: TestService;
 
     @RequestMapping({
+        prefix: '/resource/*'
+    })
+    public async resource(@Ctx() ctx: Context) {
+        this.dto = true;
+        return await send(ctx, ctx.path, { root: join(__dirname, '../') });
+    }
+
+    @RequestMapping({
+        prefix: '/favicon.ico'
+    })
+    public async favicon(@Ctx() ctx: Context) {
+        this.dto = true;
+        return await send(ctx, ctx.path, { root: join(__dirname, '../resource/static') });
+    }
+
+    @RequestMapping({
+        prefix: '/login',
+        methods: [RequestMappingMethod.POST]
+    })
+    @request(RequestMappingMethod.POST, '/login')
+    @summary('login user auth jwt .')
+    @body(LoginValidation)
+    @tag
+    public login(
+        @Body({ validate: true }) loginForm: LoginValidation
+    ): TestDto {
+        return PYIExecption(class extends TestController implements PYIThrows {
+            public errno!: number;
+            public errmsg!: string;
+            public async throws() {
+                // this.append('test', '111');
+                return await { userid: 1 };
+            }
+        });
+    }
+
+    @RequestMapping({
         prefix: '/'
     })
     @request(RequestMappingMethod.GET, '/')
     @summary('test get index')
     @tag
     public index(): TestDto {
-        // tslint:disable-next-line:max-classes-per-file
         return PYIExecption(class extends TestController implements PYIThrows {
             public errno!: number;
             public errmsg!: string;
@@ -42,7 +82,6 @@ export class TestController extends PYIController {
         prefix: '/error'
     })
     public err(): TestDto {
-        // tslint:disable-next-line:max-classes-per-file
         return PYIExecption(class extends TestController implements PYIThrows {
             public errno!: number;
             public errmsg!: string;
@@ -61,8 +100,7 @@ export class TestController extends PYIController {
     })
     public async test(
         @Res() response: Response,
-        @QueryParams() gets: any,
-        @Body() body: any
+        @QueryParams() gets: any
     ) {
         // console.log(await this.service.findAllUsers());
         return await 'Hello World ...';
