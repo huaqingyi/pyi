@@ -9,6 +9,8 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const koa_logger_1 = __importDefault(require("koa-logger"));
+const koa_session_1 = __importDefault(require("koa-session"));
+const koa_jwt_1 = __importDefault(require("koa-jwt"));
 class Application extends koa_1.default {
     constructor() {
         super();
@@ -18,7 +20,6 @@ class Application extends koa_1.default {
         this.interceptors = [];
         this.components = [];
         this.dto = false;
-        this.use(koa_bodyparser_1.default());
     }
     static _pyi() {
         return {};
@@ -32,11 +33,53 @@ class Application extends koa_1.default {
     static _runtime() {
         return this;
     }
-    static bootstrap() {
-        if (!this._this) {
-            this._this = new this();
+    use(middleware) {
+        return super.use(async (ctx, next) => {
+            this.ctx = ctx;
+            return middleware.apply(this, [ctx, next]);
+        });
+    }
+    async addUse() {
+        /**
+         * body formatter
+         */
+        await this.use(koa_bodyparser_1.default());
+        /**
+         * session
+         */
+        const sconfig = { ...this.config.session };
+        if (!this.keys) {
+            this.keys = sconfig.keys || ['pyi secret hurr'];
         }
-        return this._this;
+        this.config.session.keys = this.keys;
+        delete sconfig.keys;
+        await this.use(koa_session_1.default(this.config.session, this));
+        /**
+         * jwt
+         */
+        if (this.config.jwt) {
+            const { errno, errmsg } = this.config.jwt;
+            // Custom 401 handling if you don't want to expose koa-jwt errors to users
+            await this.use(async (ctx, next) => {
+                return await next().catch(async (err) => {
+                    if (401 === err.status) {
+                        ctx.status = 401;
+                    }
+                    if (this.dto === false && this.config.enableDto === true) {
+                        const Dto = this.config.globalDto;
+                        ctx.body = await (new Dto()).throws(err, errno || 1000, errmsg || 'token 验证失败 .');
+                    }
+                    else {
+                        ctx.body = err;
+                    }
+                    this.dto = false;
+                });
+            });
+            await this.use(koa_jwt_1.default(this.config.jwt).unless({
+                path: this.config.jwt.path
+            }));
+        }
+        return await this;
     }
     async setup(app, callback) {
         this.config.globalDto.prototype.app = this;
@@ -44,15 +87,16 @@ class Application extends koa_1.default {
         this.on('error', async (err, ctx) => {
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
-                ctx.body = await (new Dto()).throws(err, 500);
+                ctx.body = await (new Dto()).throws(err, ctx.errno || 500, ctx.errmsg);
             }
             else {
                 ctx.body = err;
             }
+            delete ctx.errno;
+            delete ctx.errmsg;
         });
         this.use(async (ctx, next) => {
             const code = ctx.response.status;
-            console.log(code);
             switch (code) {
                 case 500:
                 case 404: return await koa_logger_1.default((str, args) => {
@@ -86,14 +130,16 @@ class Application extends koa_1.default {
         });
         // tslint:disable-next-line:no-unused-expression
         callback && callback.apply(this);
+        return this;
+    }
+    async starter() {
         this.listen(this.config.port, () => {
             // tslint:disable-next-line:no-unused-expression
             this.didRuntime && this.didRuntime.apply(this);
             console.log(colors_1.green(`PYI Server runtime listen: http://${this.config.host || 'localhost'}:${this.config.port}`));
         });
-        return this;
     }
-    starter(callback) {
+    bootstrap(callback) {
         return this._setup.subscribe((app) => {
             this.setup(app, callback);
         });

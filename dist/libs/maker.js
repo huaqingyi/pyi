@@ -1,44 +1,21 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 const decorators_1 = require("../decorators");
-const signale_1 = require("signale");
+const signale_1 = __importDefault(require("signale"));
 class Maker {
     constructor(app) {
         this.app = app;
-        const options = {
-            disabled: false,
-            interactive: false,
-            logLevel: 'info',
-            scope: 'custom',
-            secrets: [],
-            stream: process.stdout,
-            types: {
-                success: {
-                    badge: '🥰',
-                    color: 'green',
-                    label: 'success',
-                    logLevel: 'info'
-                },
-                error: {
-                    badge: '😂',
-                    color: 'red',
-                    label: 'error',
-                    logLevel: 'info'
-                },
-            }
-        };
-        const signale = new signale_1.Signale(options);
-        this.app.success = signale.success;
-        this.app.debug = signale.debug;
-        this.app.pending = signale.pending;
-        this.app.fatal = signale.fatal;
-        this.app.watch = signale.watch;
-        this.app.complete = signale.complete;
-        this.app.error = signale.error;
-        // this.app.logger = createLogger({
-        //     timestamp: true
-        // });
+        this.app.success = signale_1.default.success;
+        this.app.debug = signale_1.default.debug;
+        this.app.pending = signale_1.default.pending;
+        this.app.fatal = signale_1.default.fatal;
+        this.app.watch = signale_1.default.watch;
+        this.app.complete = signale_1.default.complete;
+        this.app.error = signale_1.default.error;
     }
     static runtime(app) {
         return new this(app);

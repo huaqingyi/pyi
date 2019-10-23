@@ -1,4 +1,4 @@
-import Koa, { Context } from 'koa';
+import Koa, { Context, Middleware, DefaultState, DefaultContext } from 'koa';
 import { PYICoreApp } from './pyi.core';
 import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIAutoAppConfiguration } from '../decorators';
 import { green } from 'colors';
@@ -8,9 +8,8 @@ import bodyParser from 'koa-bodyparser';
 import logger from 'koa-logger';
 import session from 'koa-session';
 import jwt from 'koa-jwt';
-import { isString } from 'lodash';
 
-export class Application extends Koa implements PYICoreApp {
+export class Application<StateT = Koa.DefaultState, CustomT = Koa.DefaultContext> extends Koa implements PYICoreApp {
     public static __proto__: any;
 
     public static _pyi() {
@@ -46,6 +45,7 @@ export class Application extends Koa implements PYICoreApp {
     public watch!: (...args: any) => any;
     public complete!: (...args: any) => any;
     public error!: (...args: any) => any;
+    public ctx!: Context;
 
     protected app!: this;
 
@@ -57,6 +57,15 @@ export class Application extends Koa implements PYICoreApp {
         this.interceptors = [];
         this.components = [];
         this.dto = false;
+    }
+
+    public use<NewStateT = any, NewCustomT = any>(
+        middleware: Middleware<StateT & NewStateT, CustomT & NewCustomT>
+    ): any & Koa<StateT & NewStateT, CustomT & NewCustomT> {
+        return super.use(async (ctx, next) => {
+            this.ctx = ctx as Context;
+            return middleware.apply(this, [ctx as any, next]);
+        }) as any;
     }
 
     public async addUse() {
@@ -78,35 +87,43 @@ export class Application extends Koa implements PYICoreApp {
          * jwt
          */
         if (this.config.jwt) {
+
+            const { errno, errmsg } = this.config.jwt;
             // Custom 401 handling if you don't want to expose koa-jwt errors to users
-            this.use(async (ctx, next) => {
-                return await next().catch((err) => {
-                    if (401 === err.status) {
-                        ctx.status = 401;
-                        ctx.body = 'Protected resource, use Authorization header to get access\n';
+            await this.use(async (ctx, next) => {
+                return await next().catch(async (err) => {
+                    if (401 === err.status) { ctx.status = 401; }
+                    if (this.dto === false && this.config.enableDto === true) {
+                        const Dto = this.config.globalDto;
+                        ctx.body = await (new Dto()).throws(err, errno || 1000, errmsg || 'token 验证失败 .');
                     } else {
-                        throw err;
+                        ctx.body = err;
                     }
+                    this.dto = false;
                 });
             });
-            this.use(jwt(this.config.jwt).unless({
+
+            await this.use(jwt(this.config.jwt as any).unless({
                 path: this.config.jwt.path
             }));
         }
+
+        return await this;
     }
 
     public async setup(app: Application, callback?: () => any) {
         this.config.globalDto.prototype.app = this;
-        this.addUse();
 
         // this.use(this.logger);
         this.on('error', async (err: any, ctx: Context) => {
             if (this.dto === false && this.config.enableDto === true) {
                 const Dto = this.config.globalDto;
-                ctx.body = await (new Dto()).throws(err, 500);
+                ctx.body = await (new Dto()).throws(err, ctx.errno || 500, ctx.errmsg);
             } else {
                 ctx.body = err;
             }
+            delete ctx.errno;
+            delete ctx.errmsg;
         });
         this.use(async (ctx, next) => {
             const code = ctx.response.status;

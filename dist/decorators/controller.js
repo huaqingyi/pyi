@@ -1,9 +1,13 @@
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 const core_1 = require("../core");
 const routing_controllers_1 = require("routing-controllers");
 const execption_1 = require("./execption");
+__export(require("routing-controllers"));
 /**
  * Controller ================================
  */
@@ -94,5 +98,23 @@ function Interceptor(options) {
     };
 }
 exports.Interceptor = Interceptor;
+function Body(options) {
+    return (target, key, idx) => {
+        routing_controllers_1.Body({ ...options, validate: false })(target, key, idx);
+        const fn = target[key];
+        // tslint:disable-next-line:only-arrow-functions
+        target[key] = function (...args) {
+            const valid = args[idx];
+            return valid.validate().then((errors) => {
+                if (errors.length === 0) {
+                    return fn(...args);
+                }
+                return valid.throws.apply(this, errors);
+            });
+        };
+        return target[key];
+    };
+}
+exports.Body = Body;
 
 //# sourceMappingURL=../sourcemaps/decorators/controller.js.map

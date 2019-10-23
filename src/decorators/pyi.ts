@@ -45,7 +45,8 @@ export abstract class PYIApplication extends Application implements PYIApplicati
         this.config.middlewares = (this.config.middlewares || []).concat(this.middlewares);
         this.config.interceptors = (this.config.interceptors || []).concat(this.interceptors);
         if (this.config.enableDto === true) { this.config.defaultErrorHandler = false; }
-        const app = useKoaServer(this, {
+        await this.addUse();
+        const app = await useKoaServer(this, {
             ...(this.config as any),
             defaultErrorHandler: false
         });

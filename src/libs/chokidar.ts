@@ -27,10 +27,11 @@ export class PYIChokidar {
     }
 
     public async addFile(path: string) {
+        if (path.indexOf('.d.ts') !== -1) { return path; }
         const comp = await import(path);
         if (!comp) { return false; }
         await Promise.all(map(comp, async (o, i) => {
-            if (!comp[i]) { return await o; }
+            if (!comp[i] || !comp[i].prototype) { return await o; }
             comp[i].prototype.app = this.app;
             comp[i].prototype.mode = await this.mode;
             if (comp[i]._pyi) {

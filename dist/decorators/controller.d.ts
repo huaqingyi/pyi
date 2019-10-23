@@ -1,4 +1,6 @@
 import { PYICore } from '../core';
+import { BodyOptions } from 'routing-controllers';
+export * from 'routing-controllers';
 /**
  * Controller ================================
  */
@@ -53,3 +55,4 @@ export declare abstract class PYIInterceptor extends PYICore {
 export declare function Interceptor(options?: {
     priority?: number;
 }): (target: any, key?: string | undefined) => void;
+export declare function Body(options: BodyOptions): (target: any, key: string, idx: number) => any;

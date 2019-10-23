@@ -26,14 +26,18 @@ class PYIChokidar {
         return new PYIChokidar(dirname, mode);
     }
     async addFile(path) {
+        if (path.indexOf('.d.ts') !== -1) {
+            return path;
+        }
         const comp = await Promise.resolve().then(() => __importStar(require(path)));
         if (!comp) {
             return false;
         }
         await Promise.all(lodash_1.map(comp, async (o, i) => {
-            if (!comp[i]) {
+            if (!comp[i] || !comp[i].prototype) {
                 return await o;
             }
+            comp[i].prototype.app = this.app;
             comp[i].prototype.mode = await this.mode;
             if (comp[i]._pyi) {
                 const _pyi = comp[i]._pyi();
@@ -51,7 +55,8 @@ class PYIChokidar {
         this.files[path] = comp;
         console.log(colors_1.blue(`File ${path} has been added ...`));
     }
-    async setup() {
+    async setup(app) {
+        this.app = app;
         return new Promise((r) => {
             this.watcher.on('add', this.addFile.bind(this));
             this.watcher.on('ready', () => r(this));

@@ -13,7 +13,7 @@ class PYIApplication extends core_1.Application {
         await console.log(colors_1.green(`start load project files ...`));
         // tslint:disable-next-line:no-unused-expression
         onInit && await onInit.apply(this);
-        const chokidar = await libs_1.PYIChokidar.runtime(path, this.mode).setup();
+        const chokidar = await libs_1.PYIChokidar.runtime(path, this.mode).setup(this);
         await console.log(colors_1.green(`load end project files success ...`));
         // tslint:disable-next-line:no-unused-expression
         didLoad && await didLoad.apply(this);
@@ -23,13 +23,6 @@ class PYIApplication extends core_1.Application {
         await console.log(colors_1.green(`will load app to all components and config ...`));
         // tslint:disable-next-line:no-unused-expression
         onInitComponent && await onInitComponent.apply(this);
-        await comps.forEach((comp) => {
-            const { _root } = comp;
-            if (_root && _root() === PYIApplication) {
-                return comp;
-            }
-            comp.prototype.app = this;
-        });
         await console.log(colors_1.green(`did load app to all components success ...`));
         // tslint:disable-next-line:no-unused-expression
         didInitComponent && await didInitComponent.apply(this);
@@ -43,7 +36,8 @@ class PYIApplication extends core_1.Application {
         if (this.config.enableDto === true) {
             this.config.defaultErrorHandler = false;
         }
-        const app = routing_controllers_1.useKoaServer(this, {
+        await this.addUse();
+        const app = await routing_controllers_1.useKoaServer(this, {
             ...this.config,
             defaultErrorHandler: false
         });

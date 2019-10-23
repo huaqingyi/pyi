@@ -25,6 +25,10 @@ class PYIAutoAppConfiguration extends core_1.PYICore {
         this.enableDto = true;
         this.defaultErrorHandler = false;
         this.globalDto = dto_1.PYIGDto;
+        this.session = {
+            key: 'pyi:session',
+            maxAge: 60 * 60 * 24 * 1000
+        };
     }
     static _root() {
         return PYIAutoAppConfiguration;

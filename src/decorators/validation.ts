@@ -1,14 +1,12 @@
 import { PYICore } from '../core';
 import { isFunction } from 'lodash';
-import { validate, ValidationError } from 'class-validator';
-import { PYIController } from './controller';
+import { validate, validateSync, ValidationError } from 'class-validator';
 import { PYIExecption, PYIThrows } from './execption';
 
 export function Validation(target: any) {
-    const { _root } = target;
-    if (_root && isFunction(_root) && _root() === PYIValidation) {
-        console.log('v');
-    }
+    // const { _root } = target;
+    // if (_root && isFunction(_root) && _root() === PYIValidation) {
+    // }
     return target;
 }
 
@@ -18,6 +16,8 @@ export interface PYIValidationImpl {
 }
 
 export abstract class PYIValidation<Props = {}> extends PYICore implements PYIValidationImpl {
+    public static swaggerDocument: any;
+    
     public static _root() {
         return PYIValidation;
     }

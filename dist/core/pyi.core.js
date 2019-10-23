@@ -1,5 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class PYICore {
     static _pyi() {
         return {};
@@ -19,6 +23,26 @@ class PYICore {
     }
     get dto() {
         return this.app.dto;
+    }
+    get config() {
+        return this.app.config;
+    }
+    get tokenConfig() {
+        return this.app.config.jwt;
+    }
+    get token() {
+        return {
+            ...jsonwebtoken_1.default,
+            translate: (token) => {
+                return jsonwebtoken_1.default.verify(token, this.tokenConfig.secret);
+            }
+        };
+    }
+    get ctx() {
+        return this.app.ctx;
+    }
+    set ctx(ctx) {
+        this.app.ctx = ctx;
     }
 }
 exports.PYICore = PYICore;

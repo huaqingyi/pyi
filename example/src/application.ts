@@ -11,7 +11,10 @@ export class Application extends PYIApplication implements PYIApplicationImpl {
 
     constructor() {
         super();
-        this.run(join(__dirname, '**/**.ts'));
+        this.run([
+            join(__dirname, '**/**.ts'),
+            join(__dirname, '**/**.js')
+        ]);
     }
 
     public async onInit() {
@@ -33,7 +36,19 @@ export class Application extends PYIApplication implements PYIApplicationImpl {
 
     public async didMakeConfig() {
         console.log('didMakeConfig ...');
-        Swagger.build('/swagger.io', this);
+        Swagger.build('/swagger.io', this, {
+            info: {
+                description: 'PYI Swagger 测试用例',
+                title: 'PYI Swagger 测试用例'
+            },
+            securityDefinitions: {
+                api_key: {
+                    type: 'apiKey',
+                    name: 'authorization',
+                    in: 'header'
+                }
+            }
+        });
     }
 
     public async didRuntime() {

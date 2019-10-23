@@ -7,7 +7,8 @@ import { stores } from 'koa-session';
 import { Context } from 'vm';
 import { Session } from 'inspector';
 import Keygrip from 'keygrip';
-import { Options, SecretLoader } from 'koa-jwt';
+import { Options } from 'koa-jwt';
+import { SignOptions, Secret } from 'jsonwebtoken';
 
 // tslint:disable-next-line:no-empty-interface
 export interface SessionOption extends Omit<SetOption, 'maxAge'> {
@@ -26,9 +27,22 @@ export interface SessionOption extends Omit<SetOption, 'maxAge'> {
     beforeSave?(ctx: Context, session: Session): void;
 }
 
-export interface JWTOptions extends Options {
-    secret: string | string[] | Buffer | Buffer[] | SecretLoader;
+export interface JWTOptions {
+    secret: Secret;
     path: RegExp[];
+    token?: SignOptions;
+    key?: string;
+    tokenKey?: string;
+    passthrough?: boolean;
+    cookie?: string;
+    debug?: boolean;
+    audience?: string | string[];
+    issuer?: string;
+    algorithms?: string[];
+    errno?: number;
+    errmsg?: string;
+    getToken?(ctx: Context, opts: Options): string;
+    isRevoked?(ctx: Context, decodedToken: object, token: string): Promise<boolean>;
 }
 
 export interface PYIApplicationConfiguration extends RoutingControllersOptions {

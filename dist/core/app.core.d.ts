@@ -1,15 +1,15 @@
+/// <reference types="koa-session" />
 /// <reference types="koa-bodyparser" />
-import Koa from 'koa';
+import Koa, { Context, Middleware } from 'koa';
 import { PYICoreApp } from './pyi.core';
 import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIAutoAppConfiguration } from '../decorators';
 import { BehaviorSubject } from 'rxjs';
-export declare class Application extends Koa implements PYICoreApp {
+export declare class Application<StateT = Koa.DefaultState, CustomT = Koa.DefaultContext> extends Koa implements PYICoreApp {
     static __proto__: any;
     static _pyi(): {};
     static _root(): PYICoreApp;
     static _extends(): any;
     static _runtime(): typeof Application;
-    static bootstrap(): Application;
     protected static _this: Application;
     [x: string]: any;
     controllers: PYIController[];
@@ -27,8 +27,12 @@ export declare class Application extends Koa implements PYICoreApp {
     watch: (...args: any) => any;
     complete: (...args: any) => any;
     error: (...args: any) => any;
+    ctx: Context;
     protected app: this;
     constructor();
+    use<NewStateT = any, NewCustomT = any>(middleware: Middleware<StateT & NewStateT, CustomT & NewCustomT>): any & Koa<StateT & NewStateT, CustomT & NewCustomT>;
+    addUse(): Promise<this>;
     setup(app: Application, callback?: () => any): Promise<this>;
-    starter(callback?: () => any): import("rxjs").Subscription;
+    starter(): Promise<void>;
+    bootstrap(callback?: () => any): import("rxjs").Subscription;
 }

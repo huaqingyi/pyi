@@ -1,3 +1,4 @@
+import { Application } from '../core';
 export declare class PYIChokidar {
     static runtime(dirname: string | string[], mode: string): PYIChokidar;
     files: {
@@ -8,7 +9,8 @@ export declare class PYIChokidar {
     mode: string;
     private dirname;
     private watcher;
+    private app;
     constructor(dirname: string | string[], mode: string);
-    addFile(path: string): Promise<false | undefined>;
-    setup(): Promise<PYIChokidar>;
+    addFile(path: string): Promise<string | false | undefined>;
+    setup(app: Application): Promise<PYIChokidar>;
 }

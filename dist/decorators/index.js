@@ -10,5 +10,6 @@ __export(require("./service"));
 __export(require("./pyi"));
 __export(require("./dto"));
 __export(require("./execption"));
+__export(require("./validation"));
 
 //# sourceMappingURL=../sourcemaps/decorators/index.js.map
