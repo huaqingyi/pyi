@@ -8,7 +8,7 @@ import {
     BodyOptions
 } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
-import { throws, PYIExecption, PYIThrows } from './execption';
+import { throws } from './execption';
 import { ValidationError } from 'class-validator';
 
 export * from 'routing-controllers';
