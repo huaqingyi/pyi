@@ -106,10 +106,15 @@ function Body(options) {
         target[key] = function (...args) {
             const valid = args[idx];
             return valid.validate().then((errors) => {
-                if (errors.length === 0) {
-                    return fn(...args);
+                if (options.validate === true) {
+                    if (errors.length === 0) {
+                        return fn(...args);
+                    }
+                    return valid.throws.apply(this, errors);
                 }
-                return valid.throws.apply(this, errors);
+                else {
+                    return fn(...args, errors);
+                }
             });
         };
         return target[key];

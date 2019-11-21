@@ -17,6 +17,12 @@ class PYICore {
     static _runtime() {
         return this;
     }
+    static _connect() {
+        if (!this._this) {
+            this._this = new this();
+        }
+        return this._this;
+    }
     set dto(bool) {
         this._dto = bool;
         this.app.dto = this._dto;

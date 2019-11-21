@@ -7,12 +7,13 @@ import { Context } from 'koa';
 export interface PYICoreApp {
     [x: string]: any;
 }
-export declare abstract class PYICore implements PYICoreApp {
+export declare class PYICore implements PYICoreApp {
     static __proto__: any;
     static _pyi(): {};
     static _root(): PYICoreApp;
     static _extends(): any;
     static _runtime(): typeof PYICore;
+    static _connect(): PYICore;
     protected static _this: PYICore;
     mode: string;
     success: (...args: any) => any;

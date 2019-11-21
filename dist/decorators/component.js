@@ -36,6 +36,57 @@ exports.Component = Component;
  * @param target classes(主类)
  * @param key prototype(键)
  */
+function autoconnect(target, key) {
+    /**
+     * 容错
+     */
+    if (!target.constructor._pyi) {
+        target.constructor._pyi = () => ({});
+    }
+    /**
+     * 获取注入类
+     */
+    const params = Reflect.getMetadata('design:type', target, key);
+    /**
+     * 是否嵌套依赖
+     */
+    if (!params._pyi || !params._pyi().autowired) {
+        const { props } = params.prototype;
+        // let instance = new params(props);
+        let instance = params._connect(props);
+        target.constructor.prototype[key] = instance;
+        if (params._root && lodash_1.isFunction(params._root)) {
+            if (params._root() === configuration_1.PYIAutoConfiguration ||
+                params._root() === configuration_1.PYIAutoAppConfiguration) {
+                (async () => {
+                    instance = await instance._runtime();
+                    target.constructor.prototype[key] = await instance;
+                })();
+            }
+        }
+    }
+    else {
+        /**
+         * 嵌套依赖
+         */
+        const _pyi = target.constructor._pyi();
+        if (!_pyi.autowired) {
+            target.constructor._pyi = () => ({
+                ..._pyi,
+                autowired: [
+                    ...(_pyi.autowired || []),
+                    key
+                ]
+            });
+        }
+    }
+}
+exports.autoconnect = autoconnect;
+/**
+ * 自动注入新类
+ * @param target classes(主类)
+ * @param key prototype(键)
+ */
 function autowired(target, key) {
     /**
      * 容错
@@ -52,6 +103,7 @@ function autowired(target, key) {
      */
     if (!params._pyi || !params._pyi().autowired) {
         const { props } = params.prototype;
+        // let instance = new params(props);
         let instance = new params(props);
         target.constructor.prototype[key] = instance;
         if (params._root && lodash_1.isFunction(params._root)) {

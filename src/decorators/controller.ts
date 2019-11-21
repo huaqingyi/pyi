@@ -128,8 +128,12 @@ export function Body(options: BodyOptions) {
         target[key] = function(...args: any[]) {
             const valid = args[idx];
             return valid.validate().then((errors: ValidationError[]) => {
-                if (errors.length === 0) { return fn(...args); }
-                return valid.throws.apply(this, errors);
+                if (options.validate === true) {
+                    if (errors.length === 0) { return fn(...args); }
+                    return valid.throws.apply(this, errors);
+                } else {
+                    return fn(...args, errors);
+                }
             });
         };
         return target[key];

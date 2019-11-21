@@ -7,7 +7,7 @@ export interface PYICoreApp {
     [x: string]: any;
 }
 
-export abstract class PYICore implements PYICoreApp {
+export class PYICore implements PYICoreApp {
     public static __proto__: any;
 
     public static _pyi() {
@@ -24,6 +24,13 @@ export abstract class PYICore implements PYICoreApp {
 
     public static _runtime() {
         return this;
+    }
+
+    public static _connect() {
+        if (!this._this) {
+            this._this = new this();
+        }
+        return this._this;
     }
 
     protected static _this: PYICore;
