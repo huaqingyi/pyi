@@ -10,7 +10,6 @@ const operators_1 = require("rxjs/operators");
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const koa_logger_1 = __importDefault(require("koa-logger"));
 const koa_session_1 = __importDefault(require("koa-session"));
-const koa_jwt_1 = __importDefault(require("koa-jwt"));
 class Application extends koa_1.default {
     constructor() {
         super();
@@ -54,31 +53,6 @@ class Application extends koa_1.default {
         this.config.session.keys = this.keys;
         delete sconfig.keys;
         await this.use(koa_session_1.default(this.config.session, this));
-        /**
-         * jwt
-         */
-        if (this.config.jwt) {
-            const { errno, errmsg } = this.config.jwt;
-            // Custom 401 handling if you don't want to expose koa-jwt errors to users
-            await this.use(async (ctx, next) => {
-                return await next().catch(async (err) => {
-                    if (401 === err.status) {
-                        ctx.status = 401;
-                    }
-                    if (this.dto === false && this.config.enableDto === true) {
-                        const Dto = this.config.globalDto;
-                        ctx.body = await (new Dto()).throws(err, errno || 1000, errmsg || 'token 验证失败 .');
-                    }
-                    else {
-                        ctx.body = err;
-                    }
-                    this.dto = false;
-                });
-            });
-            await this.use(koa_jwt_1.default(this.config.jwt).unless({
-                path: this.config.jwt.path
-            }));
-        }
         return await this;
     }
     async setup(app, callback) {

@@ -1,7 +1,5 @@
 import { Application } from './app.core';
-import jwt from 'jsonwebtoken';
-import { JWTOptions } from '../decorators';
-import { DefaultState, Context } from 'koa';
+import { Context } from 'koa';
 
 export interface PYICoreApp {
     [x: string]: any;
@@ -45,30 +43,24 @@ export class PYICore implements PYICoreApp {
 
     public app!: Application;
     private _dto!: boolean;
+
     public set dto(bool: boolean) {
         this._dto = bool;
         this.app.dto = this._dto;
     }
+
     public get dto() {
         return this.app.dto;
     }
+
     public get config() {
         return this.app.config;
     }
-    public get tokenConfig() {
-        return this.app.config.jwt as JWTOptions;
-    }
-    public get token() {
-        return {
-            ...jwt,
-            translate: (token: string) => {
-                return jwt.verify(token, this.tokenConfig.secret);
-            }
-        };
-    }
+
     protected get ctx(): Context {
         return this.app.ctx;
     }
+
     protected set ctx(ctx: Context) {
         this.app.ctx = ctx;
     }

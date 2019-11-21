@@ -7,7 +7,6 @@ import { filter } from 'rxjs/operators';
 import bodyParser from 'koa-bodyparser';
 import logger from 'koa-logger';
 import session from 'koa-session';
-import jwt from 'koa-jwt';
 
 export class Application<StateT = Koa.DefaultState, CustomT = Koa.DefaultContext> extends Koa implements PYICoreApp {
     public static __proto__: any;
@@ -82,31 +81,6 @@ export class Application<StateT = Koa.DefaultState, CustomT = Koa.DefaultContext
         this.config.session.keys = this.keys;
         delete sconfig.keys;
         await this.use(session(this.config.session as any, this));
-
-        /**
-         * jwt
-         */
-        if (this.config.jwt) {
-
-            const { errno, errmsg } = this.config.jwt;
-            // Custom 401 handling if you don't want to expose koa-jwt errors to users
-            await this.use(async (ctx, next) => {
-                return await next().catch(async (err) => {
-                    if (401 === err.status) { ctx.status = 401; }
-                    if (this.dto === false && this.config.enableDto === true) {
-                        const Dto = this.config.globalDto;
-                        ctx.body = await (new Dto()).throws(err, errno || 1000, errmsg || 'token 验证失败 .');
-                    } else {
-                        ctx.body = err;
-                    }
-                    this.dto = false;
-                });
-            });
-
-            await this.use(jwt(this.config.jwt as any).unless({
-                path: this.config.jwt.path
-            }));
-        }
 
         return await this;
     }
