@@ -1,5 +1,5 @@
 import { IsString, MinLength, MaxLength, validateSync, IsNotEmpty } from 'class-validator';
-import { Validation, PYIValidation } from '../../../src';
+import { Validation, PYIValidation, IsNotEmptyIf } from '../../../src';
 import { swaggerClass, swaggerProperty } from 'koa-swagger-decorator';
 
 @Validation
@@ -15,6 +15,7 @@ export class LoginValidation extends PYIValidation {
         example: '1234',
         description: '用户名'
     })
+    @IsNotEmptyIf
     public username!: string;
 
     @IsString({ message: '请传入字符串 .' })
