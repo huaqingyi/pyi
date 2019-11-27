@@ -1,4 +1,4 @@
-import { IsString, MinLength, MaxLength, validateSync, IsNotEmpty } from 'class-validator';
+import { IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
 import { Validation, PYIValidation, IsNotEmptyIf } from '../../../src';
 import { swaggerClass, swaggerProperty } from 'koa-swagger-decorator';
 

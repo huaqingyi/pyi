@@ -80,6 +80,7 @@ export class TestController extends PYIController {
     @summary('test get index')
     @tag
     public index(): TestDto {
+        console.log(2);
         return PYIExecption(class extends TestController implements PYIThrows {
             public errno!: number;
             public errmsg!: string;

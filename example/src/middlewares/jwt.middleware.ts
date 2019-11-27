@@ -3,7 +3,7 @@ import { Context } from 'koa';
 import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from '../../../src';
 import jwt from 'jsonwebtoken';
 
-@Middleware({ type: 'after' })
+@Middleware({ type: 'before' })
 export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
     public excloude: string[];
     constructor() {
@@ -14,14 +14,15 @@ export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterfa
         ];
     }
     public async use(ctx: Context, next: (err?: any) => Promise<any>) {
+        console.log(1);
         if (this.excloude.indexOf(ctx.url) === -1) {
             jwt.verify(ctx.header.authorization, 'pyi', async (err: any) => {
                 if (err) {
                     const dto = new TestDto();
                     ctx.body = await dto.throws(new Error(err), 10014, err.message);
-                    next(ctx);
+                    next();
                 } else {
-                    next(ctx);
+                    next();
                 }
             });
         }
