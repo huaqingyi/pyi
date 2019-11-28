@@ -28,8 +28,6 @@ export function PYIExecption<UseParentClass = any, UsePYIDto = PYIDto>(this: any
 }
 
 export interface PYIThrows {
-    errno?: number;
-    errmsg?: string;
     throws: (...args: any) => Promise<any>;
 }
 

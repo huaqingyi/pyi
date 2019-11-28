@@ -1,8 +1,7 @@
 import chokidar, { FSWatcher } from 'chokidar';
 import { blue } from 'colors';
 import { map } from 'lodash';
-import { PYIAutoAppConfiguration } from '../decorators';
-import { Application } from '../core';
+import { PYIAutoAppConfiguration, PYIApplication } from '../decorators';
 
 export class PYIChokidar {
     public static runtime(dirname: string | string[], mode: string) {
@@ -16,7 +15,7 @@ export class PYIChokidar {
 
     private dirname: string | string[];
     private watcher: FSWatcher;
-    private app!: Application;
+    private app!: PYIApplication;
 
     constructor(dirname: string | string[], mode: string) {
         this.dirname = dirname;
@@ -51,7 +50,7 @@ export class PYIChokidar {
         console.log(blue(`File ${path} has been added ...`));
     }
 
-    public async setup(app: Application): Promise<PYIChokidar> {
+    public async setup(app: PYIApplication): Promise<PYIChokidar> {
         this.app = app;
         return new Promise<PYIChokidar>((r) => {
             this.watcher.on('add', this.addFile.bind(this));

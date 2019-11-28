@@ -31,6 +31,8 @@ export class Maker {
 
             this.useLoagger(comp);
 
+            comp.prototype.app = this.app;
+
             if (_root && _root() === PYIController) { controllers.push(comp); }
             if (_root && _root() === PYIMiddleware) { middlewares.push(comp); }
             if (_root && _root() === PYIInterceptor) { interceptors.push(comp); }

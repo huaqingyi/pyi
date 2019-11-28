@@ -1,7 +1,11 @@
-import { Application } from '../core';
+import { PYIComponent } from './component';
+import { PYIController, PYIMiddleware, PYIInterceptor } from './controller';
+import Koa from 'koa';
 import { PYIChokidar, Maker } from '../libs';
 import { green } from 'colors';
 import { useKoaServer } from 'routing-controllers';
+import bodyParser from 'koa-bodyparser';
+import { PYIAutoAppConfiguration } from './configuration';
 
 export interface PYIApplicationImpl {
     [x: string]: any;
@@ -13,10 +17,27 @@ export interface PYIApplicationImpl {
     didRuntime?: () => any;
 }
 
-export abstract class PYIApplication extends Application implements PYIApplicationImpl {
+export abstract class PYIApplication extends Koa implements PYIApplicationImpl {
     public static _pyi: () => any;
     public static _root() {
         return PYIApplication;
+    }
+
+    [x: string]: any;
+    public controllers: PYIController[];
+    public middlewares: PYIMiddleware[];
+    public interceptors: PYIInterceptor[];
+    public components: PYIComponent[];
+    public config!: PYIAutoAppConfiguration;
+
+    private _bootstrap!: () => any;
+
+    constructor() {
+        super();
+        this.controllers = [];
+        this.middlewares = [];
+        this.interceptors = [];
+        this.components = [];
     }
 
     public async run(path: string | string[]) {
@@ -30,7 +51,7 @@ export abstract class PYIApplication extends Application implements PYIApplicati
         didLoad && await didLoad.apply(this);
         const comps = await chokidar.comps;
         const config = await chokidar.appconfig;
-        this.config = config;
+        this.config = await config;
         await console.log(green(`will load app to all components and config ...`));
         // tslint:disable-next-line:no-unused-expression
         onInitComponent && await onInitComponent.apply(this);
@@ -44,17 +65,35 @@ export abstract class PYIApplication extends Application implements PYIApplicati
         this.config.controllers = (this.config.controllers || []).concat(this.controllers);
         this.config.middlewares = (this.config.middlewares || []).concat(this.middlewares);
         this.config.interceptors = (this.config.interceptors || []).concat(this.interceptors);
-        if (this.config.enableDto === true) { this.config.defaultErrorHandler = false; }
-        await this.addUse();
+        this.config.defaultErrorHandler = false;
+
+        /**
+         * body formatter
+         */
+        await this.use(bodyParser());
+
         const app = await useKoaServer(this, {
             ...(this.config as any),
             defaultErrorHandler: false
         });
-        this._setup.next(this);
+        // console.log(app === this);
+        this._bootstrap();
         return app;
     }
 
-    [x: string]: any;
+    public bootstrap(bootstrap: () => any) {
+        this._bootstrap = bootstrap;
+    }
+
+    public async starter() {
+        this.listen(this.config.port, () => {
+            // tslint:disable-next-line:no-unused-expression
+            this.didRuntime && this.didRuntime.apply(this);
+            console.log(green(
+                `PYI Server runtime listen: http://${this.config.host || 'localhost'}:${this.config.port}`
+            ));
+        });
+    }
 }
 
 export function PYIBootstrap(target: any, key?: string) {

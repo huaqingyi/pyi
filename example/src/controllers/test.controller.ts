@@ -10,15 +10,10 @@ import { Response, Context } from 'koa';
 import { tags, request, summary, body, security } from 'pyi-swagger';
 import send from 'koa-send';
 import { join } from 'path';
-import { LoginValidation } from '../validation/login.validation';
 import { UserDto } from '../dto/user.info';
 import jwt from 'jsonwebtoken';
 
 const tag = tags(['TestController']);
-const userSchema = {
-    name: { type: 'string', required: true },
-    password: { type: 'string', required: true }
-};
 
 @Controller
 export class TestController extends PYIController {
@@ -26,11 +21,15 @@ export class TestController extends PYIController {
     @autowired
     public service!: TestService;
 
+    constructor() {
+        super();
+        console.log('constructor');
+    }
+
     @RequestMapping({
         prefix: '/resource/*'
     })
     public async resource(@Ctx() ctx: Context) {
-        this.dto = true;
         return await send(ctx, ctx.path, { root: join(__dirname, '../') });
     }
 
@@ -38,40 +37,39 @@ export class TestController extends PYIController {
         prefix: '/favicon.ico'
     })
     public async favicon(@Ctx() ctx: Context) {
-        this.dto = true;
         return await send(ctx, ctx.path, { root: join(__dirname, '../resource/static') });
     }
 
-    @RequestMapping({
-        prefix: '/login',
-        methods: [RequestMappingMethod.POST]
-    })
-    @request(RequestMappingMethod.POST, '/login')
-    @summary('login user auth jwt .')
-    @body(LoginValidation.swaggerDocument)
-    @tag
-    public login(
-        @Body({ validate: true }) loginForm: LoginValidation,
-        @Res() response: Response,
-        @Ctx() ctx: Context
-    ): UserDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                const result = {
-                    id: 1,
-                    username: 'test',
-                    age: '1',
-                    nikename: 'test',
-                    email: 'test@email.com'
-                };
-                // const { secret, token } = this.tokenConfig;
-                response.append('token', jwt.sign(result, 'pyi', { expiresIn: '24h' }));
-                return await result;
-            }
-        });
-    }
+    // @RequestMapping({
+    //     prefix: '/login',
+    //     methods: [RequestMappingMethod.POST]
+    // })
+    // @request(RequestMappingMethod.POST, '/login')
+    // @summary('login user auth jwt .')
+    // @body(LoginValidation.swaggerDocument)
+    // @tag
+    // public login(
+    //     @Body({ validate: true }) loginForm: LoginValidation,
+    //     @Res() response: Response,
+    //     @Ctx() ctx: Context
+    // ): UserDto {
+    //     return PYIExecption(class extends TestController implements PYIThrows {
+    //         public errno!: number;
+    //         public errmsg!: string;
+    //         public async throws() {
+    //             const result = {
+    //                 id: 1,
+    //                 username: 'test',
+    //                 age: '1',
+    //                 nikename: 'test',
+    //                 email: 'test@email.com'
+    //             };
+    //             // const { secret, token } = this.tokenConfig;
+    //             response.append('token', jwt.sign(result, 'pyi', { expiresIn: '24h' }));
+    //             return await result;
+    //         }
+    //     });
+    // }
 
     @RequestMapping({
         prefix: '/'

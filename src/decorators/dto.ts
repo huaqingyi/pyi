@@ -16,7 +16,6 @@ export abstract class PYIDto extends PYICore {
         super();
         this.err = false;
         this.data = data || {};
-        this.app.dto = true;
     }
 
     public async throws(err: Error, errno?: number, errmsg?: string) {
