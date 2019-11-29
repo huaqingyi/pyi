@@ -6,6 +6,8 @@ import { green } from 'colors';
 import { useKoaServer } from 'routing-controllers';
 import bodyParser from 'koa-bodyparser';
 import { PYIAutoAppConfiguration } from './configuration';
+import { PYIDto } from './dto';
+import { PYICoreApp } from '../core';
 
 export interface PYIApplicationImpl {
     [x: string]: any;
@@ -15,6 +17,12 @@ export interface PYIApplicationImpl {
     didInitComponent?: () => any;
     didMakeConfig?: () => any;
     didRuntime?: () => any;
+}
+
+export interface PYIExecptionAsync {
+    Vo?: PYICoreApp;
+    body: any | Promise<any>;
+    execption: PYICoreApp;
 }
 
 export abstract class PYIApplication extends Koa implements PYIApplicationImpl {
@@ -32,20 +40,46 @@ export abstract class PYIApplication extends Koa implements PYIApplicationImpl {
 
     private _bootstrap!: () => any;
 
+    public set asynctx({ Vo, body, execption }: PYIExecptionAsync) {
+        if (Vo) {
+            if (body.then) {
+                body.then((resp: any) => {
+                    console.log(3);
+                    this.ctx = new (Vo as any)(resp);
+                    return this.ctx;
+                }).catch((err: Error) => {
+                    console.log(4);
+                    this.ctx = {
+                        ...(new (Vo as any)()).throws(err),
+                        ...execption
+                    };
+                    return this.ctx;
+                });
+            }
+        } else {
+            this.ctx = body;
+        }
+    }
+
+    public get asynctx() {
+        return this.ctx;
+    }
+
     constructor() {
         super();
         this.controllers = [];
         this.middlewares = [];
         this.interceptors = [];
         this.components = [];
+        this.run();
     }
 
-    public async run(path: string | string[]) {
+    public async run() {
         const { onInit, didLoad, onInitComponent, didInitComponent, didMakeConfig } = this;
         await console.log(green(`start load project files ...`));
         // tslint:disable-next-line:no-unused-expression
         onInit && await onInit.apply(this);
-        const chokidar: PYIChokidar = await PYIChokidar.runtime(path, this.mode).setup(this);
+        const chokidar: PYIChokidar = await PYIChokidar.runtime(this.mode).setup(this);
         await console.log(green(`load end project files success ...`));
         // tslint:disable-next-line:no-unused-expression
         didLoad && await didLoad.apply(this);

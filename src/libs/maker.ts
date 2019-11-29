@@ -1,5 +1,5 @@
 import { map } from 'lodash';
-import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIApplication } from '../decorators';
+import { PYIController, PYIMiddleware, PYIInterceptor, PYIComponent, PYIApplication, PYIAutoMiddleware } from '../decorators';
 import signale from 'signale';
 
 export class Maker {
@@ -24,6 +24,7 @@ export class Maker {
     public setup(comps: any[]) {
         const controllers: PYIController[] = [];
         const middlewares: PYIMiddleware[] = [];
+        const umiddlewares: PYIMiddleware[] = [];
         const interceptors: PYIInterceptor[] = [];
         const components: PYIComponent[] = [];
         map(comps, (comp) => {
@@ -34,7 +35,8 @@ export class Maker {
             comp.prototype.app = this.app;
 
             if (_root && _root() === PYIController) { controllers.push(comp); }
-            if (_root && _root() === PYIMiddleware) { middlewares.push(comp); }
+            if (_root && _root() === PYIAutoMiddleware) { middlewares.push(comp); }
+            if (_root && _root() === PYIMiddleware) { umiddlewares.push(comp); }
             if (_root && _root() === PYIInterceptor) { interceptors.push(comp); }
             if (_root && _root() === PYIComponent) { components.push(comp); }
         });

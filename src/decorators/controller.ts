@@ -85,6 +85,14 @@ export abstract class PYIMiddleware extends PYICore {
     }
 }
 
+// tslint:disable-next-line:max-classes-per-file
+export abstract class PYIAutoMiddleware extends PYICore {
+    public static _pyi: () => any;
+    public static _root() {
+        return PYIAutoMiddleware;
+    }
+}
+
 /**
  * Extends for routing-controllers middleware
  * @param options extends routing-controllers middleware

@@ -78,11 +78,9 @@ export class TestController extends PYIController {
     @summary('test get index')
     @tag
     public index(): TestDto {
-        console.log(2);
         return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
             public async throws() {
+                console.log(this.service);
                 return await 'Hello PYI ...';
             }
         });

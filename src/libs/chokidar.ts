@@ -2,10 +2,11 @@ import chokidar, { FSWatcher } from 'chokidar';
 import { blue } from 'colors';
 import { map } from 'lodash';
 import { PYIAutoAppConfiguration, PYIApplication } from '../decorators';
+import { dirname } from 'path';
 
 export class PYIChokidar {
-    public static runtime(dirname: string | string[], mode: string) {
-        return new PYIChokidar(dirname, mode);
+    public static runtime(mode: string) {
+        return new PYIChokidar(mode);
     }
 
     public files: { [x: string]: any };
@@ -14,19 +15,28 @@ export class PYIChokidar {
     public mode: string;
 
     private dirname: string | string[];
+    private root: string;
     private watcher: FSWatcher;
     private app!: PYIApplication;
 
-    constructor(dirname: string | string[], mode: string) {
-        this.dirname = dirname;
+    constructor(mode: string) {
         this.files = {};
         this.comps = [];
         this.mode = mode;
-        this.watcher = chokidar.watch(this.dirname);
+        this.root = process.argv[1];
+        this.dirname = dirname(this.root);
+        this.watcher = chokidar.watch([
+            `${this.dirname}/**/*.js`,
+            `${this.dirname}/**/*.ts`,
+            `${this.dirname}/**/*.jsx`,
+            `${this.dirname}/**/*.tsx`,
+        ], {
+            ignored: new RegExp(`${this.root}|\.d\.ts`, 'gi')
+        });
     }
 
     public async addFile(path: string) {
-        if (path.indexOf('.d.ts') !== -1) { return path; }
+        // if (path.indexOf('.d.ts') !== -1) { return path; }
         const comp = await import(path);
         if (!comp) { return false; }
         await Promise.all(map(comp, async (o, i) => {

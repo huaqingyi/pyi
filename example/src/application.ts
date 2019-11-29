@@ -9,14 +9,6 @@ export class Application extends PYIApplication implements PYIApplicationImpl {
     @autowired
     public schedule!: ScheduleComponent;
 
-    constructor() {
-        super();
-        this.run([
-            join(__dirname, '**/**.ts'),
-            join(__dirname, '**/**.js')
-        ]);
-    }
-
     public async onInit() {
         SwaggerInjectService.register();
         console.log('onInit ...');
