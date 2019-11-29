@@ -1,37 +1,32 @@
+import { isFunction } from 'lodash';
+import { PYICore } from '../core';
 import { PYIDto } from './dto';
-import { isFunction, map } from 'lodash';
 
-export function PYIExecption<UseParentClass = any, UsePYIDto = PYIDto>(this: any,
-    exp: UseParentClass & any, Vo?: UsePYIDto & any
-): any {
-    return (NVo?: UsePYIDto & any) => {
+export function PYIExecption<Props>(this: any, trys: PYIThrows<Props>, Vo?: PYICore & any): any {
+    console.log(3, this);
+    return ((NVo?: PYICore & any) => {
         if (
             NVo && NVo._root &&
             isFunction(NVo._root) && NVo._root() === PYIDto
         ) { Vo = NVo; }
-        exp.bind(this);
-        const execption = new exp();
-        const body: Promise<any> = execption.throws();
+        // tslint:disable-next-line:no-shadowed-variable
+        const { throws } = trys;
+        console.log(throws);
+        const body: Promise<any> = throws.apply(this);
         if (Vo) {
             return body.then((resp) => {
-                return {
-                    ...new Vo(resp),
-                    ...execption
-                };
+                return new Vo(resp);
             }).catch((err) => {
-                return {
-                    ...(new Vo()).throws(err),
-                    ...execption
-                };
+                return (new Vo()).throws(err);
             });
         } else {
             return body;
         }
-    };
+    }).bind(this);
 }
 
-export interface PYIThrows {
-    throws: (this: any) => any;
+export interface PYIThrows<Props> {
+    throws: (this: Props) => any;
 }
 
 export function throws(target: any, key: string): any {

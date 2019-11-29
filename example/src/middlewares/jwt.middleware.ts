@@ -8,7 +8,6 @@ export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterfa
     public excloude: string[];
     constructor() {
         super();
-        console.log(1);
         this.excloude = [
             '/favicon.ico',
             '/login'
@@ -20,24 +19,20 @@ export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterfa
         next(ctx);
     }
 
-    // @throws
-    // public verify(ctx: Context): TestDto {
-    //     return PYIExecption(class extends JWTMiddleware implements PYIThrows {
-    //         public name?: string;
-    //         public throws() {
-    //             return new Promise((r, j) => {
-    //                 if (this.excloude.indexOf(ctx.url) === -1) {
-    //                     jwt.verify(ctx.header.authorization, 'pyi', async (err: any) => {
-    //                         if (err) {
-    //                             j(err);
-    //                         } else { r(); }
-    //                     });
-    //                 } else { r(); }
-    //             });
-    //         }
-    //         public test() {
-    //             console.log('test');
-    //         }
-    //     });
-    // }
+    @throws
+    public verify(ctx: Context): TestDto {
+        return PYIExecption<JWTMiddleware>({
+            async throws() {
+                return new Promise((r, j) => {
+                    if (this.excloude.indexOf(ctx.url) === -1) {
+                        jwt.verify(ctx.header.authorization, 'pyi', async (err: any) => {
+                            if (err) {
+                                j(err);
+                            } else { r(); }
+                        });
+                    } else { r(); }
+                });
+            }
+        });
+    }
 }

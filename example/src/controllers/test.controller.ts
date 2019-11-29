@@ -78,10 +78,10 @@ export class TestController extends PYIController {
     @summary('test get index')
     @tag
     public index(): TestDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public async throws() {
-                console.log(this.service);
-                return await 'Hello PYI ...';
+        return PYIExecption<TestController>({
+            throws() {
+                console.log(1, this.service);
+                return 'Hello PYI ...';
             }
         });
     }
@@ -90,12 +90,8 @@ export class TestController extends PYIController {
         prefix: '/error'
     })
     public err(): TestDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                this.errno = 1000;
-                this.errmsg = 'test error ...';
+        return PYIExecption<TestController>({
+            async throws() {
                 throw new Error('test error');
                 return await 'Hello PYI ...';
             }
@@ -113,10 +109,8 @@ export class TestController extends PYIController {
     public info(
         @Ctx() ctx: Context
     ): UserDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
+        return PYIExecption<TestController>({
+            async throws() {
                 return ctx.state;
             }
         });
