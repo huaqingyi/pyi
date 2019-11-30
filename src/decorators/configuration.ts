@@ -1,106 +1,28 @@
-import { isFunction } from 'lodash';
-import { PYICore } from '../core';
-import { RoutingControllersOptions } from 'routing-controllers';
-import { PYIDto, PYIGDto } from './dto';
-import { SetOption } from 'cookies';
-import { stores } from 'koa-session';
-import { Context } from 'vm';
-import { Session } from 'inspector';
-import Keygrip from 'keygrip';
-import { SignOptions, Secret } from 'jsonwebtoken';
+import { PYICore, PYIApp } from '../core';
 
-// tslint:disable-next-line:no-empty-interface
-export interface SessionOption extends Omit<SetOption, 'maxAge'> {
-    keys?: Keygrip | string[];
-    key: string;
-    maxAge?: number | 'session';
-    encode?: (obj: object) => string;
-    decode?: (str: string) => object;
-    genid?: () => string;
-    rolling?: boolean;
-    renew?: boolean;
-    store?: stores;
-    ContextStore?: new (ctx: Context) => stores;
-    prefix?: string;
-    valid?(ctx: Context, session: Partial<Session>): void;
-    beforeSave?(ctx: Context, session: Session): void;
-}
-
-export interface PYIApplicationConfiguration extends RoutingControllersOptions {
-    [x: string]: any;
-    enableDto?: boolean;
-    globalDto?: PYIDto;
-    session?: SessionOption;
-}
-
-/**
- * Component base
- */
-export abstract class PYIAutoConfiguration<Props = {}> extends PYICore {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoConfiguration;
-    }
-
-    public props?: Props;
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-export abstract class PYIAutoAppConfiguration<Props = {}> extends PYICore implements PYIApplicationConfiguration {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoAppConfiguration;
-    }
-
-    public props?: Props;
-
-    public enableDto: boolean;
-    public globalDto: any & PYIDto;
-    public session: SessionOption;
-    
-    constructor() {
-        super();
-        this.enableDto = true;
-        this.defaultErrorHandler = false;
-        this.globalDto = PYIGDto;
-        this.session = {
-            key: 'pyi:session',
-            maxAge: 60 * 60 * 24 * 1000
+export function Configuration<Props extends any>(props: Props): any {
+    if (props._base && props._base() === PYIConfiguration) {
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            return target;
         };
     }
-
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
-    }
 }
 
-export function Configuration<Props = any>(config: Props): any {
-    const { _root } = (config as any);
-    /**
-     * 如果是直接修饰类
-     */
-    if (_root && isFunction(_root)) {
-        if (
-            _root() === PYIAutoConfiguration ||
-            _root() === PYIAutoAppConfiguration
-        ) {
-            return config;
-        } else {
-            /**
-             * 带参数的修饰
-             */
-            return (target: any, key?: string) => {
-                target.prototype.props = config;
-            };
-        }
-    } else {
-        return config;
+export class PYIConfiguration<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIConfiguration;
     }
+
+    public props!: Props;
+}
+
+export class PYIAppConfiguration<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIConfiguration;
+    }
+
+    public props!: Props;
 }

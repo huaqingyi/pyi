@@ -1,18 +1,20 @@
-import { PYICore } from '../core';
+import { PYICore, PYIApp } from '../core';
 
-export abstract class PYIService extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIService;
+export function Service<Props extends any>(props: Props): any {
+    if (props._base && props._base() === PYIService) {
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            return target;
+        };
     }
 }
 
-/**
- * 服务组件
- * @param target service component
- * @param key off
- */
-// tslint:disable-next-line:no-empty
-export function Service(target: any & PYIService, key?: string) {
+export class PYIService<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIService;
+    }
 
+    public props!: Props;
 }

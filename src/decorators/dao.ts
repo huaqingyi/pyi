@@ -1,7 +1,7 @@
 import { PYICore, PYIApp } from '../core';
 
-export function Dto<Props extends any>(props: Props): any {
-    if (props._base && props._base() === PYIDto) {
+export function Dao<Props extends any>(props: Props): any {
+    if (props._base && props._base() === PYIDao) {
         return props;
     } else {
         return (target: PYIApp) => {
@@ -11,9 +11,9 @@ export function Dto<Props extends any>(props: Props): any {
     }
 }
 
-export class PYIDto<Props = any> extends PYICore {
+export class PYIDao<Props = any> extends PYICore {
     public static _base(): PYIApp {
-        return PYIDto;
+        return PYIDao;
     }
 
     public props!: Props;
