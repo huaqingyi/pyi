@@ -1,6 +1,6 @@
-import { Dao } from '../../../src';
+import { Dao, PYIDto } from '../../../src';
 
 @Dao
-export class LoginDao {
-    
+export class LoginDao extends PYIDto {
+
 }

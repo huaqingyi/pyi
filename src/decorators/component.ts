@@ -1,11 +1,9 @@
-import { PYICore, PYIApp } from '../core';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
 
-export type ComponentClass<V> = (new (...args: any[]) => V & PYIComponent) & typeof PYIComponent;
-
-export function Component<VC extends ComponentClass<PYIComponent>>(tprops: VC): VC;
+export function Component<VC extends PYICoreClass<PYIComponent>>(tprops: VC): VC;
 export function Component<Props = any>(
     props: Props & any
-): <VC extends ComponentClass<PYIComponent>>(target: VC) => VC;
+): <VC extends PYICoreClass<PYIComponent>>(target: VC) => VC;
 export function Component(props: any | PYIApp) {
     if (props._base && props._base() === PYIComponent) {
         return props;

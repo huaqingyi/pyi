@@ -1,6 +1,10 @@
-import { PYICore, PYIApp } from '../core';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
 
-export function Dao<Props extends any>(props: Props): any {
+export function Dao<VC extends PYICoreClass<PYIDao>>(tprops: VC): VC;
+export function Dao<Props = any>(
+    props: Props & any
+): <VC extends PYICoreClass<PYIDao>>(target: VC) => VC;
+export function Dao<Props extends any>(props: Props) {
     if (props._base && props._base() === PYIDao) {
         return props;
     } else {

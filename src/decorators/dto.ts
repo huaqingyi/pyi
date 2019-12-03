@@ -1,6 +1,10 @@
-import { PYICore, PYIApp } from '../core';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
 
-export function Dto<Props extends any>(props: Props): any {
+export function Dto<VC extends PYICoreClass<PYIDto>>(tprops: VC): VC;
+export function Dto<Props = any>(
+    props: Props & any
+): <VC extends PYICoreClass<PYIDto>>(target: VC) => VC;
+export function Dto<Props extends any>(props: Props) {
     if (props._base && props._base() === PYIDto) {
         return props;
     } else {

@@ -3,6 +3,8 @@ export interface PYIApp extends Function {
     [x: string]: any;
 }
 
+export type PYICoreClass<V> = (new (...args: any[]) => V & PYICore) & typeof PYICore;
+
 export class PYICore extends Function implements PYIApp {
     [x: string]: any;
     public static __proto__: any;
@@ -35,4 +37,6 @@ export class PYICore extends Function implements PYIApp {
     }
 
     protected static _this: PYIApp;
+    
+    public mode!: string;
 }
