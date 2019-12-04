@@ -1,8 +1,6 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
 import { RoutingControllersOptions } from 'routing-controllers';
-import { PYIController } from './controller';
-import { PYIMiddleware } from './middleware';
-import { PYIInterceptor } from './interceptor';
+import { PYIController, PYIMiddleware, PYIInterceptor } from './controller';
 
 export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export function Configuration<Props = any>(

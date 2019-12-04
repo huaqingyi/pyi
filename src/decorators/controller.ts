@@ -94,3 +94,64 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
         };
     }
 }
+
+export interface PYIMiddlewareProps {
+    type: 'after' | 'before';
+    priority?: number;
+    before?: PYICoreClass<PYIMiddleware>;
+}
+
+export function Middleware<VC extends PYICoreClass<PYIMiddleware>>(tprops: VC): VC;
+export function Middleware<Props = PYIMiddlewareProps>(
+    props: Props & PYIMiddlewareProps
+): <VC extends PYICoreClass<PYIMiddleware>>(target: VC) => VC;
+export function Middleware<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIMiddleware) {
+        RMiddleware({ type: 'before' })(props);
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            RMiddleware(props as any)(target);
+            return target;
+        };
+    }
+}
+
+export class PYIMiddleware<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIMiddleware;
+    }
+
+    public props!: Props;
+}
+
+export interface PYIInterceptorProps {
+    priority?: number;
+    before?: PYICoreClass<PYIInterceptor>;
+}
+
+export function Interceptor<VC extends PYICoreClass<PYIInterceptor>>(tprops: VC): VC;
+export function Interceptor<Props = PYIInterceptorProps>(
+    props: Props & PYIInterceptorProps
+): <VC extends PYICoreClass<PYIInterceptor>>(target: VC) => VC;
+export function Interceptor<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIInterceptor) {
+        RInterceptor()(props);
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            RInterceptor(props)(target);
+            return target;
+        };
+    }
+}
+
+export class PYIInterceptor<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIInterceptor;
+    }
+
+    public props!: Props;
+}
