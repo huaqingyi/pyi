@@ -1,6 +1,7 @@
+import { PYIAppConfiguration } from './configuration';
 import { PYICore, PYIApp } from '../core';
-import Koa from 'koa';
-import { useKoaServer, RoutingControllersOptions } from 'routing-controllers';
+import Koa, { DefaultState, DefaultContext } from 'koa';
+import { useKoaServer } from 'routing-controllers';
 import { Compile } from '../core/compile';
 import { green } from 'colors';
 import { get } from 'node-emoji';
@@ -32,7 +33,7 @@ export interface PYIOnConfigurationInit {
 
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnConfigurationAfter {
-    onConfigurationAfter: (config: RoutingControllersOptions) => any;
+    onConfigurationAfter: (config: PYIAppConfiguration) => any;
 }
 
 // tslint:disable-next-line:no-empty-interface
@@ -59,7 +60,10 @@ export function PYIBootstrap(props: any | PYIApp) {
     };
 }
 
-export class PYIApplication<Props = any> extends Koa {
+export class PYIApplication<
+    StateT = DefaultState,
+    CustomT = DefaultContext
+    > extends Koa<StateT, CustomT> {
     [x: string]: any;
     public static __proto__: any;
 
@@ -91,10 +95,9 @@ export class PYIApplication<Props = any> extends Koa {
     }
 
     protected static _this: Koa;
-
-    public props!: Props;
     public mode!: string;
-    public config!: RoutingControllersOptions;
+    public props?: any;
+    public config!: PYIAppConfiguration;
     public compile: Compile;
     private _bootstrap: () => any;
     private ready?: (value?: any | PromiseLike<any>) => void;
@@ -112,6 +115,14 @@ export class PYIApplication<Props = any> extends Koa {
         this._bootstrap = callback;
         return await new Promise((r) => {
             this.ready = r;
+        });
+    }
+
+    public async starter() {
+        this.listen(this.config.port, this.config.host, () => {
+            console.log(`${get('kiss')} ${green(
+                `application running for http://${this.config.host}:${this.config.port}`
+            )}`);
         });
     }
 
@@ -137,9 +148,11 @@ export class PYIApplication<Props = any> extends Koa {
         console.log(`${get('rocket')} ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
-        await useKoaServer(this, this.config);
+        await useKoaServer(this, {
+            ...this.config, development: this.mode === 'development'
+        });
         // tslint:disable-next-line:no-unused-expression
         this.ready && await this.ready(this);
-        await this.callback();
+        await this._bootstrap();
     }
 }

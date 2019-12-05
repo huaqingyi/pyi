@@ -7,7 +7,7 @@ export class Compile {
     private drive: PYIApplication;
     private comps: PYIApp[];
 
-    constructor(drive: PYIApplication) {
+    constructor(drive: PYIApplication<any, any>) {
         this.drive = drive;
         this.comps = [];
     }
