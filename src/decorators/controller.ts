@@ -1,5 +1,5 @@
-import { isFunction, map } from 'lodash';
-import { PYICore } from '../core';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
+
 import {
     JsonController, Method,
     Middleware as RMiddleware,
@@ -8,8 +8,7 @@ import {
     BodyOptions
 } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
-import { throws } from './execption';
-import { ValidationError } from 'class-validator';
+import { map } from 'lodash';
 
 export * from 'routing-controllers';
 
@@ -21,7 +20,28 @@ export enum RequestMappingMethod {
     POST = 'POST',
     DELETE = 'DELETE',
     PUT = 'PUT',
-    PATCH = 'PATCH'
+    PATCH = 'PATCH',
+    CONNECT = 'CONNECT',
+    CHECKOUT = 'CHECKOUT',
+    COPY = 'COPY',
+    HEAD = 'HEAD',
+    LOCK = 'LOCK',
+    MERGE = 'MERGE',
+    MKACTIVITY = 'MKACTIVITY',
+    MKCOL = 'MKCOL',
+    MOVE = 'MOVE',
+    M_SEARCH = 'm-search',
+    NOTIFY = 'NOTIFY',
+    OPTIONS = 'OPTIONS',
+    PROPFIND = 'PROPFIND',
+    PROPPATCH = 'PROPPATCH',
+    PURGE = 'PURGE',
+    REPORT = 'REPORT',
+    SEARCH = 'SEARCH',
+    SUBSCRIBE = 'SUBSCRIBE',
+    TRACE = 'TRACE',
+    UNLOCK = 'UNLOCK',
+    UNSUBSCRIBE = 'UNSUBSCRIBE'
 }
 
 export interface ControllerConfiguration {
@@ -33,26 +53,30 @@ export interface ControllerRequestConfiguration extends ControllerConfiguration 
     methods?: string[] | RequestMappingMethod[];
 }
 
-export abstract class PYIController extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIController;
+export function Controller<VC extends PYICoreClass<PYIController>>(tprops: VC): VC;
+export function Controller<Props = any>(
+    props: Props & any
+): <VC extends PYICoreClass<PYIController>>(target: VC) => VC;
+export function Controller<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIController) {
+        JsonController(undefined)(props as any);
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            const { prefix } = props;
+            JsonController(prefix ? prefix : undefined)(target);
+            return target;
+        };
     }
 }
 
-/**
- * Extends for routing-controllers JsonController
- * @param config extends routing-controllers config(继承于 routing-controllers 参数)
- */
-export function Controller<Props = ControllerConfiguration | PYIController>(config: Props): any {
-    if (isFunction(config)) {
-        JsonController(undefined)(config as any);
-    } else {
-        return (target: any, key?: string) => {
-            const { prefix } = config as ControllerConfiguration;
-            JsonController(prefix ? prefix : undefined)(target);
-        };
+export class PYIController<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIController;
     }
+
+    public props!: Props;
 }
 
 export function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any {
@@ -60,7 +84,6 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
         map(RequestMappingMethod, (m) => {
             Method(m as any, undefined)(config, key);
         });
-        return throws(config, key);
     } else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target: any, key: string) => {
@@ -68,74 +91,67 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 Method(m as ActionType, prefix)(target, key);
             });
-            return throws(target, key);
         };
     }
 }
 
-/**
- * Middleware ===============================================
- */
+export interface PYIMiddlewareProps {
+    type: 'after' | 'before';
+    priority?: number;
+    before?: PYICoreClass<PYIMiddleware>;
+}
 
-// tslint:disable-next-line:max-classes-per-file
-export abstract class PYIMiddleware extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
+export function Middleware<VC extends PYICoreClass<PYIMiddleware>>(tprops: VC): VC;
+export function Middleware<Props = PYIMiddlewareProps>(
+    props: Props & PYIMiddlewareProps
+): <VC extends PYICoreClass<PYIMiddleware>>(target: VC) => VC;
+export function Middleware<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIMiddleware) {
+        RMiddleware({ type: 'before' })(props);
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            RMiddleware(props as any)(target);
+            return target;
+        };
+    }
+}
+
+export class PYIMiddleware<Props = any> extends PYICore {
+    public static _base(): PYIApp {
         return PYIMiddleware;
     }
+
+    public props!: Props;
 }
 
-/**
- * Extends for routing-controllers middleware
- * @param options extends routing-controllers middleware
- */
-export function Middleware(
-    options: {
-        type: 'after' | 'before';
-        priority?: number;
+export interface PYIInterceptorProps {
+    priority?: number;
+    before?: PYICoreClass<PYIInterceptor>;
+}
+
+export function Interceptor<VC extends PYICoreClass<PYIInterceptor>>(tprops: VC): VC;
+export function Interceptor<Props = PYIInterceptorProps>(
+    props: Props & PYIInterceptorProps
+): <VC extends PYICoreClass<PYIInterceptor>>(target: VC) => VC;
+export function Interceptor<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIInterceptor) {
+        RInterceptor()(props);
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            RInterceptor(props)(target);
+            return target;
+        };
     }
-) {
-    return (target: any, key?: string) => {
-        RMiddleware(options)(target);
-    };
 }
 
-// tslint:disable-next-line:max-classes-per-file
-export abstract class PYIInterceptor extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
+export class PYIInterceptor<Props = any> extends PYICore {
+    public static _base(): PYIApp {
         return PYIInterceptor;
     }
 
-    constructor(...props: any) { super(); }
-}
-
-/**
- * Extends for routing-controllers Interceptor
- * @param options extends routing-controllers Interceptor
- */
-export function Interceptor(options?: { priority?: number; }) {
-    return (target: any, key?: string) => {
-        RInterceptor(options)(target);
-    };
-}
-
-export function Body(options: BodyOptions) {
-    return (target: any, key: string, idx: number) => {
-        RBody({ ...options, validate: false })(target, key, idx);
-        const fn = target[key];
-        // tslint:disable-next-line:only-arrow-functions
-        target[key] = function(...args: any[]) {
-            const valid = args[idx];
-            return valid.validate().then((errors: ValidationError[]) => {
-                if (options.validate === true) {
-                    if (errors.length === 0) { return fn(...args); }
-                    return valid.throws.apply(this, errors);
-                } else {
-                    return fn(...args, errors);
-                }
-            });
-        };
-        return target[key];
-    };
+    public props!: Props;
 }

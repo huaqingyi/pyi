@@ -1,69 +1,45 @@
-import { isFunction } from 'lodash';
-import { PYICore } from '../core';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
 import { RoutingControllersOptions } from 'routing-controllers';
+import { PYIController, PYIMiddleware, PYIInterceptor } from './controller';
 
-export interface PYIApplicationConfiguration extends RoutingControllersOptions {
-    [x: string]: any;
-}
-
-/**
- * Component base
- */
-export abstract class PYIAutoConfiguration<Props = {}> extends PYICore {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoConfiguration;
-    }
-
-    public props?: Props;
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
+export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
+export function Configuration<Props = any>(
+    props: Props & any
+): <VC extends PYICoreClass<PYIConfiguration>>(target: VC) => VC;
+export function Configuration<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIConfiguration) {
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            return target;
+        };
     }
 }
 
-// tslint:disable-next-line:max-classes-per-file
-export abstract class PYIAutoAppConfiguration<Props = {}> extends PYICore implements PYIApplicationConfiguration {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoAppConfiguration;
+export class PYIConfiguration<Props = any> extends PYICore {
+    public static _base(): PYIApp {
+        return PYIConfiguration;
     }
 
-    public props?: Props;
-    
+    public props!: Props;
+}
+
+export class PYIAppConfiguration<Props = any> extends PYIConfiguration implements RoutingControllersOptions {
+    public static _base(): PYIApp {
+        return PYIConfiguration;
+    }
+
+    public props!: Props;
+
+    public controllers: PYIController[];
+    public middlewares: PYIMiddleware[];
+    public interceptors: PYIInterceptor[];
+
     constructor() {
         super();
-        this.defaultErrorHandler = false;
-    }
-
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
-    }
-}
-
-export function Configuration<Props = any>(config: Props): any {
-    const { _root } = (config as any);
-    /**
-     * 如果是直接修饰类
-     */
-    if (_root && isFunction(_root)) {
-        if (
-            _root() === PYIAutoConfiguration ||
-            _root() === PYIAutoAppConfiguration
-        ) {
-            return config;
-        } else {
-            /**
-             * 带参数的修饰
-             */
-            return (target: any, key?: string) => {
-                target.prototype.props = config;
-            };
-        }
-    } else {
-        return config;
+        this.controllers = [];
+        this.middlewares = [];
+        this.interceptors = [];
     }
 }

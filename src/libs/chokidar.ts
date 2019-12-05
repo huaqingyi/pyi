@@ -1,28 +1,33 @@
 import chokidar, { FSWatcher } from 'chokidar';
-import { blue } from 'colors';
+import { gray } from 'colors';
 import { map } from 'lodash';
-import { PYIAutoAppConfiguration, PYIApplication } from '../decorators';
+import { dirname } from 'path';
+import { PYIAppConfiguration } from '../decorators';
+import { PYIApp } from '../core';
+import { get } from 'node-emoji';
 
 export class PYIChokidar {
-    public static runtime(dirname: string | string[], mode: string) {
-        return new PYIChokidar(dirname, mode);
+    public static async runtime(mode: string, callback: (file: PYIApp | PYIApp[]) => any) {
+        return (new PYIChokidar(mode, callback)).runtime();
     }
 
-    public files: { [x: string]: any };
-    public comps: any[];
-    public appconfig: any;
-    public mode: string;
-
-    private dirname: string | string[];
+    public config!: PYIAppConfiguration;
+    public comps: PYIApp[];
+    private callback: (file: PYIApp | PYIApp[]) => any;
     private watcher: FSWatcher;
-    private app!: PYIApplication;
+    private appPath: string;
+    private projectPath: string;
+    private mode: string;
+    private fileTrans: { [x: string]: PYIApp | PYIApp[]; };
 
-    constructor(dirname: string | string[], mode: string) {
-        this.dirname = dirname;
-        this.files = {};
+    constructor(mode: string, callback: (file: PYIApp | PYIApp[]) => any) {
         this.comps = [];
+        this.fileTrans = {};
         this.mode = mode;
-        this.watcher = chokidar.watch(this.dirname);
+        this.callback = callback;
+        this.appPath = process.argv[1];
+        this.projectPath = dirname(this.appPath);
+        this.watcher = chokidar.watch(this.projectPath);
     }
 
     public async addFile(path: string) {
@@ -31,7 +36,6 @@ export class PYIChokidar {
         if (!comp) { return false; }
         await Promise.all(map(comp, async (o, i) => {
             if (!comp[i] || !comp[i].prototype) { return await o; }
-            comp[i].prototype.app = this.app;
             comp[i].prototype.mode = await this.mode;
             if (comp[i]._pyi) {
                 const _pyi = comp[i]._pyi();
@@ -39,19 +43,19 @@ export class PYIChokidar {
                     ..._pyi, path
                 });
             }
-            const { _root } = await comp[i];
-            if (_root && _root() === PYIAutoAppConfiguration) {
-                this.appconfig = await (new (comp[i] as any)())._runtime();
+            const { _base } = await comp[i];
+            if (_base && _base() === PYIAppConfiguration) {
+                this.config = await (new (comp[i] as any)())._runtime();
             }
+            await this.callback(o);
             await this.comps.push(o);
             return await o;
         }));
-        this.files[path] = comp;
-        console.log(blue(`File ${path} has been added ...`));
+        this.fileTrans[path] = comp;
+        console.log(`${get('kiss')} ${gray(`ready ${path} has been added ...`)}`);
     }
 
-    public async setup(app: PYIApplication): Promise<PYIChokidar> {
-        this.app = app;
+    public async runtime(): Promise<PYIChokidar> {
         return new Promise<PYIChokidar>((r) => {
             this.watcher.on('add', this.addFile.bind(this));
             this.watcher.on('ready', () => r(this));

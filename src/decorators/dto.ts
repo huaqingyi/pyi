@@ -1,44 +1,24 @@
-import { PYICore } from '../core';
-import { yellow } from 'colors';
+import { PYICore, PYIApp, PYICoreClass } from '../core';
 
-export abstract class PYIDto extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
+export function Dto<VC extends PYICoreClass<PYIDto>>(tprops: VC): VC;
+export function Dto<Props = any>(
+    props: Props & any
+): <VC extends PYICoreClass<PYIDto>>(target: VC) => VC;
+export function Dto<Props extends any>(props: Props) {
+    if (props._base && props._base() === PYIDto) {
+        return props;
+    } else {
+        return (target: PYIApp) => {
+            target.prototype.props = props;
+            return target;
+        };
+    }
+}
+
+export class PYIDto<Props = any> extends PYICore {
+    public static _base(): PYIApp {
         return PYIDto;
     }
 
-    public err?: boolean;
-    public errno?: number;
-    public errmsg?: string;
-    public data: any;
-
-    constructor(data?: any) {
-        super();
-        this.err = false;
-        this.data = data || {};
-    }
-
-    public async throws(err: Error, errno?: number, errmsg?: string) {
-        this.err = true;
-        this.errno = errno || 1003;
-        if (errmsg) {
-            this.errmsg = errmsg;
-            console.log(yellow(`${err.name}: ${err.message} ${err.stack ? `(${err.stack})` : ''}`));
-            // console.error(err);
-        } else {
-            this.errmsg = `${err.name}: ${err.message} ${err.stack ? `(${err.stack})` : ''}`;
-        }
-        this.data = {};
-        return this;
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-export class PYIGDto extends PYIDto {
-    public err!: boolean;
-    public data!: any;
-}
-
-export function Dto<UsePYIDto = PYIDto>(target: UsePYIDto, key?: string) {
-    // console.log('dto', target);
+    public props!: Props;
 }
