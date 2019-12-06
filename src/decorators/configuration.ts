@@ -24,14 +24,19 @@ export function Configuration<Props extends any>(props: Props) {
 }
 
 export class PYIConfiguration<Props = any> extends PYICore {
+
     public static _base(): PYIApp {
         return PYIConfiguration;
     }
 
     public props!: Props;
     public _runtime() {
-        const resp = this[this.mode]();
-        if (resp.then) { return resp.then(() => this).catch(() => this); }
+        let mode: string = 'development';
+        if (process.env.NODE_ENV) { mode = process.env.NODE_ENV; }
+        if (this[this.mode || mode]) {
+            const resp = this[this.mode || mode]();
+            if (resp.then) { return resp.then(() => this).catch(() => this); }
+        }
         return this;
     }
 }
@@ -124,7 +129,7 @@ export interface PYIRoutingConfiguration {
     production?: () => any;
 }
 
-export class PYIAppConfiguration<Props = any> extends PYICore {
+export class PYIAppConfiguration<Props = any> extends PYIConfiguration {
     public static _base(): PYIApp {
         return PYIAppConfiguration;
     }
@@ -147,6 +152,7 @@ export class PYIAppConfiguration<Props = any> extends PYICore {
         this.port = 4000;
         this.host = 'localhost';
     }
+
     public _runtime() {
         const resp = this[this.mode]();
         if (resp.then) { return resp.then(() => this).catch(() => this); }

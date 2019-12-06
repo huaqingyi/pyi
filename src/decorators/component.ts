@@ -1,4 +1,6 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
+import { isFunction } from 'lodash';
+import { PYIConfiguration, PYIAppConfiguration } from './configuration';
 
 export function Component<VC extends PYICoreClass<PYIComponent>>(tprops: VC): VC;
 export function Component<Props = any>(
@@ -14,9 +16,71 @@ export function Component(props: any | PYIApp) {
     };
 }
 
-export function autowired() {
-    // ...
+export enum ComponentWiredType {
+    AUTOCONNECT = 'autoconnect',
+    AUTOWIRED = 'autowired'
 }
+
+export function auto(type: string) {
+    return (target: any, key: string) => {
+        /**
+         * 容错
+         */
+        if (!target.constructor._pyi) { target.constructor._pyi = () => ({}); }
+        /**
+         * 获取注入类
+         */
+        const params = Reflect.getMetadata('design:type', target, key);
+        /**
+         * 是否嵌套依赖
+         */
+        if (!params._pyi || !params._pyi().autowired) {
+            const { props } = params.prototype;
+            let instance;
+            if (params._base && isFunction(params._base)) {
+                if (
+                    params._base() === PYIConfiguration ||
+                    params._base() === PYIAppConfiguration
+                ) {
+                    (async () => {
+                        instance = await params._runtime(props)._runtime();
+                        target.constructor.prototype[key] = await instance;
+                    })();
+                } else {
+                    instance = params._runtime(props);
+                    console.log(instance);
+                    target.constructor.prototype[key] = instance;
+                }
+            } else {
+                instance = new params(props);
+                target.constructor.prototype[key] = instance;
+            }
+        } else {
+            /**
+             * 嵌套依赖
+             */
+            const _pyi = target.constructor._pyi();
+            if (!_pyi.autowired) {
+                target.constructor._pyi = () => ({
+                    ..._pyi,
+                    autowired: [
+                        ...(_pyi.autowired || []),
+                        key
+                    ]
+                });
+            }
+        }
+    };
+}
+
+export function autowired(target: any, key: string) {
+    return auto(ComponentWiredType.AUTOWIRED)(target, key);
+}
+
+export function autoconnect(target: any, key: string) {
+    return auto(ComponentWiredType.AUTOCONNECT)(target, key);
+}
+
 export class PYIComponent<Props = any> extends PYICore {
     public static _base(): PYIApp {
         return PYIComponent;

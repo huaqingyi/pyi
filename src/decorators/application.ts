@@ -152,6 +152,9 @@ export class PYIApplication<
         await useKoaServer(this, {
             ...this.config, development: this.mode === 'development'
         });
+        console.log(`${get('rocket')}  ${green(`application scan project init success ...`)}`);
+        // tslint:disable-next-line:no-unused-expression
+        this.onInitApplication && await this.onInitApplication();
         // tslint:disable-next-line:no-unused-expression
         this.ready && await this.ready(this);
         await this._bootstrap();
