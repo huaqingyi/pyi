@@ -98,7 +98,6 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
 export interface PYIMiddlewareProps {
     type: 'after' | 'before';
     priority?: number;
-    before?: PYICoreClass<PYIMiddleware>;
 }
 
 export function Middleware<VC extends PYICoreClass<PYIMiddleware>>(tprops: VC): VC;
@@ -107,6 +106,7 @@ export function Middleware<Props = PYIMiddlewareProps>(
 ): <VC extends PYICoreClass<PYIMiddleware>>(target: VC) => VC;
 export function Middleware<Props extends any>(props: Props) {
     if (props._base && props._base() === PYIMiddleware) {
+        props.prototype.props = { type: 'before' };
         RMiddleware({ type: 'before' })(props);
         return props;
     } else {
@@ -128,7 +128,6 @@ export class PYIMiddleware<Props = any> extends PYICore {
 
 export interface PYIInterceptorProps {
     priority?: number;
-    before?: PYICoreClass<PYIInterceptor>;
 }
 
 export function Interceptor<VC extends PYICoreClass<PYIInterceptor>>(tprops: VC): VC;
@@ -137,6 +136,7 @@ export function Interceptor<Props = PYIInterceptorProps>(
 ): <VC extends PYICoreClass<PYIInterceptor>>(target: VC) => VC;
 export function Interceptor<Props extends any>(props: Props) {
     if (props._base && props._base() === PYIInterceptor) {
+        props.prototype.props = {};
         RInterceptor()(props);
         return props;
     } else {

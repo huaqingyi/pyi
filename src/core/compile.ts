@@ -27,33 +27,10 @@ export class Compile {
             if (!config.middlewares) { config.middlewares = []; }
 
             if (_base && _base() === PYIController) { config.controllers.push(comp); }
-            if (_base && _base() === PYIInterceptor) {
-                config.interceptors = await this.order(config.interceptors, comp);
-            }
-            if (_base && _base() === PYIMiddleware) {
-                config.middlewares = await this.order(config.middlewares, comp);
-            }
+            if (_base && _base() === PYIInterceptor) { config.interceptors.push(comp); }
+            if (_base && _base() === PYIMiddleware) { config.middlewares.push(comp); }
             return await comp;
         }));
         return await config;
-    }
-
-    private async order(packs: any[], comp: any) {
-        const { props } = await comp;
-        if (props.before) {
-            const idx = packs.indexOf(props.before);
-            if (idx !== -1) {
-                packs = packs.slice(0, idx).concat(
-                    [comp]
-                ).concat(
-                    packs.slice(idx, packs.length)
-                );
-            } else {
-                packs.push(comp);
-            }
-        } else {
-            packs.push(comp);
-        }
-        return await packs;
     }
 }

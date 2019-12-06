@@ -3,7 +3,7 @@ import { PYICore, PYIApp } from '../core';
 import Koa, { DefaultState, DefaultContext } from 'koa';
 import { useKoaServer } from 'routing-controllers';
 import { Compile } from '../core/compile';
-import { green } from 'colors';
+import { blue, green } from 'colors';
 import { get } from 'node-emoji';
 
 // tslint:disable-next-line:no-empty-interface
@@ -120,34 +120,35 @@ export class PYIApplication<
 
     public async starter() {
         this.listen(this.config.port, this.config.host, () => {
-            console.log(`${get('kiss')} ${green(
+            console.log(`${get('kiss')}  ${blue(
                 `application running for http://${this.config.host}:${this.config.port}`
             )}`);
         });
     }
 
     private async run() {
-        console.log(`${get('rocket')} ${green(`application onInit runtime ...`)}`);
+        console.log(`${get('rocket')}  ${green(`application onInit runtime ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInit && await this.onInit();
 
-        console.log(`${get('rocket')} ${green(`application scan project ...`)}`);
+        console.log(`${get('rocket')}  ${green(`application scan project ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onScanInit && await this.onScanInit();
         const { config } = await this.compile.scanProject(async (file) => {
-            console.log(`${get('rainbow')} ${green(`application scan change components ...`)}`);
+            console.log(`${get('rainbow')}  ${green(`application scan change components ...`)}`);
             // tslint:disable-next-line:no-unused-expression
             this.onScanChange && await this.onScanChange(file);
         });
 
-        console.log(`${get('rocket')} ${green(`application scan project config ...`)}`);
+        console.log(`${get('rocket')}  ${green(`application scan project config ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationInit && await this.onConfigurationInit();
 
         this.config = await this.compile.configrationInit(config);
-        console.log(`${get('rocket')} ${green(`application scan project config success ...`)}`);
+        console.log(`${get('rocket')}  ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
+        
         await useKoaServer(this, {
             ...this.config, development: this.mode === 'development'
         });

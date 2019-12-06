@@ -27,12 +27,18 @@ export class PYIChokidar {
         this.callback = callback;
         this.appPath = process.argv[1];
         this.projectPath = dirname(this.appPath);
-        this.watcher = chokidar.watch(this.projectPath);
+        this.watcher = chokidar.watch(this.projectPath, {
+            ignored: new RegExp(`${this.appPath}|.d.ts`, 'gi')
+        });
     }
 
     public async addFile(path: string) {
-        if (path.indexOf('.d.ts') !== -1) { return path; }
-        const comp = await import(path);
+        let comp: any = {};
+        try {
+            comp = await import(path);
+        // tslint:disable-next-line:no-empty
+        } catch (err) { }
+
         if (!comp) { return false; }
         await Promise.all(map(comp, async (o, i) => {
             if (!comp[i] || !comp[i].prototype) { return await o; }
@@ -52,7 +58,7 @@ export class PYIChokidar {
             return await o;
         }));
         this.fileTrans[path] = comp;
-        console.log(`${get('kiss')} ${gray(`ready ${path} has been added ...`)}`);
+        console.log(`${get('kiss')}  ${gray(`ready ${path} has been added ...`)}`);
     }
 
     public async runtime(): Promise<PYIChokidar> {

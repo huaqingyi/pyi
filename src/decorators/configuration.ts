@@ -1,5 +1,4 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
-import { RoutingControllersOptions } from 'routing-controllers';
 import { PYIController, PYIMiddleware, PYIInterceptor } from './controller';
 import { ClassTransformOptions } from 'class-transformer';
 import { ValidatorOptions } from 'class-validator';
@@ -11,7 +10,10 @@ export function Configuration<Props = any>(
     props: Props & any
 ): <VC extends PYICoreClass<PYIConfiguration>>(target: VC) => VC;
 export function Configuration<Props extends any>(props: Props) {
-    if (props._base && props._base() === PYIConfiguration) {
+    if (
+        props._base && props._base() === PYIConfiguration ||
+        props._base && props._base() === PYIAppConfiguration
+    ) {
         return props;
     } else {
         return (target: PYIApp) => {
@@ -29,7 +31,7 @@ export class PYIConfiguration<Props = any> extends PYICore {
     public props!: Props;
     public _runtime() {
         const resp = this[this.mode]();
-        if (resp.then) { return resp.then(() => this).catch(() => this) }
+        if (resp.then) { return resp.then(() => this).catch(() => this); }
         return this;
     }
 }
@@ -122,9 +124,9 @@ export interface PYIRoutingConfiguration {
     production?: () => any;
 }
 
-export class PYIAppConfiguration<Props = any> extends PYIConfiguration {
+export class PYIAppConfiguration<Props = any> extends PYICore {
     public static _base(): PYIApp {
-        return PYIConfiguration;
+        return PYIAppConfiguration;
     }
 
     public props!: Props;
@@ -144,5 +146,10 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration {
         this.defaultErrorHandler = false;
         this.port = 4000;
         this.host = 'localhost';
+    }
+    public _runtime() {
+        const resp = this[this.mode]();
+        if (resp.then) { return resp.then(() => this).catch(() => this); }
+        return this;
     }
 }

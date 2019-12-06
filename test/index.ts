@@ -1,18 +1,18 @@
-import { createProgram, ModuleKind, ScriptTarget } from 'typescript';
-import { join } from 'path';
+// import { createProgram, ModuleKind, ScriptTarget } from 'typescript';
+// import { join } from 'path';
 
-const program = createProgram([join(__dirname, '../src/index.ts')], {
-    module: ModuleKind.CommonJS,
-    target: ScriptTarget.ESNext,
-    sourceMap: true,
-    noImplicitAny: true,
-    removeComments: true,
-    preserveConstEnums: true,
-    suppressImplicitAnyIndexErrors: true,
-    declaration: true,
-    outDir: join(__dirname, '../testbuild')
-});
-const output = program.emit();
+// const program = createProgram([join(__dirname, '../src/index.ts')], {
+//     module: ModuleKind.CommonJS,
+//     target: ScriptTarget.ESNext,
+//     sourceMap: true,
+//     noImplicitAny: true,
+//     removeComments: true,
+//     preserveConstEnums: true,
+//     suppressImplicitAnyIndexErrors: true,
+//     declaration: true,
+//     outDir: join(__dirname, '../testbuild')
+// });
+// const output = program.emit();
 // import {
 //     sys, findConfigFile, createSemanticDiagnosticsBuilderProgram,
 //     createWatchCompilerHost, createWatchProgram, flattenDiagnosticMessageText,
@@ -74,3 +74,10 @@ const output = program.emit();
 // }
 
 // watchMain();
+import Koa from 'koa';
+
+export class Test extends Koa {
+
+}
+
+console.log(new Test());
