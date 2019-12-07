@@ -37,22 +37,38 @@ export function auto(type: string) {
         if (!params._pyi || !params._pyi().autowired) {
             const { props } = params.prototype;
             let instance;
-            if (params._base && isFunction(params._base)) {
-                if (
-                    params._base() === PYIConfiguration ||
-                    params._base() === PYIAppConfiguration
-                ) {
-                    (async () => {
-                        instance = await params._runtime(props)._runtime();
-                        target.constructor.prototype[key] = await instance;
-                    })();
-                } else {
-                    instance = params._runtime(props);
-                    console.log(instance);
-                    target.constructor.prototype[key] = instance;
-                }
+            if (
+                (params._base && isFunction(params._base) && params._base() === PYIConfiguration) ||
+                (params._base && isFunction(params._base) && params._base() === PYIAppConfiguration)
+            ) {
+                (async () => {
+                    switch (type) {
+                        case ComponentWiredType.AUTOWIRED:
+                            instance = await params._pyiruntime(props);
+                            break;
+                        case ComponentWiredType.AUTOCONNECT:
+                            instance = await params._pyiconnect(props);
+                            break;
+                        default: return target;
+                    }
+                    instance = await instance._pyiruntime();
+                    target.constructor.prototype[key] = await instance;
+                })();
             } else {
-                instance = new params(props);
+                switch (type) {
+                    case ComponentWiredType.AUTOWIRED:
+                        console.log(11, instance);
+                        instance = params._pyiruntime();
+                        console.log(1, instance);
+                        break;
+                    case ComponentWiredType.AUTOCONNECT:
+                        console.log(22, instance);
+                        instance = params._pyiconnect();
+                        console.log(2, instance);
+                        break;
+                    default: return target;
+                }
+                console.log(key, params, instance);
                 target.constructor.prototype[key] = instance;
             }
         } else {
@@ -70,6 +86,7 @@ export function auto(type: string) {
                 });
             }
         }
+        return target.constructor.prototype[key];
     };
 }
 

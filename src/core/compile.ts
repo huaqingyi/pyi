@@ -1,7 +1,7 @@
 import { PYIApplication, PYIAppConfiguration, PYIController, PYIInterceptor, PYIMiddleware } from '../decorators';
 import { PYIChokidar } from '../libs/chokidar';
 import { PYIApp } from './pyi';
-import { map } from 'lodash';
+import { map, isFunction, find, filter } from 'lodash';
 
 export class Compile {
     private drive: PYIApplication;
@@ -20,7 +20,7 @@ export class Compile {
     }
 
     public async configrationInit(config: PYIAppConfiguration) {
-        await Promise.all(map(this.comps, async (comp: any) => {
+        await Promise.all(map(this.comps, async (comp: any, i: number) => {
             const { _base } = await comp;
             if (!config.controllers) { config.controllers = []; }
             if (!config.interceptors) { config.interceptors = []; }

@@ -25,19 +25,20 @@ export class PYICore extends Function implements PYIApp {
         return this.__proto__;
     }
 
-    public static _runtime(...props: any) {
-        // console.log(this);
-        // if (!this._this) {
-        //     this._this = new this(...props);
-        //     return this._this;
-        // } else { return new this(...props); }
-        return new this();
+    public static _pyiruntime(props: any) {
+        if (!this._this) {
+            this._this = new this(props);
+            return this._this;
+        } else { return new this(props); }
     }
 
-    public static _connect(...props: any) {
+    public static _pyiconnect(props: any) {
         if (!this._this) {
-            this._this = new this(...props);
+            console.log('s');
+            this._this = new this(props);
+            console.log('e');
         }
+        console.log(this._this);
         return this._this;
     }
 

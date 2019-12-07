@@ -30,7 +30,7 @@ export class PYIConfiguration<Props = any> extends PYICore {
     }
 
     public props!: Props;
-    public _runtime() {
+    public _pyiruntime() {
         let mode: string = 'development';
         if (process.env.NODE_ENV) { mode = process.env.NODE_ENV; }
         if (this[this.mode || mode]) {
@@ -153,7 +153,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration {
         this.host = 'localhost';
     }
 
-    public _runtime() {
+    public _pyiruntime() {
         const resp = this[this.mode]();
         if (resp.then) { return resp.then(() => this).catch(() => this); }
         return this;

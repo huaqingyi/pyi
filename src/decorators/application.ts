@@ -83,7 +83,7 @@ export class PYIApplication<
         return this.__proto__;
     }
 
-    public static _runtime() {
+    public static _pyiruntime() {
         return this;
     }
 

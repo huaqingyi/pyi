@@ -36,7 +36,7 @@ export class PYIChokidar {
         let comp: any = {};
         try {
             comp = await import(path);
-        // tslint:disable-next-line:no-empty
+            // tslint:disable-next-line:no-empty
         } catch (err) { }
 
         if (!comp) { return false; }
@@ -48,10 +48,12 @@ export class PYIChokidar {
                 comp[i]._pyi = () => ({
                     ..._pyi, path
                 });
+            } else {
+                comp[i]._pyi = () => ({ path });
             }
             const { _base } = await comp[i];
             if (_base && _base() === PYIAppConfiguration) {
-                this.config = await (new (comp[i] as any)())._runtime();
+                this.config = await (new (comp[i] as any)())._pyiruntime();
             }
             await this.callback(o);
             await this.comps.push(o);
