@@ -54,15 +54,15 @@ export interface PYIRoutingConfiguration {
     /**
      * List of controllers to register in the framework or directories from where to import all your controllers.
      */
-    controllers?: Function[] | string[];
+    controllers?: PYIController[] | string[];
     /**
      * List of middlewares to register in the framework or directories from where to import all your middlewares.
      */
-    middlewares?: Function[] | string[];
+    middlewares?: PYIMiddleware[] | string[];
     /**
      * List of interceptors to register in the framework or directories from where to import all your interceptors.
      */
-    interceptors?: Function[] | string[];
+    interceptors?: PYIInterceptor[] | string[];
     /**
      * Indicates if class-transformer should be used to perform serialization / deserialization.
      */
@@ -129,7 +129,7 @@ export interface PYIRoutingConfiguration {
     production?: () => any;
 }
 
-export class PYIAppConfiguration<Props = any> extends PYIConfiguration {
+export class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
     public static _base(): PYIApp {
         return PYIAppConfiguration;
     }

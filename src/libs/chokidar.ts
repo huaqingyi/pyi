@@ -53,7 +53,7 @@ export class PYIChokidar {
             }
             const { _base } = await comp[i];
             if (_base && _base() === PYIAppConfiguration) {
-                this.config = await (new (comp[i] as any)())._pyiruntime();
+                this.config = await (comp[i] as any)._pyiconnect()._pyiruntime();
             }
             await this.callback(o);
             await this.comps.push(o);

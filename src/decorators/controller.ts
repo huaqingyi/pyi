@@ -9,6 +9,7 @@ import {
 } from 'routing-controllers';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 import { map } from 'lodash';
+import { ValidationError } from 'class-validator';
 
 export * from 'routing-controllers';
 
@@ -65,7 +66,7 @@ export function Controller<Props extends any>(props: Props) {
         return (target: PYIApp) => {
             target.prototype.props = props;
             const { prefix } = props;
-            JsonController(prefix ? prefix : undefined)(target);
+            JsonController(prefix ? prefix : undefined)(target as any);
             return target;
         };
     }

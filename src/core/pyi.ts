@@ -1,11 +1,11 @@
 // tslint:disable-next-line:no-empty-interface
-export interface PYIApp extends Function {
+export interface PYIApp {
     [x: string]: any;
 }
 
 export type PYICoreClass<V> = (new (...args: any[]) => V & PYICore) & typeof PYICore;
 
-export class PYICore extends Function implements PYIApp {
+export class PYICore implements PYIApp {
     [x: string]: any;
     public static __proto__: any;
 
@@ -34,15 +34,15 @@ export class PYICore extends Function implements PYIApp {
 
     public static _pyiconnect(props: any) {
         if (!this._this) {
-            console.log('s');
             this._this = new this(props);
-            console.log('e');
         }
-        console.log(this._this);
         return this._this;
     }
 
     protected static _this: PYIApp;
 
     public mode!: string;
+
+    // tslint:disable-next-line:no-empty
+    constructor(...props: any) { }
 }

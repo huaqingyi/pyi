@@ -148,9 +148,12 @@ export class PYIApplication<
         console.log(`${get('rocket')}  ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
-        
+
         await useKoaServer(this, {
-            ...this.config, development: this.mode === 'development'
+            ...this.config as any, development: this.mode === 'development'
+        });
+        this.on('error', (ctx) => {
+            console.log('ctx', ctx);
         });
         console.log(`${get('rocket')}  ${green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression

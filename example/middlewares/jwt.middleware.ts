@@ -4,6 +4,5 @@ import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from '../../src';
 export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
     public async use(ctx, next) {
         await next();
-        await console.log(0);
     }
 }

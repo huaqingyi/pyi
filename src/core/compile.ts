@@ -1,7 +1,7 @@
 import { PYIApplication, PYIAppConfiguration, PYIController, PYIInterceptor, PYIMiddleware } from '../decorators';
 import { PYIChokidar } from '../libs/chokidar';
 import { PYIApp } from './pyi';
-import { map, isFunction, find, filter } from 'lodash';
+import { map } from 'lodash';
 
 export class Compile {
     private drive: PYIApplication;

@@ -1,4 +1,5 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
+import { ValidationError } from 'class-validator';
 
 export function Dao<VC extends PYICoreClass<PYIDao>>(tprops: VC): VC;
 export function Dao<Props = any>(
@@ -13,6 +14,10 @@ export function Dao<Props extends any>(props: Props) {
             return target;
         };
     }
+}
+
+export interface PYIDaoThrow {
+    throw: (errors: ValidationError[]) => any;
 }
 
 export class PYIDao<Props = any> extends PYICore {

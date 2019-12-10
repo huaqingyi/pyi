@@ -57,18 +57,13 @@ export function auto(type: string) {
             } else {
                 switch (type) {
                     case ComponentWiredType.AUTOWIRED:
-                        console.log(11, instance);
                         instance = params._pyiruntime();
-                        console.log(1, instance);
                         break;
                     case ComponentWiredType.AUTOCONNECT:
-                        console.log(22, instance);
                         instance = params._pyiconnect();
-                        console.log(2, instance);
                         break;
                     default: return target;
                 }
-                console.log(key, params, instance);
                 target.constructor.prototype[key] = instance;
             }
         } else {
