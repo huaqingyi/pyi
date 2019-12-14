@@ -1,6 +1,6 @@
 import { PYICoreClass, PYICore } from '../core';
 
-export function PYIExecption<Props extends PYICoreClass<PYIThrows<any>>>(execption: Props) {
+export function PYIExecption<Props extends PYICoreClass<PYIThrows<any>>>(execption: Props): any {
     // ...
 }
 

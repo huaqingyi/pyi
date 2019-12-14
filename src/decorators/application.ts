@@ -1,10 +1,11 @@
 import { PYIAppConfiguration } from './configuration';
 import { PYICore, PYIApp } from '../core';
-import Koa, { DefaultState, DefaultContext } from 'koa';
+import Koa, { DefaultState, DefaultContext, Context } from 'koa';
 import { useKoaServer } from 'routing-controllers';
 import { Compile } from '../core/compile';
 import { blue, green } from 'colors';
 import { get } from 'node-emoji';
+import { Responseiddleware } from '../middlewares/response.middleware';
 
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnInit {
@@ -94,7 +95,7 @@ export class PYIApplication<
         return this._this;
     }
 
-    protected static _this: Koa;
+    protected static _this: PYIApplication;
     public mode!: string;
     public props?: any;
     public config!: PYIAppConfiguration;
@@ -148,13 +149,44 @@ export class PYIApplication<
         console.log(`${get('rocket')}  ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
-
+        this.config.middlewares.push(Responseiddleware);
         await useKoaServer(this, {
-            ...this.config as any, development: this.mode === 'development'
+            ...this.config as any, development: this.mode === 'development', defaultErrorHandler: true
         });
-        this.on('error', (ctx) => {
-            console.log('ctx', ctx);
-        });
+        // this.use(async (ctx, next) => {
+        //     try {
+        //         await next();
+        //     } catch (e) {
+        //         ctx.status = 500;
+        //     }
+        //     if (Number(ctx.status) === 404) {
+        //         ctx.status = 404;
+        //     }
+        // });
+        // this.use(async (ctx, next) => {
+        //     await next();
+        //     console.log(ctx.status);
+        //     if (Number(ctx.status) === 404) {
+        //         ctx.body = '404';
+        //     }
+        // });
+        // this.on('error', (err, ctx) => {
+        //     console.log('error', err, ctx);
+        // });
+        // this.use(async (ctx: Context, next) => {
+        //     try {
+        //         ctx.error = (code, message) => {
+        //             if (typeof code === 'string') {
+        //                 message = code;
+        //                 code = 500;
+        //             }
+        //             ctx.throw(code || 500, message || '服务器错误');
+        //         };
+        //         await next();
+        //     } catch (e) {
+        //         console.log('catch', e);
+        //     }
+        // });
         console.log(`${get('rocket')}  ${green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInitApplication && await this.onInitApplication();

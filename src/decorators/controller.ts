@@ -80,8 +80,14 @@ export class PYIController<Props = any> extends PYICore {
     public props!: Props;
 }
 
+export function throws(target: any, key: string) {
+    const Dto = Reflect.getMetadata('design:returntype', target, key);
+    console.log(Dto);
+}
+
 export function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any {
     if (key) {
+        throws(config, key);
         map(RequestMappingMethod, (m) => {
             Method(m as any, undefined)(config, key);
         });
@@ -89,6 +95,7 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
         // tslint:disable-next-line:no-shadowed-variable
         return (target: any, key: string) => {
             const { prefix, methods } = config as ControllerRequestConfiguration;
+            throws(target, key);
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 Method(m as ActionType, prefix)(target, key);
             });
