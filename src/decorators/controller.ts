@@ -4,12 +4,10 @@ import {
     JsonController, Method,
     Middleware as RMiddleware,
     Interceptor as RInterceptor,
-    Body as RBody,
-    BodyOptions
-} from 'routing-controllers';
+} from '../extends';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
-import { map } from 'lodash';
-import { ValidationError } from 'class-validator';
+import { map, isFunction } from 'lodash';
+import { PYIThrows } from './execption';
 
 export * from 'routing-controllers';
 
@@ -82,23 +80,62 @@ export class PYIController<Props = any> extends PYICore {
 
 export function throws(target: any, key: string) {
     const Dto = Reflect.getMetadata('design:returntype', target, key);
-    console.log(Dto);
+    const types = Reflect.getMetadata('design:type', target, key);
+    const params = Reflect.getMetadata('design:paramtypes', target, key);
+    console.log(Dto, types, params, key);
+    const action = target.constructor.prototype[key];
+    // tslint:disable-next-line:only-arrow-functions
+    target.constructor.prototype[key] = async function(...props: any) {
+        let response: Promise<any> | PYICoreClass<PYIThrows<any>> | any;
+        let body: any = {};
+        try {
+            response = action.apply(this, props);
+        } catch (err) {
+            return 'error';
+        }
+        if (
+            response &&
+            response._base &&
+            response._base() === PYIThrows
+        ) {
+            const execption = new Proxy(new response(), {
+                get: (t, p) => {
+                    if (t[p]) {
+                        return t[p];
+                    } else { return this[p]; }
+                },
+                set: (t, p, value) => {
+                    t[p] = value;
+                    return true;
+                }
+            });
+            try {
+                body = await execption.throws();
+                return (new Dto(body));
+            } catch (error) {
+                return (new Dto(body)).throws(error);
+            }
+        } else {
+            return response;
+        }
+    };
+    return target.constructor.prototype[key];
 }
 
 export function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any {
     if (key) {
-        throws(config, key);
         map(RequestMappingMethod, (m) => {
             Method(m as any, undefined)(config, key);
         });
+        return throws(config, key);
     } else {
         // tslint:disable-next-line:no-shadowed-variable
         return (target: any, key: string) => {
             const { prefix, methods } = config as ControllerRequestConfiguration;
-            throws(target, key);
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
                 Method(m as ActionType, prefix)(target, key);
             });
+            return throws(target, key);
         };
     }
 }

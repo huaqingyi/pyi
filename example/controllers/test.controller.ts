@@ -24,6 +24,18 @@ export class TestController extends PYIController {
     }
 
     @RequestMapping({
+        prefix: '/error'
+    })
+    public error(): ResponseDto {
+        return PYIExecption(class extends PYIThrows<TestController> {
+            public async throws(this: TestController) {
+                console.log(this.service);
+                return 'test ...';
+            }
+        });
+    }
+
+    @RequestMapping({
         prefix: '/valid',
         methods: [RequestMappingMethod.POST]
     })

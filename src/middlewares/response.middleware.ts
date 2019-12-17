@@ -1,7 +1,7 @@
-import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from '../../src/decorators';
+import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from '../decorators/controller';
 
-@Middleware({ type: 'after', priority: 0 })
-export class Responseiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
+@Middleware({ type: 'after' })
+export class ResponseMiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
     public async use(context: any, next: (err?: any) => Promise<any>): Promise<any> {
         console.log('do something before execution...');
         return next().then(() => {
