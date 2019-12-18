@@ -1,6 +1,6 @@
 {
   "name": "pyi",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "pyi freamwork",
   "main": "dist/index.js",
   "scripts": {
