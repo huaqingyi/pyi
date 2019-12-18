@@ -18,6 +18,8 @@ export class TestController extends PYIController {
         methods: [RequestMappingMethod.GET]
     })
     public async test() {
+        this.logger.error(1111);
+        console.log(111);
         console.log(await this.service.findAll());
         throw new Error('测试');
         return 111;
@@ -29,7 +31,7 @@ export class TestController extends PYIController {
     public error(): ResponseDto {
         return PYIExecption(class extends PYIThrows<TestController> {
             public async throws(this: TestController) {
-                console.log(this.service);
+                console.log(await this.service.test());
                 return 'test ...';
             }
         });
@@ -44,7 +46,6 @@ export class TestController extends PYIController {
     ): ResponseDto {
         return PYIExecption(class extends PYIThrows<TestController> {
             public async throws(this: TestController) {
-                console.log(this.service);
                 return 'test ...';
             }
         });
