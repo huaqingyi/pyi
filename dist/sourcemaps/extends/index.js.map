@@ -1,0 +1,1 @@
+{"version":3,"sources":["extends/index.ts"],"names":[],"mappings":";;;;;AAAA,2CAAsC","file":"../../extends/index.js","sourcesContent":["export * from './routing.controllers';\n"]}

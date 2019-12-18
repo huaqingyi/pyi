@@ -6,9 +6,10 @@ export class GulpFile {
 
     @Task({
         src: join(__dirname, 'src/**/*.ts'),
-        dest: join(__dirname, 'app')
+        dest: join(__dirname, 'dist')
     })
+    // tslint:disable-next-line:no-shadowed-variable
     public async build(tsc: TSC) {
-        await tsc.runtime(join(__dirname, 'src/**/*.ts'), join(__dirname, 'app'));
+        tsc.runtime();
     }
 }
