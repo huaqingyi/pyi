@@ -1,1 +1,1 @@
-export * from './pyi.core';
+export * from './pyi';

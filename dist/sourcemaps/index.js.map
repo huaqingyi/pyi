@@ -1,1 +1,0 @@
-{"version":3,"sources":["index.ts"],"names":[],"mappings":";;;;;AAAA,4BAA0B;AAC1B,kCAA6B","file":"../index.js","sourcesContent":["import 'reflect-metadata';\nexport * from './decorators';\n"]}

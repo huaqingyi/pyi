@@ -1,7 +1,7 @@
-import { Application } from './src/application';
+import { Application } from './application';
 
 const app = new Application();
 app.bootstrap(() => {
-    // app.listen(3000);
     app.starter();
 });
+// console.log(app);
