@@ -22,6 +22,9 @@ export class Compile {
     public async configrationInit(config: PYIAppConfiguration) {
         await Promise.all(map(this.comps, async (comp: any, i: number) => {
             const { _base } = await comp;
+            if (comp) {
+                comp.prototype.logger = this.drive.logger;
+            }
             if (!config.controllers) { config.controllers = []; }
             if (!config.interceptors) { config.interceptors = []; }
             if (!config.middlewares) { config.middlewares = []; }

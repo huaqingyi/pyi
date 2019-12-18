@@ -7,6 +7,9 @@ import { isPromiseLike } from 'routing-controllers/util/isPromiseLike';
 import { runInSequence } from 'routing-controllers/util/runInSequence';
 import { importClassesFromDirectories } from 'routing-controllers/util/importClassesFromDirectories';
 import { getFromContainer, ValidationOptions } from 'class-validator';
+import { PYIThrows } from '../decorators/execption';
+import { PYIDto } from '../decorators/dto';
+import { PYICoreClass } from '../core/pyi';
 
 export * from 'routing-controllers';
 
@@ -115,20 +118,70 @@ export class RoutingControllers<T extends BaseDriver> {
             .sort((param1, param2) => param1.index - param2.index)
             .map((param) => this.parameterHandler.handle(action, param));
 
+        const controllerInstance = actionMetadata.controllerMetadata.instance;
+        const Dto = Reflect.getMetadata('design:returntype', controllerInstance, actionMetadata.method);
+
         // after all parameters are computed
-        return Promise.all(paramsPromises).then((params) => {
-
+        return Promise.all(paramsPromises).then(async (params) => {
+            let body = {};
+            let response: Promise<any> | PYICoreClass<PYIThrows<any>> | any;
             // execute action and handle result
-            const allParams = actionMetadata.appendParams ? actionMetadata.appendParams(action).concat(params) : params;
-            const result = actionMetadata.methodOverride ? actionMetadata.methodOverride(
-                actionMetadata, action, allParams
-            ) : actionMetadata.callMethod(allParams);
-            return this.handleCallMethodResult(result, actionMetadata, action, interceptorFns);
+            const allParams = actionMetadata.appendParams ? (
+                actionMetadata.appendParams(action).concat(params)
+            ) : params;
+            if (actionMetadata.methodOverride) {
+                response = actionMetadata.methodOverride(
+                    actionMetadata, action, allParams
+                );
+            } else {
+                response = await controllerInstance[actionMetadata.method].apply(controllerInstance, params);
+            }
+            if (
+                response &&
+                response._base &&
+                response._base() === PYIThrows
+            ) {
+                const execption = new Proxy(new response(), {
+                    get: (t, p) => {
+                        if (t[p]) {
+                            return t[p];
+                        } else { return controllerInstance[p]; }
+                    },
+                    set: (t, p, value) => {
+                        t[p] = value;
+                        return true;
+                    }
+                });
+                if (
+                    Dto &&
+                    Dto._base &&
+                    Dto._base() === PYIDto
+                ) {
+                    try {
+                        const data = await execption.throws();
+                        body = (new Dto(data));
+                    } catch (error) {
+                        body = (new Dto(body)).throws(error);
+                    }
+                } else {
+                    body = await execption.throws();
+                }
+            }
+            return await this.handleCallMethodResult(body, actionMetadata, action, interceptorFns);
 
-        }).catch((error) => {
-            console.log('routing', error);
+        }).catch(async (error) => {
+            if (
+                Dto &&
+                Dto._base &&
+                Dto._base() === PYIDto
+            ) {
+                const body = (new Dto({})).throws(error);
+                return await this.handleCallMethodResult(body, actionMetadata, action, interceptorFns);
+            } else {
+                return this.driver.handleError(error, actionMetadata, action);
+            }
             // otherwise simply handle error without action execution
-            return this.driver.handleError(error, actionMetadata, action);
+            // return this.driver.handleError(error, actionMetadata, action);
         });
     }
 

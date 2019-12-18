@@ -4,6 +4,7 @@ import { ClassTransformOptions } from 'class-transformer';
 import { ValidatorOptions } from 'class-validator';
 import { AuthorizationChecker } from 'routing-controllers/AuthorizationChecker';
 import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
+import { SignaleOptions } from 'signale';
 
 export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export function Configuration<Props = any>(
@@ -24,6 +25,7 @@ export function Configuration<Props extends any>(props: Props) {
 }
 
 export class PYIConfiguration<Props = any> extends PYICore {
+    [x: string]: any;
 
     public static _base(): PYIApp {
         return PYIConfiguration;
@@ -125,6 +127,8 @@ export interface PYIRoutingConfiguration {
         };
     };
 
+    debugOptions?: SignaleOptions;
+
     development?: () => any;
     production?: () => any;
 }
@@ -142,13 +146,14 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
     public defaultErrorHandler: boolean;
     public port: number;
     public host: string;
+    public debugOptions?: SignaleOptions;
 
     constructor() {
         super();
         this.controllers = [];
         this.middlewares = [];
         this.interceptors = [];
-        this.defaultErrorHandler = false;
+        this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';
     }

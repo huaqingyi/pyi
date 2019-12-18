@@ -1,3 +1,5 @@
+import { Signale } from 'signale';
+
 // tslint:disable-next-line:no-empty-interface
 export interface PYIApp {
     [x: string]: any;
@@ -42,6 +44,8 @@ export class PYICore implements PYIApp {
     protected static _this: PYIApp;
 
     public mode!: string;
+
+    public logger!: Signale;
 
     // tslint:disable-next-line:no-empty
     constructor(...props: any) { }

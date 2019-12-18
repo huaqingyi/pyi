@@ -11,4 +11,9 @@ export class TestService extends PYIService {
     public findAll() {
         return this.db.table(User).findAll({ raw: true });
     }
+
+    public async test() {
+        throw new Error('测试 Service Error ...');
+        return await { name: 'Hello World ...' };
+    }
 }

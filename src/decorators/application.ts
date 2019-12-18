@@ -1,12 +1,12 @@
 import { PYIAppConfiguration } from './configuration';
-import { PYICore, PYIApp } from '../core';
+import { PYICore, PYIApp, PYICoreClass, PYIPlugins } from '../core';
 import Koa, { DefaultState, DefaultContext } from 'koa';
 import { createExecutor, KoaDriver } from '../extends';
 import { Compile } from '../core/compile';
 import { blue, green } from 'colors';
 import { get } from 'node-emoji';
-import { ResponseMiddleware } from '../middlewares/response.middleware';
-export { ResponseMiddleware };
+import { HttpLogger } from '../plugins/http.logger';
+import { Signale } from 'signale';
 
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnInit {
@@ -41,6 +41,11 @@ export interface PYIOnConfigurationAfter {
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnInitApplication {
     onInitApplication: () => any;
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface PYIOnPluginApplication {
+    onPluginApplication: (plugins: PYICoreClass<PYIPlugins>) => any;
 }
 
 export type PYIApplicationClass<V> = (new (...args: any[]) => V & PYIApplication) & typeof PYIApplication;
@@ -101,11 +106,13 @@ export class PYIApplication<
     public props?: any;
     public config!: PYIAppConfiguration;
     public compile: Compile;
+    public logger: Signale;
     private _bootstrap: () => any;
     private ready?: (value?: any | PromiseLike<any>) => void;
 
     constructor() {
         super();
+        this.logger = new Signale();
         // tslint:disable-next-line:no-unused-expression
         this.compile = new Compile(this);
         this.run();
@@ -147,17 +154,27 @@ export class PYIApplication<
         this.onConfigurationInit && await this.onConfigurationInit();
 
         this.config = await this.compile.configrationInit(config);
+        this.logger = new Signale(this.config.debugOptions || {});
         console.log(`${get('rocket')}  ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
-        this.config.middlewares.push(ResponseMiddleware);
         const driver = new KoaDriver(this);
         await createExecutor(driver, {
-            ...this.config as any, development: this.mode === 'development', defaultErrorHandler: false
+            ...this.config as any, development: this.mode === 'development'
         });
         console.log(`${get('rocket')}  ${green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInitApplication && await this.onInitApplication();
+
+        // tslint:disable-next-line:no-empty
+        const isPlugins: (plugins: PYICoreClass<PYIPlugins>) => any = this.onPluginApplication || (() => { });
+
+        // // tslint:disable-next-line:no-unused-expression
+        // this.onPluginApplication && await this.onPluginApplication(HttpLogger);
+        if (await isPlugins(HttpLogger) !== false) {
+            const logger = new HttpLogger(this);
+            await logger.init();
+        }
         // tslint:disable-next-line:no-unused-expression
         this.ready && await this.ready(this);
         await this._bootstrap();
