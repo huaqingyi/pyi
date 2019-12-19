@@ -5,6 +5,7 @@ import { ValidatorOptions } from 'class-validator';
 import { AuthorizationChecker } from 'routing-controllers/AuthorizationChecker';
 import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { SignaleOptions } from 'signale';
+import { PYIPlugin } from './plugins';
 
 export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export function Configuration<Props = any>(
@@ -143,6 +144,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
     public controllers: Array<PYICoreClass<PYIController>>;
     public middlewares: Array<PYICoreClass<PYIMiddleware>>;
     public interceptors: Array<PYICoreClass<PYIInterceptor>>;
+    public plugins: Array<PYICoreClass<PYIPlugin>>;
     public defaultErrorHandler: boolean;
     public port: number;
     public host: string;
@@ -153,6 +155,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
         this.controllers = [];
         this.middlewares = [];
         this.interceptors = [];
+        this.plugins = [];
         this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';

@@ -35,6 +35,7 @@
     "lodash": "^4.17.15",
     "mysql2": "^2.0.1",
     "node-emoji": "^1.10.0",
+    "pyi-swagger": "^1.0.3",
     "reflect-metadata": "^0.1.13",
     "routing-controllers": "^0.8.0",
     "sequelize": "^5.21.2",

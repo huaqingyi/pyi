@@ -6,3 +6,4 @@ export * from './dao';
 export * from './dto';
 export * from './service';
 export * from './execption';
+export * from './plugins';

@@ -26,6 +26,7 @@ export class Database extends PYIComponent<DataBaseConfiguration> {
 
     constructor() {
         super();
+        console.log(this.props);
         this.database = new Sequelize(this.props);
     }
 

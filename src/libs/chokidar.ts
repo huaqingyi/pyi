@@ -1,5 +1,5 @@
 import chokidar, { FSWatcher } from 'chokidar';
-import { gray } from 'colors';
+import { gray, bgRed, blue, bgCyan, red, bgWhite } from 'colors';
 import { map } from 'lodash';
 import { dirname } from 'path';
 import { PYIAppConfiguration } from '../decorators';
@@ -37,7 +37,9 @@ export class PYIChokidar {
         try {
             comp = await import(path);
             // tslint:disable-next-line:no-empty
-        } catch (err) { }
+        } catch (err) {
+            console.log(bgWhite(`${get('no_entry')}  ${red(err)}`));
+        }
 
         if (!comp) { return false; }
         await Promise.all(map(comp, async (o, i) => {

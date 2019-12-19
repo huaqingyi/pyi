@@ -8,48 +8,78 @@ import { get } from 'node-emoji';
 import { HttpLogger } from '../plugins/http.logger';
 import { Signale } from 'signale';
 
+/**
+ * Application init
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnInit {
     onInit: () => any;
 }
 
+/**
+ * 开始扫描文件
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnScanInit {
     onScanInit: () => any;
 }
 
+/**
+ * 发现项目文件
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnScanChange {
     onScanChange: () => any;
 }
 
+/**
+ * 添加扫描的文件完成
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnScanAfter {
     onScanAfter: () => any;
 }
 
+/**
+ * 初始化 Application 配置
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnConfigurationInit {
     onConfigurationInit: () => any;
 }
 
+/**
+ * 配置初始化完成
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnConfigurationAfter {
     onConfigurationAfter: (config: PYIAppConfiguration) => any;
 }
 
+/**
+ * 初始化 Application 完成
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnInitApplication {
     onInitApplication: () => any;
 }
 
+/**
+ * install plugins
+ */
 // tslint:disable-next-line:no-empty-interface
 export interface PYIOnPluginApplication {
     onPluginApplication: (plugins: PYICoreClass<PYIPlugins>) => any;
 }
-
+/**
+ * PYI Class 基础类型
+ */
 export type PYIApplicationClass<V> = (new (...args: any[]) => V & PYIApplication) & typeof PYIApplication;
 
+/**
+ * 启动修饰器, 获取运行模式. 默认 development
+ * @param tprops Application
+ */
 export function PYIBootstrap<VC extends PYIApplicationClass<PYIApplication>>(tprops: VC): VC;
 export function PYIBootstrap<Props = any>(
     props: Props & any
@@ -67,6 +97,9 @@ export function PYIBootstrap(props: any | PYIApp) {
     };
 }
 
+/**
+ * 继承 Koa 主类
+ */
 export class PYIApplication<
     StateT = DefaultState,
     CustomT = DefaultContext
@@ -105,7 +138,9 @@ export class PYIApplication<
     public mode!: string;
     public props?: any;
     public config!: PYIAppConfiguration;
+    // 项目文件发现和编译
     public compile: Compile;
+    // logger 插件
     public logger: Signale;
     private _bootstrap: () => any;
     private ready?: (value?: any | PromiseLike<any>) => void;
@@ -120,6 +155,10 @@ export class PYIApplication<
         this._bootstrap = () => { };
     }
 
+    /**
+     * 初始化完成回调
+     * @param callback 启动会掉
+     */
     public async bootstrap(callback: () => any) {
         this._bootstrap = callback;
         return await new Promise((r) => {
@@ -127,6 +166,9 @@ export class PYIApplication<
         });
     }
 
+    /**
+     * 启动项目
+     */
     public async starter() {
         this.listen(this.config.port, this.config.host, () => {
             console.log(`${get('kiss')}  ${blue(
@@ -135,6 +177,9 @@ export class PYIApplication<
         });
     }
 
+    /**
+     * 开始初始化 Application
+     */
     private async run() {
         console.log(`${get('rocket')}  ${green(`application onInit runtime ...`)}`);
         // tslint:disable-next-line:no-unused-expression
@@ -154,10 +199,21 @@ export class PYIApplication<
         this.onConfigurationInit && await this.onConfigurationInit();
 
         this.config = await this.compile.configrationInit(config);
-        this.logger = new Signale(this.config.debugOptions || {});
         console.log(`${get('rocket')}  ${green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
+
+        this.logger = new Signale(this.config.debugOptions || {});
+        // tslint:disable-next-line:no-empty
+        const isPlugins: (plugins: PYICoreClass<PYIPlugins>) => any = this.onPluginApplication || (() => { });
+        // tslint:disable-next-line:no-unused-expression
+        if (await isPlugins(HttpLogger) !== false) {
+            const logger = new HttpLogger(this);
+            await logger.init();
+        }
+
+        await this.compile.installPlugins(this.config.plugins);
+
         const driver = new KoaDriver(this);
         await createExecutor(driver, {
             ...this.config as any, development: this.mode === 'development'
@@ -166,15 +222,6 @@ export class PYIApplication<
         // tslint:disable-next-line:no-unused-expression
         this.onInitApplication && await this.onInitApplication();
 
-        // tslint:disable-next-line:no-empty
-        const isPlugins: (plugins: PYICoreClass<PYIPlugins>) => any = this.onPluginApplication || (() => { });
-
-        // // tslint:disable-next-line:no-unused-expression
-        // this.onPluginApplication && await this.onPluginApplication(HttpLogger);
-        if (await isPlugins(HttpLogger) !== false) {
-            const logger = new HttpLogger(this);
-            await logger.init();
-        }
         // tslint:disable-next-line:no-unused-expression
         this.ready && await this.ready(this);
         await this._bootstrap();
