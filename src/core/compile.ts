@@ -1,8 +1,9 @@
 import { PYIApplication, PYIAppConfiguration, PYIController, PYIInterceptor, PYIMiddleware } from '../decorators';
 import { PYIChokidar } from '../libs/chokidar';
 import { PYIApp, PYICoreClass } from './pyi';
-import { map } from 'lodash';
+import { map, find } from 'lodash';
 import { PYIPlugin } from '../decorators/plugins';
+import { FactoryComponent } from '../factory';
 
 export class Compile {
     private drive: PYIApplication;
@@ -20,12 +21,33 @@ export class Compile {
         return await chokidar;
     }
 
+    public async factoryComponent(factorys: FactoryComponent[]) {
+        const fs: FactoryComponent[] = [];
+        await Promise.all(map(factorys, async (factory) => {
+            if (find(factorys, (f) => f.target === factory.component)) {
+                await fs.push(factory);
+            } else {
+                await factory._output();
+            }
+            return factory;
+        }));
+        if (fs.length > 0) { await this.factoryComponent(fs); }
+        return await factorys;
+    }
+
     public async configrationInit(config: PYIAppConfiguration) {
+        const factorys: FactoryComponent[] = [];
         await Promise.all(map(this.comps, async (comp: any, i: number) => {
             const { _base } = await comp;
-            if (comp) {
+            if (comp && comp.prototype) {
                 comp.prototype.logger = this.drive.logger;
             }
+            map(comp.prototype, (prototype) => {
+                if (prototype._base && prototype._base() === FactoryComponent) {
+                    prototype._input(comp);
+                    factorys.push(prototype);
+                }
+            });
             if (!config.controllers) { config.controllers = []; }
             if (!config.interceptors) { config.interceptors = []; }
             if (!config.middlewares) { config.middlewares = []; }
@@ -37,6 +59,8 @@ export class Compile {
             if (_base && _base() === PYIPlugin) { config.plugins.push(comp); }
             return await comp;
         }));
+
+        await this.factoryComponent(factorys);
 
         config.plugins = config.plugins.sort(
             (p1, p2) => {

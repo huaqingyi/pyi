@@ -4,10 +4,13 @@ import { Context } from 'koa';
 export interface PYIPluginsInstall {
     install: (ctx: Context, next: (...args: any) => any) => any;
 }
-export declare class PYIPlugins extends PYICore implements PYIPluginsInstall {
+export interface PYIPluginsAppInstall {
+    init: () => any;
+}
+export declare class PYIPlugins extends PYICore implements PYIPluginsInstall, PYIPluginsAppInstall {
     static _base(): typeof PYIPlugins;
-    protected drive: PYIApplication;
-    constructor(drive: PYIApplication<any, any>);
-    init(): Promise<import("koa")<import("koa").DefaultState, import("koa").DefaultContext & Context>>;
+    protected app: PYIApplication<any, any>;
+    constructor(app: PYIApplication<any, any>);
     install(ctx: Context, next: (...args: any) => any): any;
+    init(): any;
 }

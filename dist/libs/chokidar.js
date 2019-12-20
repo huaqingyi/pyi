@@ -37,7 +37,9 @@ class PYIChokidar {
             comp = await Promise.resolve().then(() => __importStar(require(path)));
             // tslint:disable-next-line:no-empty
         }
-        catch (err) { }
+        catch (err) {
+            console.log(colors_1.bgWhite(`${node_emoji_1.get('no_entry')}  ${colors_1.red(err)}`));
+        }
         if (!comp) {
             return false;
         }

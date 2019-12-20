@@ -1,6 +1,7 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
 import { isFunction } from 'lodash';
 import { PYIConfiguration, PYIAppConfiguration } from './configuration';
+import { FactoryComponent, ComponentWiredType } from '../factory';
 
 export function Component<VC extends PYICoreClass<PYIComponent>>(tprops: VC): VC;
 export function Component<Props = any>(
@@ -16,71 +17,11 @@ export function Component(props: any | PYIApp) {
     };
 }
 
-export enum ComponentWiredType {
-    AUTOCONNECT = 'autoconnect',
-    AUTOWIRED = 'autowired'
-}
-
-export function auto(type: string) {
+export function auto(type: ComponentWiredType) {
     return (target: any, key: string) => {
-        /**
-         * 容错
-         */
-        if (!target.constructor._pyi) { target.constructor._pyi = () => ({}); }
-        /**
-         * 获取注入类
-         */
         const params = Reflect.getMetadata('design:type', target, key);
-        /**
-         * 是否嵌套依赖
-         */
-        if (!params._pyi || !params._pyi().autowired) {
-            const { props } = params.prototype;
-            let instance;
-            if (
-                (params._base && isFunction(params._base) && params._base() === PYIConfiguration) ||
-                (params._base && isFunction(params._base) && params._base() === PYIAppConfiguration)
-            ) {
-                (async () => {
-                    switch (type) {
-                        case ComponentWiredType.AUTOWIRED:
-                            instance = await params._pyiruntime(props);
-                            break;
-                        case ComponentWiredType.AUTOCONNECT:
-                            instance = await params._pyiconnect(props);
-                            break;
-                        default: return target;
-                    }
-                    instance = await instance._pyiruntime();
-                    target.constructor.prototype[key] = await instance;
-                })();
-            } else {
-                switch (type) {
-                    case ComponentWiredType.AUTOWIRED:
-                        instance = params._pyiruntime();
-                        break;
-                    case ComponentWiredType.AUTOCONNECT:
-                        instance = params._pyiconnect();
-                        break;
-                    default: return target;
-                }
-                target.constructor.prototype[key] = instance;
-            }
-        } else {
-            /**
-             * 嵌套依赖
-             */
-            const _pyi = target.constructor._pyi();
-            if (!_pyi.autowired) {
-                target.constructor._pyi = () => ({
-                    ..._pyi,
-                    autowired: [
-                        ...(_pyi.autowired || []),
-                        key
-                    ]
-                });
-            }
-        }
+        const { props } = params.prototype;
+        target.constructor.prototype[key] = new FactoryComponent(key, params, type, props);
         return target.constructor.prototype[key];
     };
 }

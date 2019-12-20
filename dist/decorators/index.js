@@ -11,5 +11,6 @@ __export(require("./dao"));
 __export(require("./dto"));
 __export(require("./service"));
 __export(require("./execption"));
+__export(require("./plugins"));
 
 //# sourceMappingURL=../sourcemaps/decorators/index.js.map

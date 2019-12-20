@@ -39,6 +39,7 @@ class PYIAppConfiguration extends PYIConfiguration {
         this.controllers = [];
         this.middlewares = [];
         this.interceptors = [];
+        this.plugins = [];
         this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';

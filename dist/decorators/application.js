@@ -26,6 +26,9 @@ function PYIBootstrap(props) {
     };
 }
 exports.PYIBootstrap = PYIBootstrap;
+/**
+ * 继承 Koa 主类
+ */
 class PYIApplication extends koa_1.default {
     constructor() {
         super();
@@ -57,17 +60,27 @@ class PYIApplication extends koa_1.default {
         }
         return this._this;
     }
+    /**
+     * 初始化完成回调
+     * @param callback 启动会掉
+     */
     async bootstrap(callback) {
         this._bootstrap = callback;
         return await new Promise((r) => {
             this.ready = r;
         });
     }
+    /**
+     * 启动项目
+     */
     async starter() {
         this.listen(this.config.port, this.config.host, () => {
             console.log(`${node_emoji_1.get('kiss')}  ${colors_1.blue(`application running for http://${this.config.host}:${this.config.port}`)}`);
         });
     }
+    /**
+     * 开始初始化 Application
+     */
     async run() {
         console.log(`${node_emoji_1.get('rocket')}  ${colors_1.green(`application onInit runtime ...`)}`);
         // tslint:disable-next-line:no-unused-expression
@@ -84,10 +97,18 @@ class PYIApplication extends koa_1.default {
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationInit && await this.onConfigurationInit();
         this.config = await this.compile.configrationInit(config);
-        this.logger = new signale_1.Signale(this.config.debugOptions || {});
         console.log(`${node_emoji_1.get('rocket')}  ${colors_1.green(`application scan project config success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onConfigurationAfter && await this.onConfigurationAfter();
+        this.logger = new signale_1.Signale(this.config.debugOptions || {});
+        // tslint:disable-next-line:no-empty
+        const isPlugins = this.onPluginApplication || (() => { });
+        // tslint:disable-next-line:no-unused-expression
+        if (await isPlugins(http_logger_1.HttpLogger) !== false) {
+            const logger = new http_logger_1.HttpLogger(this);
+            await logger.init();
+        }
+        await this.compile.installPlugins(this.config.plugins);
         const driver = new extends_1.KoaDriver(this);
         await extends_1.createExecutor(driver, {
             ...this.config, development: this.mode === 'development'
@@ -95,14 +116,6 @@ class PYIApplication extends koa_1.default {
         console.log(`${node_emoji_1.get('rocket')}  ${colors_1.green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInitApplication && await this.onInitApplication();
-        // tslint:disable-next-line:no-empty
-        const isPlugins = this.onPluginApplication || (() => { });
-        // // tslint:disable-next-line:no-unused-expression
-        // this.onPluginApplication && await this.onPluginApplication(HttpLogger);
-        if (await isPlugins(http_logger_1.HttpLogger) !== false) {
-            const logger = new http_logger_1.HttpLogger(this);
-            await logger.init();
-        }
         // tslint:disable-next-line:no-unused-expression
         this.ready && await this.ready(this);
         await this._bootstrap();

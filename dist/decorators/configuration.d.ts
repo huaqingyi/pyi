@@ -5,6 +5,7 @@ import { ValidatorOptions } from 'class-validator';
 import { AuthorizationChecker } from 'routing-controllers/AuthorizationChecker';
 import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { SignaleOptions } from 'signale';
+import { PYIPlugin } from './plugins';
 export declare function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export declare function Configuration<Props = any>(props: Props & any): <VC extends PYICoreClass<PYIConfiguration>>(target: VC) => VC;
 export declare class PYIConfiguration<Props = any> extends PYICore {
@@ -106,6 +107,7 @@ export declare class PYIAppConfiguration<Props = any> extends PYIConfiguration i
     controllers: Array<PYICoreClass<PYIController>>;
     middlewares: Array<PYICoreClass<PYIMiddleware>>;
     interceptors: Array<PYICoreClass<PYIInterceptor>>;
+    plugins: Array<PYICoreClass<PYIPlugin>>;
     defaultErrorHandler: boolean;
     port: number;
     host: string;
