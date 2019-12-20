@@ -25,7 +25,9 @@ class PYIChokidar {
         this.appPath = process.argv[1];
         this.projectPath = path_1.dirname(this.appPath);
         this.watcher = chokidar_1.default.watch(this.projectPath, {
-            ignored: new RegExp(`${this.appPath}|.d.ts|.js.map`, 'gi')
+            ignored: (path) => {
+                return (new RegExp(`${this.appPath}|\.d\.ts|\.js\.map`, 'gi')).test(path);
+            }
         });
     }
     static async runtime(mode, callback) {
