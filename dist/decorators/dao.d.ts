@@ -6,6 +6,7 @@ export interface PYIDaoThrow {
     throw: (errors: ValidationError[]) => any;
 }
 export declare class PYIDao<Props = any> extends PYICore {
+    static swaggerDocument: any;
     static _base(): PYIApp;
     props: Props;
 }

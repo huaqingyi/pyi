@@ -21,6 +21,7 @@ export interface PYIDaoThrow {
 }
 
 export class PYIDao<Props = any> extends PYICore {
+    public static swaggerDocument: any;
     public static _base(): PYIApp {
         return PYIDao;
     }

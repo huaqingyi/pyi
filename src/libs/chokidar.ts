@@ -27,7 +27,10 @@ export class PYIChokidar {
         this.callback = callback;
         this.appPath = process.argv[1];
         this.projectPath = dirname(this.appPath);
-        this.watcher = chokidar.watch(this.projectPath, {
+        this.watcher = chokidar.watch([
+            `${this.projectPath}/**/*.ts`,
+            `${this.projectPath}/**/*.js`,
+        ], {
             ignored: (path: string) => {
                 return (new RegExp(`${this.appPath}|\.d\.ts|\.js\.map`, 'gi')).test(path);
             }
