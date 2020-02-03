@@ -1,3 +1,6 @@
+###### <sup>（PYI Typescript Framework）</sup><br>（PYI JS）<br>──<br><br>`Commonjs/1.2.9`<br><br><br><br><br>**huaqingyi**<br>*COPYRIGHT © XXXXX. ALL RIGHTS RESERVED.*
+[TOC]
+
 # pyi
 This Typescript MVC Server Framework ...
 轻量级 restful 快速开发
@@ -25,101 +28,129 @@ $ npm run start
 ### 编译部署工具可选用 gyi 或 pm2 和 nodemon
 #### src/application.ts 程序入口
 ```
-import { PYIBootstrap, PYIApplication, PYIApplicationImpl, autowired } from 'pyi';
-import { join } from 'path';
-import { ScheduleComponent } from './components/schedule.component';
-import { SwaggerInjectService, Swagger } from 'pyi-swagger';
+import { PYIBootstrap, PYIApplication } from 'pyi';
 
 @PYIBootstrap
-export class Application extends PYIApplication implements PYIApplicationImpl {
-
-    @autowired
-    public schedule!: ScheduleComponent;
-
-    constructor() {
-        super();
-        this.run([
-            join(__dirname, '**/**.ts'),
-            join(__dirname, '**/**.js')
-        ]);
-    }
-
-    public async onInit() {
-        SwaggerInjectService.register();
-        console.log('onInit ...');
-    }
-
-    public async didLoad() {
-        console.log('didLoad ...');
-    }
-
-    public async onInitComponent() {
-        console.log('onInitComponent ...');
-    }
-
-    public async didInitComponent() {
-        console.log('didInitComponent ...');
-    }
-
-    public async didMakeConfig() {
-        console.log('didMakeConfig ...');
-        Swagger.build('/swagger.io', this, {
-            info: {
-                description: 'PYI Swagger 测试用例',
-                title: 'PYI Swagger 测试用例'
-            },
-            securityDefinitions: {
-                api_key: {
-                    type: 'apiKey',
-                    name: 'authorization',
-                    in: 'header'
-                }
-            }
-        });
-    }
-
-    public async didRuntime() {
-        console.log('didRuntime ...');
-        await this.schedule.test();
-    }
+export class Application extends PYIApplication<any, any> {
+}
+```
+#### PYIApplication Hooks
+```
+/**
+ * Application init
+ */
+export interface PYIOnInit {
+    onInit: () => any;
+}
+/**
+ * 开始扫描文件
+ */
+export interface PYIOnScanInit {
+    onScanInit: () => any;
+}
+/**
+ * 发现项目文件
+ */
+export interface PYIOnScanChange {
+    onScanChange: () => any;
+}
+/**
+ * 添加扫描的文件完成
+ */
+export interface PYIOnScanAfter {
+    onScanAfter: () => any;
+}
+/**
+ * 初始化 Application 配置
+ */
+export interface PYIOnConfigurationInit {
+    onConfigurationInit: () => any;
+}
+/**
+ * 配置初始化完成
+ */
+export interface PYIOnConfigurationAfter {
+    onConfigurationAfter: (config: PYIAppConfiguration) => any;
+}
+/**
+ * 初始化 Application 完成
+ */
+export interface PYIOnInitApplication {
+    onInitApplication: () => any;
+}
+/**
+ * install plugins
+ */
+export interface PYIOnPluginApplication {
+    onPluginApplication: (plugins: PYICoreClass<PYIPlugins>) => any;
 }
 
+// demo 
+
+import { PYIBootstrap, PYIApplication } from 'pyi';
+
+@PYIBootstrap
+export class Application extends PYIApplication<any, any> implements PYIOnInit {
+    public onInit() {
+        console.log('Application OnInit ...');
+    }
+}
 ```
 
-### validation 入参验证
+### dao层 入参验证
 ```
-import { IsString, MinLength, MaxLength, validateSync, IsNotEmpty } from 'class-validator';
-import { Validation, PYIValidation } from 'pyi';
-import { swaggerClass, swaggerProperty } from 'koa-swagger-decorator';
+import { Dao, PYIDao } from 'pyi';
+import { IsString, IsNotEmpty } from 'class-validator';
+// import { swaggerClass, swaggerProperty } from 'koa-swagger-decorator';
 
-@Validation
-@swaggerClass()
-export class LoginValidation extends PYIValidation {
-    @IsString({ message: '请传入字符串 .' })
-    @IsNotEmpty({ message: '用户名不能为空 .' })
-    @MinLength(4, { message: '用户名最小长度大于4.' })
-    @MaxLength(10, { message: '用户名最大长度10.' })
-    @swaggerProperty({
-        type: 'string',
-        required: true,
-        example: '1234',
-        description: '用户名'
-    })
+@Dao
+// 这里可以使用 pyi-swagger 生成说明文档
+// @swaggerClass()
+export class LoginDao extends PYIDao {
+    
+    @IsString()
+    @IsNotEmpty()
+    // @swaggerProperty({
+    //     type: 'string',
+    //     required: true,
+    //     example: '1234',
+    //     description: '用户名'
+    // })
     public username!: string;
-
-    @IsString({ message: '请传入字符串 .' })
-    @IsNotEmpty({ message: '密码不能为空 .' })
-    @MinLength(6, { message: '密码最小长度大于6.' })
-    @MaxLength(20, { message: '密码最大长度20.' })
-    @swaggerProperty({
-        type: 'string',
-        required: true,
-        example: '123123',
-        description: '密码'
-    })
+    
+    @IsString()
+    @IsNotEmpty()
+    // @swaggerProperty({
+    //     type: 'string',
+    //     required: true,
+    //     example: '123123',
+    //     description: '密码'
+    // })
     public password!: string;
 }
 
+@RequestMapping({
+    prefix: '/login',
+    methods: [RequestMappingMethod.POST]
+})
+// swagger 方法及路径配置
+@request(RequestMappingMethod.POST, '/login')
+// swagger 说明
+@summary('login user auth jwt .')
+// 请用 swagger
+@body((LoginDao as any).swaggerDocument)
+// 开启 jwt auth 验证
+@security([{ api_key: [] }])
+@tag
+public login(
+    @Body({ validate: true }) login: LoginDao
+): ResponseDto {
+    return PYIExecption(class extends PYIThrows<TestController> {
+        public async throws(this: TestController) {
+            return 'test ...';
+        }
+    });
+}
 ```
 
 ### controllers
@@ -127,46 +158,46 @@ export class LoginValidation extends PYIValidation {
 #### 路由继承于 routing-controllers [https://github.com/typestack/routing-controllers]
 #### 提供所有 routing-controllers 包 中的修饰器, 均为自动注入
 ```
-import {
-    Controller, RequestMapping, RequestMappingMethod,
-    PYIController, autowired, PYIExecption, PYIThrows,
-    Res, QueryParams, Body, Ctx
+import { 
+    Controller, PYIController, RequestMapping, 
+    autoconnect, RequestMappingMethod, 
+    Body, PYIExecption, PYIThrows 
 } from 'pyi';
 import { TestService } from '../services/test.service';
-import { TestDto } from '../dto/test.dto';
-import { Response, Context } from 'koa';
-import { tags, request, summary, body, security } from 'pyi-swagger';
-import send from 'koa-send';
-import { join } from 'path';
-import { LoginValidation } from '../validation/login.validation';
-import { UserDto } from '../dto/user.info';
+import { LoginDao } from '../dao/test/login.dao';
+import { ResponseDto } from '../dto/response.dto';
+import { tags, request, summary, body } from 'pyi-swagger';
 
 const tag = tags(['TestController']);
-const userSchema = {
-    name: { type: 'string', required: true },
-    password: { type: 'string', required: true }
-};
 
 @Controller
 export class TestController extends PYIController {
 
-    @autowired
+    @autoconnect
     public service!: TestService;
 
     @RequestMapping({
-        prefix: '/resource/*'
+        prefix: '/test',
+        methods: [RequestMappingMethod.GET]
     })
-    public async resource(@Ctx() ctx: Context) {
-        this.dto = true;
-        return await send(ctx, ctx.path, { root: join(__dirname, '../') });
+    public async test() {
+        this.logger.error(1111);
+        console.log(111);
+        console.log(await this.service.findAll());
+        throw new Error('测试');
+        return 111;
     }
 
     @RequestMapping({
-        prefix: '/favicon.ico'
+        prefix: '/error'
     })
-    public async favicon(@Ctx() ctx: Context) {
-        this.dto = true;
-        return await send(ctx, ctx.path, { root: join(__dirname, '../resource/static') });
+    public error(): ResponseDto {
+        return PYIExecption(class extends PYIThrows<TestController> {
+            public async throws(this: TestController) {
+                console.log(await this.service.test());
+                return 'test ...';
+            }
+        });
     }
 
     @RequestMapping({
@@ -175,92 +206,19 @@ export class TestController extends PYIController {
     })
     @request(RequestMappingMethod.POST, '/login')
     @summary('login user auth jwt .')
-    @body(LoginValidation.swaggerDocument)
+    @body((LoginDao as any).swaggerDocument)
     @tag
+    // 注意这里的 ResponseDto 会通过反射自动实例化
+    // 返回结果为 ResponseDto { success: true, data: 'test ...' }
+    // 发生错误自动调用 dto 的 throws 方法后 return dto 实例
     public login(
-        @Body({ validate: true }) loginForm: LoginValidation,
-        @Res() response: Response,
-        @Ctx() ctx: Context
-    ): UserDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                const result = {
-                    id: 1,
-                    username: 'test',
-                    age: '1',
-                    nikename: 'test',
-                    email: 'test@email.com'
-                };
-                const { secret, token } = this.tokenConfig;
-                response.append('token', this.token.sign(result, secret, token));
-                return await result;
+        @Body({ validate: true }) login: LoginDao
+    ): ResponseDto {
+        return PYIExecption(class extends PYIThrows<TestController> {
+            public async throws(this: TestController) {
+                return 'test ...';
             }
         });
-    }
-
-    @RequestMapping({
-        prefix: '/'
-    })
-    @request(RequestMappingMethod.GET, '/')
-    @summary('test get index')
-    @tag
-    public index(): TestDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                return await 'Hello PYI ...';
-            }
-        });
-    }
-
-    @RequestMapping({
-        prefix: '/error'
-    })
-    public err(): TestDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                this.errno = 1000;
-                this.errmsg = 'test error ...';
-                throw new Error('test error');
-                return await 'Hello PYI ...';
-            }
-        });
-    }
-
-    @RequestMapping({
-        prefix: '/info',
-        methods: [RequestMappingMethod.POST]
-    })
-    @request(RequestMappingMethod.POST, '/info')
-    @security([{ api_key: [] }])
-    @summary('test token')
-    @tag
-    public info(
-        @Ctx() ctx: Context
-    ): UserDto {
-        return PYIExecption(class extends TestController implements PYIThrows {
-            public errno!: number;
-            public errmsg!: string;
-            public async throws() {
-                return ctx.state;
-            }
-        });
-    }
-
-    @RequestMapping({
-        prefix: '/test',
-        // methods: [RequestMappingMethod.GET]
-    })
-    public async test(
-        @QueryParams() gets: any
-    ) {
-        // console.log(await this.service.findAllUsers());
-        return await 'Hello World ...';
     }
 }
 ```
@@ -269,25 +227,37 @@ export class TestController extends PYIController {
 ```
 import { Dto, PYIDto } from 'pyi';
 
-export interface UserInfo {
-    id: number;
-    username: string;
-    age: string;
-    nikename: string;
-    email: string;
-}
-
 @Dto
-export class UserDto extends PYIDto {
-    public err!: boolean;
-    public data!: UserInfo;
+export class ResponseDto extends PYIDto {
+    public data: any;
+    public success: boolean;
+    public errcode?: number;
+    public errmsg?: string;
+
+    constructor(data: any) {
+        super();
+        this.data = data;
+        this.success = true;
+    }
+
+    // 失败后自动回调
+    // controller 可通过 returntype 和 PYIExecption 自动 try catch dto
+    public throws(errors: Error) {
+        this.success = false;
+        switch (errors.name) {
+            default:
+                this.errcode = 1010;
+                this.errmsg = errors.message;
+                return this;
+        }
+    }
 }
 ```
 
 ### model
 #### 这里使用的是 sequelize-typescript [https://github.com/RobinBuschmann/sequelize-typescript]
 ```
-iimport { Table, Column, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, Model } from 'sequelize-typescript';
+import { Table, Column, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, Model } from 'sequelize-typescript';
 
 @Table({
     tableName: 'test'
@@ -313,26 +283,23 @@ export class User extends Model<User> {
 ### services
 #### 自动注入目录结构自定义, 推荐使用demo项目的目录结构
 ```
-import { Service, PYIService, autowired } from 'pyi';
-import { DBComponent } from '../components/db.component';
-import { User } from '../models/user.model';
+import { Service, PYIService, autoconnect } from 'pyi';
+import { Database } from '../components/database';
+import { User } from '../models/user';
 
 @Service
 export class TestService extends PYIService {
 
-    @autowired
-    public db!: DBComponent;
+    @autoconnect
+    public db!: Database;
 
-    public async findAllUsers() {
-        return await this.db.table(User).findAll().then((row: any) => {
-            return row.map((resp: any) => resp.toJSON());
-        });
+    public async findAll() {
+        return this.db.table(User).findAll({ raw: true });
     }
 
-    public async findUser() {
-        let data: any = {};
-        [data] = await this.db.instance().query(`SELECT * FROM test1`);
-        return data;
+    public async test() {
+        throw new Error('测试 Service Error ...');
+        return await { name: 'Hello World ...' };
     }
 }
 ```
@@ -341,44 +308,92 @@ export class TestService extends PYIService {
 #### 自动注入目录结构自定义, 推荐使用demo项目的目录结构
 #### 自动化构建外部包
 ```
-import { Component, PYIComponent, autowired } from 'pyi';
-import { Sequelize, SequelizeOptions, ModelCtor } from 'sequelize-typescript';
-import { DBConfiguration } from '../config/database.config';
-
-// @Component<SequelizeOptions>({
-//     dialect: 'mysql',
-//     replication: {
-//         read: [
-//             { host: '127.0.0.1', username: 'root', password: 'yihq1105', port: 3306, database: 'test' },
-//         ],
-//         write: { host: '127.0.0.1', username: 'root', password: 'yihq1105', port: 3306, database: 'test' },
-//     },
-//     pool: {
-//         max: 20,
-//         idle: 60 * 1000
-//     }
-// })
+import { Component, PYIComponent, autoconnect } from 'pyi';
+import { Sequelize, ModelCtor } from 'sequelize-typescript';
+import { DataBaseConfiguration } from '../config/database.config';
 
 @Component
-export class DBComponent extends PYIComponent<DBConfiguration> {
+export class Database extends PYIComponent<DataBaseConfiguration> {
 
-    @autowired
-    public props!: DBConfiguration;
+    @autoconnect
+    public props!: DataBaseConfiguration;
 
-    public db: Sequelize;
+    public database: Sequelize;
 
-    constructor(props: SequelizeOptions) {
-        super(props);
-        this.db = new Sequelize(props);
+    constructor() {
+        super();
+        this.database = new Sequelize(this.props);
     }
 
-    public instance() {
-        return this.db;
+    public i() {
+        return this.database;
     }
 
     public table(model: ModelCtor): ModelCtor {
-        this.db.addModels([model]);
-        return this.db.model(model);
+        this.database.addModels([model]);
+        return this.database.model(model);
+    }
+
+    public test() {
+        return 'test component ...';
+    }
+}
+```
+
+### middlewares 中间件
+#### 自动注入目录结构自定义, 推荐使用demo项目的目录结构
+#### 自动化构建外部包
+```
+import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from 'pyi';
+import { Context } from 'koa';
+
+@Middleware({ type: 'before', priority: 0 })
+export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
+    public async use(ctx: Context, next: () => any) {
+        await next();
+    }
+}
+```
+
+### middlewares 中间件
+#### 自动注入目录结构自定义, 推荐使用demo项目的目录结构
+#### 自动化构建外部包
+```
+import { PYIMiddleware, Middleware, KoaMiddlewareInterface } from 'pyi';
+import { Context } from 'koa';
+
+@Middleware({ type: 'before', priority: 0 })
+export class JWTMiddleware extends PYIMiddleware implements KoaMiddlewareInterface {
+    public async use(ctx: Context, next: () => any) {
+        await next();
+    }
+}
+```
+
+### plugins 安装中间件插件
+#### 自动注入目录结构自定义, 推荐使用demo项目的目录结构
+#### 自动化构建外部包
+```
+import { PYIPlugin, AutoPlugin, PYIPluginsAppInstall } from 'pyi';
+import { SwaggerInjectService, Swagger } from 'pyi-swagger';
+
+@AutoPlugin
+export class SwaggerPlugins extends PYIPlugin implements PYIPluginsAppInstall {
+    public async init() {
+        SwaggerInjectService.register();
+        return await Swagger.build('/swagger.io', this.app, {
+            info: {
+                description: 'PYI Swagger 测试用例',
+                title: 'PYI Swagger 测试用例'
+            },
+            securityDefinitions: {
+                api_key: {
+                    type: 'apiKey',
+                    name: 'authorization',
+                    in: 'header'
+                }
+            }
+        });
     }
 }
 ```
@@ -388,5 +403,13 @@ export class DBComponent extends PYIComponent<DBConfiguration> {
 ```
 npm run start
 ```
+### 启动发布
+#### gulp 编译
+```
+npm run build
+```
 ##### nodemon 开始运行项目, 热更新, 适合dev开发
 ##### Think You ...
+### 特别鸣谢 [routing-controllers] https://github.com/typestack/routing-controllers.git
+### 特别鸣谢 [koa] https://github.com/koajs/koa.git
+### 特别鸣谢 [sequelize] https://github.com/RobinBuschmann/sequelize-typescript.git
