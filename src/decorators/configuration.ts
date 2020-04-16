@@ -6,6 +6,7 @@ import { AuthorizationChecker } from 'routing-controllers/AuthorizationChecker';
 import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { SignaleOptions } from 'signale';
 import { PYIPlugin } from './plugins';
+import { SwaggerJSON } from '../libs/swagger';
 
 export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export function Configuration<Props = any>(
@@ -23,6 +24,10 @@ export function Configuration<Props extends any>(props: Props) {
             return target;
         };
     }
+}
+
+export interface AppSwaggerJSON extends SwaggerJSON {
+    path: string;
 }
 
 export class PYIConfiguration<Props = any> extends PYICore {
@@ -132,6 +137,8 @@ export interface PYIRoutingConfiguration {
 
     development?: () => any;
     production?: () => any;
+
+    docs?: SwaggerJSON | false;
 }
 
 export class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
@@ -149,6 +156,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
     public port: number;
     public host: string;
     public debugOptions?: SignaleOptions;
+    public docs: AppSwaggerJSON | false;
 
     constructor() {
         super();
@@ -159,6 +167,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
         this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';
+        this.docs = false;
     }
 
     public _pyiruntime() {

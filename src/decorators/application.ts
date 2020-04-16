@@ -1,4 +1,4 @@
-import { PYIAppConfiguration } from './configuration';
+import { PYIAppConfiguration, AppSwaggerJSON } from './configuration';
 import { PYICore, PYIApp, PYICoreClass, PYIPlugins } from '../core';
 import Koa, { DefaultState, DefaultContext } from 'koa';
 import { createExecutor, KoaDriver } from '../extends';
@@ -7,6 +7,7 @@ import { blue, green } from 'colors';
 import { get } from 'node-emoji';
 import { HttpLogger } from '../plugins/http.logger';
 import { Signale } from 'signale';
+import { SwaggerInjectService } from '../libs/swagger';
 
 /**
  * Application init
@@ -181,6 +182,7 @@ export class PYIApplication<
      * 开始初始化 Application
      */
     private async run() {
+        await SwaggerInjectService.register();
         console.log(`${get('rocket')}  ${green(`application onInit runtime ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInit && await this.onInit();
@@ -213,6 +215,7 @@ export class PYIApplication<
         }
 
         await this.compile.installPlugins(this.config.plugins);
+        await this.compile.useSwaggerAction(this.config.docs);
 
         const driver = new KoaDriver(this);
         await createExecutor(driver, {

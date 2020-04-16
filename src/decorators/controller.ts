@@ -1,13 +1,13 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
 
 import {
-    JsonController, Method,
+    JsonController,
     Middleware as RMiddleware,
     Interceptor as RInterceptor,
+    getMetadataArgsStorage,
 } from '../extends';
-import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 import { map } from 'lodash';
-import { PYIThrows } from './execption';
+import { ActionType } from 'routing-controllers/metadata/types/ActionType';
 
 export * from '../extends';
 
@@ -50,6 +50,10 @@ export interface ControllerConfiguration {
 export interface ControllerRequestConfiguration extends ControllerConfiguration {
     prefix?: string;
     methods?: string[] | RequestMappingMethod[];
+    description?: string;
+    summary?: string;
+    swaggerDocument?: any;
+    security?: any[];
 }
 
 export function Controller<VC extends PYICoreClass<PYIController>>(tprops: VC): VC;
@@ -78,6 +82,17 @@ export class PYIController<Props = any> extends PYICore {
     public props!: Props;
 }
 
+export function Method(method, route, docs?: any) {
+    return (object, methodName) => {
+        getMetadataArgsStorage().actions.push({
+            type: method,
+            target: object.constructor,
+            method: methodName,
+            route, docs
+        } as any);
+    };
+}
+
 export function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any {
     if (key) {
         map(RequestMappingMethod, (m) => {
@@ -88,7 +103,7 @@ export function RequestMapping(config: ControllerRequestConfiguration | PYIContr
         return (target: any, key: string) => {
             const { prefix, methods } = config as ControllerRequestConfiguration;
             map(methods && methods.length > 0 ? methods : RequestMappingMethod, (m) => {
-                Method(m as ActionType, prefix)(target, key);
+                Method(m as ActionType, prefix, config)(target, key);
             });
         };
     }

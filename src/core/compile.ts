@@ -1,9 +1,13 @@
-import { PYIApplication, PYIAppConfiguration, PYIController, PYIInterceptor, PYIMiddleware } from '../decorators';
+import {
+    PYIApplication, PYIAppConfiguration, PYIController,
+    PYIInterceptor, PYIMiddleware, AppSwaggerJSON, getMetadataArgsStorage, RequestMappingMethod
+} from '../decorators';
 import { PYIChokidar } from '../libs/chokidar';
 import { PYIApp, PYICoreClass } from './pyi';
 import { map, find } from 'lodash';
 import { PYIPlugin } from '../decorators/plugins';
 import { FactoryComponent } from '../factory';
+import { Swagger, tags, request, summary, security, description, body } from '../libs/swagger';
 
 export class Compile {
     private drive: PYIApplication;
@@ -84,5 +88,58 @@ export class Compile {
             }
             return await plugin;
         }));
+    }
+
+    public async useSwaggerAction(config: AppSwaggerJSON | false) {
+        if (config !== false) {
+            const { controllers, actions } = getMetadataArgsStorage();
+            await Promise.all(map(actions, async (data) => {
+                const { target, method, route, type, docs } = data as any;
+
+                // tslint:disable-next-line:no-shadowed-variable
+                const control = find(controllers, (control) => control.target === target);
+                // tslint:disable-next-line:no-shadowed-variable
+                let path: string | RegExp = route;
+                if (control && control.route) {
+                    path = `/${control.route}/${route}`.split('//').join('/');
+                }
+
+                const tag = tags([target.name]);
+                tag(target, method, {
+                    value: { method: type, path }
+                });
+                // tslint:disable-next-line:no-unused-expression
+                request(type, path)(target, method, {
+                    value: { method: type, path }
+                });
+                
+                if (docs.summary) {
+                    summary(docs.summary)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.security) {
+                    security(docs.security)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.description) {
+                    description(docs.description)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.swaggerDocument) {
+                    body(docs.swaggerDocument)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                return await data;
+            }));
+            const swaggerConf: AppSwaggerJSON = config;
+            const path: string = swaggerConf.path;
+            delete swaggerConf.path;
+            return await Swagger.build(path, this.drive, swaggerConf);
+        }
+        return config;
     }
 }

@@ -1,15 +1,14 @@
-import { 
-    Controller, PYIController, RequestMapping, 
-    autowired, autoconnect, RequestMappingMethod, 
-    Body, PYIExecption, PYIThrows 
+import {
+    Controller, PYIController, RequestMapping,
+    autoconnect, RequestMappingMethod,
+    Body, PYIExecption, PYIThrows
 } from '../../src';
 import { TestService } from '../services/test.service';
 import { LoginDao } from '../dao/test/login.dao';
 import { ResponseDto } from '../dto/response.dto';
-import { summary } from '../../src/libs/swagger';
 
-@Controller
-export class TestController extends PYIController {
+@Controller({ prefix: '/test1' })
+export class Test1Controller extends PYIController {
 
     @autoconnect
     public service!: TestService;
@@ -30,8 +29,8 @@ export class TestController extends PYIController {
         prefix: '/error'
     })
     public error(): ResponseDto {
-        return PYIExecption(class extends PYIThrows<TestController> {
-            public async throws(this: TestController) {
+        return PYIExecption(class extends PYIThrows<Test1Controller> {
+            public async throws(this: Test1Controller) {
                 console.log(await this.service.test());
                 return 'test ...';
             }
@@ -45,8 +44,8 @@ export class TestController extends PYIController {
     public valid(
         @Body({ validate: true }) login: LoginDao
     ): ResponseDto {
-        return PYIExecption(class extends PYIThrows<TestController> {
-            public async throws(this: TestController) {
+        return PYIExecption(class extends PYIThrows<Test1Controller> {
+            public async throws(this: Test1Controller) {
                 return 'test ...';
             }
         });
