@@ -10,3 +10,11 @@ export declare class PYIDto<Props = any> extends PYICore implements PYIDtoThrows
     data: any;
     throws(errors: Error): void;
 }
+export declare class ResponseDto extends PYIDto {
+    data: any;
+    success: boolean;
+    errcode?: number;
+    errmsg?: string;
+    constructor(data: any);
+    throws(errors: Error): this;
+}

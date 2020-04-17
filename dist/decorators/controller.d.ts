@@ -37,13 +37,25 @@ export interface ControllerConfiguration {
 export interface ControllerRequestConfiguration extends ControllerConfiguration {
     prefix?: string;
     methods?: string[] | RequestMappingMethod[];
+    description?: string;
+    summary?: string;
+    swaggerDocument?: any;
+    security?: any[];
 }
+export declare function JsonController(baseRoute?: string): <VC extends PYICoreClass<PYIController<any>>>(control: VC) => VC;
 export declare function Controller<VC extends PYICoreClass<PYIController>>(tprops: VC): VC;
 export declare function Controller<Props = any>(props: Props & any): <VC extends PYICoreClass<PYIController>>(target: VC) => VC;
-export declare class PYIController<Props = any> extends PYICore {
+declare type NewType = Promise<Function[]> | Function[];
+export interface PYIServletController {
+    excludeJWT?: () => NewType;
+    servlet?: (action: Function, secretKey: string, context: any, next: (err?: any) => Promise<any>) => any;
+}
+export declare class PYIController<Props = any> extends PYICore implements PYIServletController {
     static _base(): PYIApp;
     props: Props;
+    servlet(action: Function, secretKey: string, context: any, next: (err?: any) => Promise<any>): Promise<void>;
 }
+export declare function Method(method: any, route: any, docs?: any): (object: any, methodName: any) => void;
 export declare function RequestMapping(config: ControllerRequestConfiguration | PYIController, key?: string): any;
 export interface PYIMiddlewareProps {
     type: 'after' | 'before';

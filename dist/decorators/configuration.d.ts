@@ -6,8 +6,13 @@ import { AuthorizationChecker } from 'routing-controllers/AuthorizationChecker';
 import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { SignaleOptions } from 'signale';
 import { PYIPlugin } from './plugins';
+import { SwaggerJSON } from '../libs/swagger';
+import { PYIServlet } from '../libs/jwt/jwt.auth.servlet';
 export declare function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export declare function Configuration<Props = any>(props: Props & any): <VC extends PYICoreClass<PYIConfiguration>>(target: VC) => VC;
+export interface AppSwaggerJSON extends SwaggerJSON {
+    path: string;
+}
 export declare class PYIConfiguration<Props = any> extends PYICore {
     [x: string]: any;
     static _base(): PYIApp;
@@ -100,6 +105,9 @@ export interface PYIRoutingConfiguration {
     debugOptions?: SignaleOptions;
     development?: () => any;
     production?: () => any;
+    docs?: SwaggerJSON | false;
+    jwt?: PYICoreClass<PYIServlet> | false;
+    jwtSecretKey?: string;
 }
 export declare class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
     static _base(): PYIApp;
@@ -112,6 +120,9 @@ export declare class PYIAppConfiguration<Props = any> extends PYIConfiguration i
     port: number;
     host: string;
     debugOptions?: SignaleOptions;
+    docs: AppSwaggerJSON | false;
+    jwt: PYICoreClass<PYIServlet> | false;
+    jwtSecretKey: string;
     constructor();
     _pyiruntime(): any;
 }

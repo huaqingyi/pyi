@@ -43,6 +43,9 @@ class PYIAppConfiguration extends PYIConfiguration {
         this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';
+        this.docs = false;
+        this.jwt = false;
+        this.jwtSecretKey = '';
     }
     static _base() {
         return PYIAppConfiguration;

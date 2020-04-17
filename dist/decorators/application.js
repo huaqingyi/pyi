@@ -11,6 +11,7 @@ const colors_1 = require("colors");
 const node_emoji_1 = require("node-emoji");
 const http_logger_1 = require("../plugins/http.logger");
 const signale_1 = require("signale");
+const swagger_1 = require("../libs/swagger");
 function PYIBootstrap(props) {
     let mode = 'development';
     if (process.env.NODE_ENV) {
@@ -82,6 +83,7 @@ class PYIApplication extends koa_1.default {
      * 开始初始化 Application
      */
     async run() {
+        await swagger_1.SwaggerInjectService.register();
         console.log(`${node_emoji_1.get('rocket')}  ${colors_1.green(`application onInit runtime ...`)}`);
         // tslint:disable-next-line:no-unused-expression
         this.onInit && await this.onInit();
@@ -109,9 +111,10 @@ class PYIApplication extends koa_1.default {
             await logger.init();
         }
         await this.compile.installPlugins(this.config.plugins);
+        await this.compile.useServletAction(this.config.docs, this.config.jwt);
         const driver = new extends_1.KoaDriver(this);
         await extends_1.createExecutor(driver, {
-            ...this.config, development: this.mode === 'development'
+            ...this.config, development: this.mode === 'development',
         });
         console.log(`${node_emoji_1.get('rocket')}  ${colors_1.green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression

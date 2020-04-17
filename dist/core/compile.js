@@ -5,6 +5,7 @@ const chokidar_1 = require("../libs/chokidar");
 const lodash_1 = require("lodash");
 const plugins_1 = require("../decorators/plugins");
 const factory_1 = require("../factory");
+const swagger_1 = require("../libs/swagger");
 class Compile {
     constructor(drive) {
         this.drive = drive;
@@ -58,6 +59,39 @@ class Compile {
                 config.plugins = [];
             }
             if (_base && _base() === decorators_1.PYIController) {
+                const { jwt } = config;
+                if (jwt !== false) {
+                    this.drive.use(async (ctx, next) => {
+                        const actions = lodash_1.filter(decorators_1.getMetadataArgsStorage().actions, (a) => {
+                            if (a.type.toLocaleUpperCase() === ctx.request.method.toLocaleUpperCase()) {
+                                return a.path.test(ctx.request.url);
+                            }
+                            return false;
+                        });
+                        // if (!actions || !actions.length) { return servlet.notFound(config.jwtSecretKey, ctx, next); }
+                        switch (actions.length) {
+                            case 0:
+                                return (new jwt()).notFound(config.jwtSecretKey, ctx, next);
+                            case 1:
+                                const servlet = new Proxy(new jwt(), {
+                                    get(target, key) {
+                                        if (target[key]) {
+                                            return target[key];
+                                        }
+                                        return actions[0].target.prototype[key];
+                                    },
+                                    set(target, key, value) {
+                                        return target[key] = actions[0].target.prototype[key] = value;
+                                    }
+                                });
+                                const action = actions[0].target.prototype[actions[0].method];
+                                console.log(action);
+                                return await servlet.use(action, config.jwtSecretKey, ctx, next);
+                            default:
+                                return await (new jwt()).multiple(actions, config.jwtSecretKey, ctx, next);
+                        }
+                    });
+                }
                 config.controllers.push(comp);
             }
             if (_base && _base() === decorators_1.PYIInterceptor) {
@@ -90,6 +124,55 @@ class Compile {
             }
             return await plugin;
         }));
+    }
+    async useServletAction(config, jwt) {
+        if (config !== false) {
+            const { controllers, actions } = decorators_1.getMetadataArgsStorage();
+            await Promise.all(lodash_1.map(actions, async (data) => {
+                const { target, method, route, type, docs } = data;
+                // tslint:disable-next-line:no-shadowed-variable
+                const control = lodash_1.find(controllers, (control) => control.target === target);
+                // tslint:disable-next-line:no-shadowed-variable
+                let path = route;
+                if (control && control.route) {
+                    path = `/${control.route}/${route}`.split('//').join('/');
+                }
+                const tag = swagger_1.tags([target.name]);
+                tag(target, method, {
+                    value: { method: type, path }
+                });
+                // tslint:disable-next-line:no-unused-expression
+                swagger_1.request(type, path)(target, method, {
+                    value: { method: type, path }
+                });
+                if (docs.summary) {
+                    swagger_1.summary(docs.summary)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.security) {
+                    swagger_1.security(docs.security)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.description) {
+                    swagger_1.description(docs.description)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                if (docs.swaggerDocument) {
+                    swagger_1.body(docs.swaggerDocument)(target, method, {
+                        value: { method: type, path }
+                    });
+                }
+                return await data;
+            }));
+            const swaggerConf = config;
+            const path = swaggerConf.path;
+            delete swaggerConf.path;
+            return await swagger_1.Swagger.build(path, this.drive, swaggerConf);
+        }
+        return config;
     }
 }
 exports.Compile = Compile;

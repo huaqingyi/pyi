@@ -138,6 +138,9 @@ class RoutingControllers {
                     body = await execption.throws();
                 }
             }
+            else {
+                body = await response;
+            }
             return await this.handleCallMethodResult(body, actionMetadata, action, interceptorFns);
         }).catch(async (error) => {
             if (Dto &&
