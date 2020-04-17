@@ -1,4 +1,5 @@
 import { Configuration, PYIAppConfiguration } from '../../src';
+import { JWTAuthServlet } from '../../src/libs/jwt/jwt.auth.servlet';
 
 @Configuration
 export class AppConfiguration extends PYIAppConfiguration {
@@ -18,8 +19,10 @@ export class AppConfiguration extends PYIAppConfiguration {
                 }
             }
         };
+        this.jwt = JWTAuthServlet;
     }
     public async production() {
         this.port = 4002;
+        this.jwt = JWTAuthServlet;
     }
 }

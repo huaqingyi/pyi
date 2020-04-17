@@ -1,13 +1,18 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
 
 import {
-    JsonController,
     Middleware as RMiddleware,
     Interceptor as RInterceptor,
     getMetadataArgsStorage,
+    ActionMetadata,
 } from '../extends';
 import { map } from 'lodash';
 import { ActionType } from 'routing-controllers/metadata/types/ActionType';
+import { Context } from 'koa';
+// tslint:disable-next-line:no-var-requires
+const pathToRegExp = require('path-to-regexp');
+import jwt from 'jsonwebtoken';
+import { ResponseDto } from './dto';
 
 export * from '../extends';
 
@@ -56,6 +61,23 @@ export interface ControllerRequestConfiguration extends ControllerConfiguration 
     security?: any[];
 }
 
+export function JsonController(baseRoute?: string) {
+    return <VC extends PYICoreClass<PYIController>>(control: VC): VC => {
+        (getMetadataArgsStorage().actions as any) = map(getMetadataArgsStorage().actions, (action) => {
+            const { target, route } = action;
+            if (target === control) {
+                const path = pathToRegExp(ActionMetadata.appendBaseRoute(baseRoute || '', route));
+                return { ...action, path };
+            }
+            return action;
+        });
+        getMetadataArgsStorage().controllers.push({
+            type: 'json', target: control, route: baseRoute || ''
+        });
+        return control;
+    };
+}
+
 export function Controller<VC extends PYICoreClass<PYIController>>(tprops: VC): VC;
 export function Controller<Props = any>(
     props: Props & any
@@ -74,12 +96,42 @@ export function Controller<Props extends any>(props: Props) {
     }
 }
 
-export class PYIController<Props = any> extends PYICore {
+type NewType = Promise<Function[]> | Function[];
+
+export interface PYIServletController {
+    excludeJWT?: () => NewType;
+    servlet?: (
+        action: Function,
+        secretKey: string,
+        context: any,
+        next: (err?: any) => Promise<any>
+    ) => any;
+}
+
+export class PYIController<Props = any> extends PYICore implements PYIServletController {
     public static _base(): PYIApp {
         return PYIController;
     }
 
     public props!: Props;
+
+    // public excludeJWT() {
+    //     return [];
+    // }
+
+    public async servlet(action: Function, secretKey: string, context: any, next: (err?: any) => Promise<any>) {
+        jwt.verify(context.header.authorization, secretKey, async (err: any, decode: any) => {
+            if (err) {
+                const dto = new ResponseDto({});
+                dto.errcode = 1000;
+                context.body = await dto.throws(err);
+                await next(context);
+            } else {
+                context.state.token = decode;
+                await next();
+            }
+        });
+    }
 }
 
 export function Method(method, route, docs?: any) {
@@ -88,7 +140,7 @@ export function Method(method, route, docs?: any) {
             type: method,
             target: object.constructor,
             method: methodName,
-            route, docs
+            route, docs,
         } as any);
     };
 }

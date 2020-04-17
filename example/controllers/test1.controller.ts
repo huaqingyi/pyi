@@ -14,7 +14,7 @@ export class Test1Controller extends PYIController {
     public service!: TestService;
 
     @RequestMapping({
-        prefix: '/test',
+        prefix: '/test/:id',
         methods: [RequestMappingMethod.GET]
     })
     public async test() {

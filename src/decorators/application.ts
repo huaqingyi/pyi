@@ -215,11 +215,11 @@ export class PYIApplication<
         }
 
         await this.compile.installPlugins(this.config.plugins);
-        await this.compile.useSwaggerAction(this.config.docs);
+        await this.compile.useServletAction(this.config.docs, this.config.jwt);
 
         const driver = new KoaDriver(this);
         await createExecutor(driver, {
-            ...this.config as any, development: this.mode === 'development'
+            ...this.config as any, development: this.mode === 'development',
         });
         console.log(`${get('rocket')}  ${green(`application scan project init success ...`)}`);
         // tslint:disable-next-line:no-unused-expression

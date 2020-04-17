@@ -1,12 +1,11 @@
-import { 
-    Controller, PYIController, RequestMapping, 
-    autowired, autoconnect, RequestMappingMethod, 
-    Body, PYIExecption, PYIThrows 
+import {
+    Controller, PYIController, RequestMapping,
+    autoconnect, RequestMappingMethod,
+    Body, PYIExecption, PYIThrows
 } from '../../src';
 import { TestService } from '../services/test.service';
 import { LoginDao } from '../dao/test/login.dao';
 import { ResponseDto } from '../dto/response.dto';
-import { summary } from '../../src/libs/swagger';
 
 @Controller
 export class TestController extends PYIController {
@@ -19,11 +18,18 @@ export class TestController extends PYIController {
         methods: [RequestMappingMethod.GET]
     })
     public async test() {
-        this.logger.error(1111);
-        console.log(111);
+        // this.logger.error(1111);
+        // console.log(111);
         console.log(await this.service.findAll());
         throw new Error('测试');
         return 111;
+    }
+
+    @RequestMapping({
+        prefix: '/test/:id'
+    })
+    public async string() {
+        return `<h1>test ...</h1>`;
     }
 
     @RequestMapping({
@@ -40,7 +46,7 @@ export class TestController extends PYIController {
 
     @RequestMapping({
         prefix: '/valid',
-        methods: [RequestMappingMethod.POST]
+        methods: [RequestMappingMethod.GET]
     })
     public valid(
         @Body({ validate: true }) login: LoginDao
@@ -50,5 +56,11 @@ export class TestController extends PYIController {
                 return 'test ...';
             }
         });
+    }
+
+    public async excludeJWT() {
+        return await [
+            this.test,
+        ];
     }
 }

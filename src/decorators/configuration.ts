@@ -7,6 +7,7 @@ import { CurrentUserChecker } from 'routing-controllers/CurrentUserChecker';
 import { SignaleOptions } from 'signale';
 import { PYIPlugin } from './plugins';
 import { SwaggerJSON } from '../libs/swagger';
+import { PYIServlet } from '../libs/jwt/jwt.auth.servlet';
 
 export function Configuration<VC extends PYICoreClass<PYIConfiguration>>(tprops: VC): VC;
 export function Configuration<Props = any>(
@@ -139,6 +140,8 @@ export interface PYIRoutingConfiguration {
     production?: () => any;
 
     docs?: SwaggerJSON | false;
+    jwt?: PYICoreClass<PYIServlet> | false;
+    jwtSecretKey?: string;
 }
 
 export class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
@@ -157,6 +160,8 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
     public host: string;
     public debugOptions?: SignaleOptions;
     public docs: AppSwaggerJSON | false;
+    public jwt: PYICoreClass<PYIServlet> | false;
+    public jwtSecretKey: string;
 
     constructor() {
         super();
@@ -168,6 +173,8 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
         this.port = 4000;
         this.host = 'localhost';
         this.docs = false;
+        this.jwt = false;
+        this.jwtSecretKey = '';
     }
 
     public _pyiruntime() {

@@ -1,5 +1,9 @@
 // import { RoutingControllers as RRoutingControllers } from 'routing-controllers/RoutingControllers';
-import { BaseDriver, ActionMetadata, Action, RoutingControllersOptions, InterceptorInterface } from 'routing-controllers';
+import {
+    BaseDriver, ActionMetadata, Action,
+    RoutingControllersOptions, InterceptorInterface,
+    UseBefore,
+} from 'routing-controllers';
 import { ActionParameterHandler } from 'routing-controllers/ActionParameterHandler';
 import { MetadataBuilder } from 'routing-controllers/metadata-builder/MetadataBuilder';
 import { InterceptorMetadata } from 'routing-controllers/metadata/InterceptorMetadata';
@@ -119,6 +123,7 @@ export class RoutingControllers<T extends BaseDriver> {
             .map((param) => this.parameterHandler.handle(action, param));
 
         const controllerInstance = actionMetadata.controllerMetadata.instance;
+
         const Dto = Reflect.getMetadata('design:returntype', controllerInstance, actionMetadata.method);
 
         // after all parameters are computed
@@ -136,6 +141,7 @@ export class RoutingControllers<T extends BaseDriver> {
             } else {
                 response = await controllerInstance[actionMetadata.method].apply(controllerInstance, params);
             }
+
             if (
                 response &&
                 response._base &&
@@ -166,6 +172,8 @@ export class RoutingControllers<T extends BaseDriver> {
                 } else {
                     body = await execption.throws();
                 }
+            } else {
+                body = await response;
             }
             return await this.handleCallMethodResult(body, actionMetadata, action, interceptorFns);
 
@@ -244,7 +252,10 @@ export class RoutingControllers<T extends BaseDriver> {
 /**
  * Registers all loaded actions in your express application.
  */
-export function createExecutor<T extends BaseDriver>(driver: T, options: RoutingControllersOptions = {}): void {
+export function createExecutor<T extends BaseDriver>(
+    driver: T,
+    options: RoutingControllersOptions = {}
+): void {
 
     // import all controllers and middlewares and error handlers (new way)
     let controllerClasses: Function[] = [];
