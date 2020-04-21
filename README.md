@@ -6,7 +6,7 @@ This Typescript MVC Server Framework ...
 轻量级 restful 快速开发
 
 ## Quick Start
-### npm i -g pyi-cli
+### npm i -g pyi
 ```
 $ pyi -h
   Usage: pyi [options] [command]
