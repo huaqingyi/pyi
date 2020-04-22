@@ -59,9 +59,14 @@ export class Compile {
             if (!config.plugins) { config.plugins = []; }
 
             if (_base && _base() === PYIController) {
-                const { jwt } = config;
+                const { jwt, docs } = config;
+                const path = docs && docs.path;
                 if (jwt !== false) {
                     this.drive.use(async (ctx, next) => {
+                        if (ctx.request.url === path) {
+                            await next();
+                            return false;
+                        }
                         const actions = filter(getMetadataArgsStorage().actions, (a: any) => {
                             if (a.type.toLocaleUpperCase() === ctx.request.method.toLocaleUpperCase()) {
                                 return a.path.test(ctx.request.url);
@@ -85,7 +90,6 @@ export class Compile {
                                     }
                                 });
                                 const action = (actions[0] as any).target.prototype[(actions[0] as any).method];
-                                console.log(action);
                                 return await servlet.use(action, config.jwtSecretKey, ctx, next);
                             default:
                                 return await (new jwt()).multiple(actions as any, config.jwtSecretKey, ctx, next);
@@ -126,7 +130,7 @@ export class Compile {
         }));
     }
 
-    public async useServletAction(config: AppSwaggerJSON | false, jwt: PYICoreClass<PYIServlet> | false) {
+    public async useServletAction(config: AppSwaggerJSON | false) {
         if (config !== false) {
             const { controllers, actions } = getMetadataArgsStorage();
 
