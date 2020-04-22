@@ -59,9 +59,14 @@ class Compile {
                 config.plugins = [];
             }
             if (_base && _base() === decorators_1.PYIController) {
-                const { jwt } = config;
+                const { jwt, docs } = config;
+                const path = docs && docs.path;
                 if (jwt !== false) {
                     this.drive.use(async (ctx, next) => {
+                        if (ctx.request.url === path) {
+                            await next();
+                            return false;
+                        }
                         const actions = lodash_1.filter(decorators_1.getMetadataArgsStorage().actions, (a) => {
                             if (a.type.toLocaleUpperCase() === ctx.request.method.toLocaleUpperCase()) {
                                 return a.path.test(ctx.request.url);
@@ -85,7 +90,6 @@ class Compile {
                                     }
                                 });
                                 const action = actions[0].target.prototype[actions[0].method];
-                                console.log(action);
                                 return await servlet.use(action, config.jwtSecretKey, ctx, next);
                             default:
                                 return await (new jwt()).multiple(actions, config.jwtSecretKey, ctx, next);
@@ -125,7 +129,7 @@ class Compile {
             return await plugin;
         }));
     }
-    async useServletAction(config, jwt) {
+    async useServletAction(config) {
         if (config !== false) {
             const { controllers, actions } = decorators_1.getMetadataArgsStorage();
             await Promise.all(lodash_1.map(actions, async (data) => {

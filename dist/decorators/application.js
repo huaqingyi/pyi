@@ -111,7 +111,7 @@ class PYIApplication extends koa_1.default {
             await logger.init();
         }
         await this.compile.installPlugins(this.config.plugins);
-        await this.compile.useServletAction(this.config.docs, this.config.jwt);
+        await this.compile.useServletAction(this.config.docs);
         const driver = new extends_1.KoaDriver(this);
         await extends_1.createExecutor(driver, {
             ...this.config, development: this.mode === 'development',
