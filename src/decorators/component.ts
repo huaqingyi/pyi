@@ -1,6 +1,4 @@
 import { PYICore, PYIApp, PYICoreClass } from '../core';
-import { isFunction } from 'lodash';
-import { PYIConfiguration, PYIAppConfiguration } from './configuration';
 import { FactoryComponent, ComponentWiredType } from '../factory';
 
 export function Component<VC extends PYICoreClass<PYIComponent>>(tprops: VC): VC;

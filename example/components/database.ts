@@ -1,5 +1,5 @@
-import { Component, PYIComponent, autoconnect } from '../../src';
-import { Sequelize, ModelCtor } from 'sequelize-typescript';
+import { Component, PYIComponent, autoconnect } from '/Users/yihuaqing/Desktop/yihq/pyi/src';
+import { Sequelize, ModelCtor, SequelizeOptions } from 'sequelize-typescript';
 import { DataBaseConfiguration } from '../config/database.config';
 import { find } from 'lodash';
 

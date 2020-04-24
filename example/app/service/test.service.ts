@@ -1,6 +1,6 @@
-import { Service, PYIService, autoconnect } from '../../src';
-import { Database } from '../components/database';
-import { User } from '../models/user';
+import { Service, PYIService, autoconnect } from '/Users/yihuaqing/Desktop/yihq/pyi/src';
+import { Database } from '/Users/yihuaqing/Desktop/yihq/pyi/example/components/database';
+import { User } from '../entity/user';
 
 @Service
 export class TestService extends PYIService {

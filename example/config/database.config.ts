@@ -1,4 +1,4 @@
-import { Configuration, PYIConfiguration } from '../../src';
+import { Configuration, PYIConfiguration } from '/Users/yihuaqing/Desktop/yihq/pyi/src';
 import { SequelizeOptions } from 'sequelize-typescript';
 import { ReplicationOptions, PoolOptions, Dialect } from 'sequelize/types';
 

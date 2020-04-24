@@ -1,4 +1,4 @@
-import { Dao, PYIDao } from '../../../src';
+import { Dao, PYIDao } from '/Users/yihuaqing/Desktop/yihq/pyi/src';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 @Dao

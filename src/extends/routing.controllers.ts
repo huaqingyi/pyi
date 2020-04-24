@@ -124,6 +124,8 @@ export class RoutingControllers<T extends BaseDriver> {
 
         const controllerInstance = actionMetadata.controllerMetadata.instance;
 
+        console.log(controllerInstance, actionMetadata.method);
+
         const Dto = Reflect.getMetadata('design:returntype', controllerInstance, actionMetadata.method);
 
         // after all parameters are computed

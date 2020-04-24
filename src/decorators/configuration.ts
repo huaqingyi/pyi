@@ -142,6 +142,8 @@ export interface PYIRoutingConfiguration {
     docs?: SwaggerJSON | false;
     jwt?: PYICoreClass<PYIServlet> | false;
     jwtSecretKey?: string;
+    
+    watch: boolean;
 }
 
 export class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
@@ -162,6 +164,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
     public docs: AppSwaggerJSON | false;
     public jwt: PYICoreClass<PYIServlet> | false;
     public jwtSecretKey: string;
+    public watch: boolean;
 
     constructor() {
         super();
@@ -169,6 +172,7 @@ export class PYIAppConfiguration<Props = any> extends PYIConfiguration implement
         this.middlewares = [];
         this.interceptors = [];
         this.plugins = [];
+        this.watch = false;
         this.defaultErrorHandler = true;
         this.port = 4000;
         this.host = 'localhost';

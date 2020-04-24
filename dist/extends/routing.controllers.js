@@ -93,6 +93,7 @@ class RoutingControllers {
             .sort((param1, param2) => param1.index - param2.index)
             .map((param) => this.parameterHandler.handle(action, param));
         const controllerInstance = actionMetadata.controllerMetadata.instance;
+        console.log(controllerInstance, actionMetadata.method);
         const Dto = Reflect.getMetadata('design:returntype', controllerInstance, actionMetadata.method);
         // after all parameters are computed
         return Promise.all(paramsPromises).then(async (params) => {

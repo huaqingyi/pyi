@@ -2,13 +2,13 @@ import {
     Controller, PYIController, RequestMapping,
     autoconnect, RequestMappingMethod,
     Body, PYIExecption, PYIThrows
-} from '../../src';
-import { TestService } from '../services/test.service';
-import { LoginDao } from '../dao/test/login.dao';
-import { ResponseDto } from '../dto/response.dto';
+} from '/Users/yihuaqing/Desktop/yihq/pyi/src';
+import { TestService } from './service';
+import { LoginDao } from './dao';
+import { ResponseDto } from './dto';
 
 @Controller
-export class TestController extends PYIController {
+export class SettingController extends PYIController {
 
     @autoconnect
     public service!: TestService;
@@ -19,8 +19,8 @@ export class TestController extends PYIController {
     })
     public async test() {
         // this.logger.error(1111);
-        // console.log(111);
-        console.log(await this.service.findAll());
+        // // console.log(111);
+        // console.log(await this.service.findAll());
         throw new Error('测试');
         return 111;
     }
@@ -36,9 +36,9 @@ export class TestController extends PYIController {
         prefix: '/error'
     })
     public error(): ResponseDto {
-        return PYIExecption(class extends PYIThrows<TestController> {
-            public async throws(this: TestController) {
-                console.log(await this.service.test());
+        return PYIExecption(class extends PYIThrows<SettingController> {
+            public async throws(this: SettingController) {
+                // console.log(await this.service.test());
                 return 'test ...';
             }
         });
@@ -51,8 +51,8 @@ export class TestController extends PYIController {
     public valid(
         @Body({ validate: true }) login: LoginDao
     ): ResponseDto {
-        return PYIExecption(class extends PYIThrows<TestController> {
-            public async throws(this: TestController) {
+        return PYIExecption(class extends PYIThrows<SettingController> {
+            public async throws(this: SettingController) {
                 return 'test ...';
             }
         });

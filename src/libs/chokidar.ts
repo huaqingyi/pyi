@@ -61,6 +61,10 @@ export class PYIChokidar {
             const { _base } = await comp[i];
             if (_base && _base() === PYIAppConfiguration) {
                 this.config = await (comp[i] as any)._pyiconnect()._pyiruntime();
+                if (!this.config.controllers) { this.config.controllers = []; }
+                if (!this.config.interceptors) { this.config.interceptors = []; }
+                if (!this.config.middlewares) { this.config.middlewares = []; }
+                if (!this.config.plugins) { this.config.plugins = []; }
             }
             await this.callback(o);
             await this.comps.push(o);

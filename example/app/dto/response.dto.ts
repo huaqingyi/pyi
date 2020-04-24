@@ -1,4 +1,4 @@
-import { Dto, PYIDto } from '../../src';
+import { Dto, PYIDto } from '/Users/yihuaqing/Desktop/yihq/pyi/src';
 
 @Dto
 export class ResponseDto extends PYIDto {

@@ -108,6 +108,7 @@ export interface PYIRoutingConfiguration {
     docs?: SwaggerJSON | false;
     jwt?: PYICoreClass<PYIServlet> | false;
     jwtSecretKey?: string;
+    watch: boolean;
 }
 export declare class PYIAppConfiguration<Props = any> extends PYIConfiguration implements PYIRoutingConfiguration {
     static _base(): PYIApp;
@@ -123,6 +124,7 @@ export declare class PYIAppConfiguration<Props = any> extends PYIConfiguration i
     docs: AppSwaggerJSON | false;
     jwt: PYICoreClass<PYIServlet> | false;
     jwtSecretKey: string;
+    watch: boolean;
     constructor();
     _pyiruntime(): any;
 }
