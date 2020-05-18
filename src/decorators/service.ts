@@ -1,9 +1,19 @@
+import { PYICoreClass } from './../core/pyi';
 import { PYICore } from '../core';
+import { isFunction } from 'lodash';
 
-export abstract class PYIService extends PYICore {
-    public static _pyi: () => any;
-    public static _root() {
+export class PYIService extends PYICore {
+
+    public static _base() {
         return PYIService;
+    }
+
+    public input() {
+        return this;
+    }
+
+    public output() {
+        return this;
     }
 }
 
@@ -12,7 +22,14 @@ export abstract class PYIService extends PYICore {
  * @param target service component
  * @param key off
  */
-// tslint:disable-next-line:no-empty
-export function Service(target: any & PYIService, key?: string) {
-
+export function Service<S extends PYICoreClass<PYIService>>(target: S): S;
+export function Service<Props = any>(props: Props): <S extends PYICoreClass<PYIService>>(target: S) => S;
+export function Service(props: any) {
+    const base = props && props._base && isFunction(props._base) && props._base();
+    if (base === PYIService) {
+        return base;
+    }
+    return (target: PYICoreClass<PYIService>) => {
+        return target;
+    };
 }

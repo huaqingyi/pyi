@@ -1,85 +1,47 @@
+import { FactoryComponent, ComponentWiredType } from '../factory/factory.component';
 import { isFunction } from 'lodash';
-import { PYICore } from '../core';
-import { PYIAutoConfiguration, PYIAutoAppConfiguration } from './configuration';
+import { PYICore, PYICoreClass } from '../core';
+import { PYIConfiguration, PYIAppConfiguration } from './configuration';
 
-/**
- * Component base
- */
-export abstract class PYIComponent<Props = {}> extends PYICore {
-    public static _root() {
+export class PYIComponent<Props = any> extends PYICore {
+
+    public static _base() {
         return PYIComponent;
     }
 
     public props!: Props;
 
-    constructor(...props: any) { super(); }
-}
+    constructor(props?: Props) {
+        super();
+    }
 
-export function Component<Props = any>(config: Props): any {
-    const { _root } = (config as any);
-    /**
-     * 如果是直接修饰类
-     */
-    if (_root && isFunction(_root) && _root() === PYIComponent) {
-        return config;
-    } else {
-        /**
-         * 带参数的修饰
-         */
-        return (target: any, key?: string) => {
-            target.prototype.props = config;
-        };
+    public input() {
+        return this;
+    }
+
+    public output() {
+        return this;
     }
 }
 
-/**
- * 自动注入类
- * @param target classes(主类)
- * @param key prototype(键)
- */
-export function autoconnect(target: any, key: string) {
-    /**
-     * 容错
-     */
-    if (!target.constructor._pyi) { target.constructor._pyi = () => ({}); }
-    /**
-     * 获取注入类
-     */
-    const params = Reflect.getMetadata('design:type', target, key);
-    /**
-     * 是否嵌套依赖
-     */
-    if (!params._pyi || !params._pyi().autowired) {
-        const { props } = params.prototype;
-        // let instance = new params(props);
-        let instance = params._connect(props);
-        target.constructor.prototype[key] = instance;
-        if (params._root && isFunction(params._root)) {
-            if (
-                params._root() === PYIAutoConfiguration ||
-                params._root() === PYIAutoAppConfiguration
-            ) {
-                (async () => {
-                    instance = await instance._runtime();
-                    target.constructor.prototype[key] = await instance;
-                })();
-            }
-        }
-    } else {
-        /**
-         * 嵌套依赖
-         */
-        const _pyi = target.constructor._pyi();
-        if (!_pyi.autowired) {
-            target.constructor._pyi = () => ({
-                ..._pyi,
-                autowired: [
-                    ...(_pyi.autowired || []),
-                    key
-                ]
-            });
-        }
+export function Component<V extends PYICoreClass<PYIComponent<any>>>(target: V): V;
+export function Component<Props = any>(
+    config: Props
+): <V extends PYICoreClass<PYIComponent<Props>>>(target: V) => V;
+export function Component(props: any) {
+    const base = props && props._base && isFunction(props._base) && props._base();
+    if (base === PYIComponent) {
+        return props;
     }
+
+    return (target: PYICoreClass<PYIComponent>) => {
+        return target;
+    };
+}
+
+export interface AutowiredConfiguration {
+    [x: string]: any;
+    singleton?: boolean;
 }
 
 /**
@@ -87,47 +49,35 @@ export function autoconnect(target: any, key: string) {
  * @param target classes(主类)
  * @param key prototype(键)
  */
-export function autowired(target: any, key: string) {
-    /**
-     * 容错
-     */
-    if (!target.constructor._pyi) { target.constructor._pyi = () => ({}); }
-    /**
-     * 获取注入类
-     */
-    const params = Reflect.getMetadata('design:type', target, key);
-    /**
-     * 是否嵌套依赖
-     */
-    if (!params._pyi || !params._pyi().autowired) {
-        const { props } = params.prototype;
-        // let instance = new params(props);
-        let instance = new params(props);
-        target.constructor.prototype[key] = instance;
-        if (params._root && isFunction(params._root)) {
-            if (
-                params._root() === PYIAutoConfiguration ||
-                params._root() === PYIAutoAppConfiguration
-            ) {
-                (async () => {
-                    instance = await instance._runtime();
-                    target.constructor.prototype[key] = await instance;
-                })();
-            }
-        }
-    } else {
-        /**
-         * 嵌套依赖
-         */
-        const _pyi = target.constructor._pyi();
-        if (!_pyi.autowired) {
-            target.constructor._pyi = () => ({
-                ..._pyi,
-                autowired: [
-                    ...(_pyi.autowired || []),
-                    key
-                ]
-            });
-        }
+// tslint:disable-next-line: adjacent-overload-signatures
+export function autowired(target: any, method: string): any;
+export function autowired(
+    config: AutowiredConfiguration
+): (target: any, metod: string) => any;
+export function autowired(props: any, method?: string) {
+    if (method) {
+        const C = Reflect.getMetadata('design:type', props, method);
+        props[method] = wired(method, C);
+        return props[method];
     }
+    return (target: any, kmethod: string) => {
+        const C = Reflect.getMetadata('design:type', target, kmethod);
+        target[kmethod] = wired(kmethod, C, props.singleton, props);
+        return target[kmethod];
+    };
+}
+
+export function wired(
+    method: string,
+    injeactor: PYICore,
+    type?: ComponentWiredType,
+    props?: AutowiredConfiguration,
+) {
+    if (
+        injeactor._base() === PYIConfiguration ||
+        injeactor._base() === PYIAppConfiguration
+    ) {
+        return new FactoryComponent(method, injeactor, type ? type : ComponentWiredType.AUTOCONNECT, props);
+    }
+    return new FactoryComponent(method, injeactor, type ? type : ComponentWiredType.AUTOWIRED, props);
 }

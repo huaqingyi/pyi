@@ -9,10 +9,10 @@
       "es2018.promise",
       "es2018.regexp"
     ],                             /* Specify library files to be included in the compilation. */
-    // "allowJs": true,                       /* Allow javascript files to be compiled. */
+    "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
-    // "jsx": "preserve",                     /* Specify JSX code generation: "preserve", "react-native", or "react". */
-    "declaration": true,
+    "jsx": "preserve",                     /* Specify JSX code generation: "preserve", "react-native", or "react". */
+    // "declaration": true,
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding ".d.ts" file. */
     // "sourceMap": true,                     /* Generates corresponding ".map" file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
@@ -64,7 +64,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "example/**/*.ts",
+    "example",
     "gulpfile.ts"
   ],
   "exclude": [

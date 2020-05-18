@@ -1,69 +1,73 @@
-import { isFunction } from 'lodash';
+import { PYICoreClass } from './../core/pyi';
 import { PYICore } from '../core';
-import { RoutingControllersOptions } from 'routing-controllers';
-
-export interface PYIApplicationConfiguration extends RoutingControllersOptions {
-    [x: string]: any;
-}
+import { isFunction } from 'util';
 
 /**
  * Component base
  */
-export abstract class PYIAutoConfiguration<Props = {}> extends PYICore {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoConfiguration;
+export class PYIConfiguration<Props = any> extends PYICore {
+    public static _base() {
+        return PYIConfiguration;
     }
 
-    public props?: Props;
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
+    public props!: Props;
+
+    public input() {
+        return this;
+    }
+
+    public output() {
+        return this;
     }
 }
 
-// tslint:disable-next-line:max-classes-per-file
-export abstract class PYIAutoAppConfiguration<Props = {}> extends PYICore implements PYIApplicationConfiguration {
-    [x: string]: any;
-    public static _pyi: () => any;
-    public static _root() {
-        return PYIAutoAppConfiguration;
+export class PYIAppConfiguration<Props = any> extends PYICore {
+    public static _base() {
+        return PYIAppConfiguration;
     }
 
-    public props?: Props;
-    
-    constructor() {
+    public props!: Props;
+
+    constructor(props?: Props) {
         super();
-        this.defaultErrorHandler = false;
     }
 
-    public async _runtime() {
-        if (this[this.mode]) { await this[this.mode](); }
-        return await this;
+    public input() {
+        return this;
+    }
+
+    public output() {
+        return this;
     }
 }
 
-export function Configuration<Props = any>(config: Props): any {
-    const { _root } = (config as any);
-    /**
-     * 如果是直接修饰类
-     */
-    if (_root && isFunction(_root)) {
-        if (
-            _root() === PYIAutoConfiguration ||
-            _root() === PYIAutoAppConfiguration
-        ) {
-            return config;
-        } else {
-            /**
-             * 带参数的修饰
-             */
-            return (target: any, key?: string) => {
-                target.prototype.props = config;
-            };
-        }
-    } else {
-        return config;
+/**
+ * 普通配置
+ * @param target PYIConfiguration 类
+ */
+export function Configuration<V extends PYICoreClass<PYIConfiguration<any>>>(target: V): V;
+export function Configuration<Props = any>(
+    config: Props
+): <V extends PYICoreClass<PYIConfiguration<Props>>>(target: V) => V;
+/**
+ * 系统配置
+ * @param target PYIAppConfiguration
+ */
+export function Configuration<V extends PYICoreClass<PYIAppConfiguration<any>>>(target: V): V;
+export function Configuration<Props = any>(
+    config: Props
+): <V extends PYICoreClass<PYIAppConfiguration<Props>>>(target: V) => V;
+export function Configuration(props: any) {
+    const base = props && props._base && isFunction(props._base) && props._base();
+    switch (base) {
+        case PYIConfiguration: {
+            return props;
+        };
+        case PYIAppConfiguration: {
+            return props;
+        };
+        default: return (target: PYICoreClass<PYIConfiguration>) => {
+            return target;
+        };
     }
 }
