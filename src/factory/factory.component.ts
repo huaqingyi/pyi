@@ -1,6 +1,6 @@
 import { red } from 'colors';
 import { PYICore } from '../core';
-import { isFunction } from 'lodash';
+import { isFunction, find, filter } from 'lodash';
 
 export enum ComponentWiredType {
     AUTOCONNECT = 'autoconnect',

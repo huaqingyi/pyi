@@ -22,14 +22,6 @@ export class PYIService extends PYICore {
  * @param target service component
  * @param key off
  */
-export function Service<S extends PYICoreClass<PYIService>>(target: S): S;
-export function Service<Props = any>(props: Props): <S extends PYICoreClass<PYIService>>(target: S) => S;
-export function Service(props: any) {
-    const base = props && props._base && isFunction(props._base) && props._base();
-    if (base === PYIService) {
-        return base;
-    }
-    return (target: PYICoreClass<PYIService>) => {
-        return target;
-    };
+export function Service<V extends PYICoreClass<PYIService>>(target: V): V {
+    return target;
 }

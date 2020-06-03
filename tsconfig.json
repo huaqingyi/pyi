@@ -65,7 +65,8 @@
   "include": [
     "src/**/*.ts",
     "example",
-    "gulpfile.ts"
+    "gulpfile.ts",
+    "@types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

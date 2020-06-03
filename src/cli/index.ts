@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+#!/usr/bin / env node
 
 import { join, dirname } from 'path';
-import { createWriteStream, existsSync, createReadStream } from 'fs';
+import { createWriteStream, existsSync, createReadStream, statSync } from 'fs';
 import { green, red } from 'colors';
 import moment from 'moment';
 import request from 'request';
@@ -10,14 +10,19 @@ import { remove, mkdir, copy } from 'fs-extra';
 import { exec } from 'child_process';
 
 import { Command, Execute } from 'yicommand';
+import Typescript from 'typescript';
+import { find } from 'lodash';
 import { PYIBuilder } from './builder';
-import { PYIApplication } from './application';
+import { PYICoreClass } from '../core/pyi';
+import { PYIApplication } from '../decorators/application';
 
 @Command({
     context: 'PYI Framework ...',
     version: require('../../package.json').version
 })
 export class TestCommand {
+
+    private tsconfigPath?: string;
 
     @Execute('create <path>')
     public async created(path: string) {
@@ -60,9 +65,29 @@ export class TestCommand {
         return await exec(`cd ${pdir} && npm i`);
     }
 
-    @Execute('start [path]')
-    public async start(path?: string) {
-        const app: PYIApplication = new PYIApplication(path || '');
-        app.bootstrap();
+    @Execute('start [application]')
+    public async start(application: string) {
+        if (statSync(application).isFile()) {
+            const Application: PYICoreClass<PYIApplication> = find(
+                await import(join(process.cwd(), application)),
+                ({ _base }) => _base && _base() === PYIApplication
+            );
+            if (!Application) {
+                throw new Error('is not bootstrap application ...');
+            } else {
+                const path = dirname(join(process.cwd(), application));
+                const { config } = Typescript.readConfigFile(
+                    join(`${path}`, 'tsconfig.json'),
+                    Typescript.sys.readFile
+                );
+                const builder = new PYIBuilder(path, join(path, '.runtime'), config);
+                await builder.build();
+                // const app = new Application();
+                // app.setResource(builder.outputs);
+                // await app.bootstrap();
+            }
+        } else {
+            throw new Error('is not bootstrap file ...');
+        }
     }
 }

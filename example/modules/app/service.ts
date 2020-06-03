@@ -9,14 +9,14 @@ export class TestService extends PYIService {
     public database!: DBComponent;
 
     public async findAllUsers() {
-        return await this.db.table(User).findAll().then((row: any) => {
+        return await this.database.table(User).findAll().then((row: any) => {
             return row.map((resp: any) => resp.toJSON());
         });
     }
 
     public async findUser() {
         let data: any = {};
-        [data] = await this.db.instance().query(`SELECT * FROM test1`);
+        [data] = await this.database.instance().query(`SELECT * FROM test1`);
         return data;
     }
 }

@@ -21,12 +21,13 @@ export class DBComponent extends PYIComponent<DBConfiguration> {
     @autowired
     public props!: DBConfiguration;
 
-    // public db: Sequelize;
+    public db: Sequelize;
 
-    constructor(props: SequelizeOptions) {
+    constructor(
+        // props: SequelizeOptions
+    ) {
         super();
-        console.log(this.props);
-        // this.db = new Sequelize(props);
+        this.db = new Sequelize(this.props);
     }
 
     public instance() {

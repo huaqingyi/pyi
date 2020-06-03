@@ -1,6 +1,7 @@
+import { PYIController } from './controller';
 import { PYICoreClass } from './../core/pyi';
 import { PYICore } from '../core';
-import { isFunction } from 'util';
+import { isFunction } from 'lodash';
 
 /**
  * Component base
@@ -27,9 +28,11 @@ export class PYIAppConfiguration<Props = any> extends PYICore {
     }
 
     public props!: Props;
+    public controllers: Array<PYICoreClass<PYIController>>;
 
     constructor(props?: Props) {
         super();
+        this.controllers = [];
     }
 
     public input() {
@@ -62,10 +65,10 @@ export function Configuration(props: any) {
     switch (base) {
         case PYIConfiguration: {
             return props;
-        };
+        }
         case PYIAppConfiguration: {
             return props;
-        };
+        }
         default: return (target: PYICoreClass<PYIConfiguration>) => {
             return target;
         };

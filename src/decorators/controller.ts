@@ -1,15 +1,26 @@
+import { PYIDto } from './dto';
+import { PYIDao } from './dao';
+import { find, map } from 'lodash';
 import { PYICore, PYICoreClass } from '../core';
 import { isFunction } from 'util';
+import Router from 'koa-router';
+import { dirname } from 'path';
+import { Context } from 'koa';
 
 /**
  * Controller ================================
  */
 export enum RequestMappingMethod {
-    GET = 'GET',
-    POST = 'POST',
-    DELETE = 'DELETE',
-    PUT = 'PUT',
-    PATCH = 'PATCH'
+    GET = 'get',
+    POST = 'post',
+    PUT = 'put',
+    LINK = 'link',
+    UNLINK = 'unlink',
+    DELETE = 'del',
+    HEAD = 'head',
+    OPTIONS = 'options',
+    PATCH = 'patch',
+    ALL = 'all',
 }
 
 export interface ControllerConfiguration {
@@ -22,17 +33,21 @@ export interface ControllerRequestConfiguration extends ControllerConfiguration 
     methods?: string[] | RequestMappingMethod[];
 }
 
+export interface ControllerActions {
+    target: PYIController;
+    method: string;
+    config: ControllerRequestConfiguration;
+    dao: PYICoreClass<PYIDao>;
+    dto: PYICoreClass<PYIDto>;
+}
+
 export class PYIController extends PYICore {
     public static _base() {
         return PYIController;
     }
 
-    public input() {
-        return this;
-    }
-
-    public output() {
-        return this;
+    constructor() {
+        super();
     }
 }
 
