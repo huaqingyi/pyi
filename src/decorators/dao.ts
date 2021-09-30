@@ -1,30 +1,25 @@
-import { PYICore, PYIApp, PYICoreClass } from '../core';
-import { ValidationError } from 'class-validator';
+/*
+ * @Author: huaqingyi
+ * @LastEditors: huaqingyi
+ * @Description: zeconding ...
+ */
+import { PYICore, PYICoreClass } from '../extensions';
 
 export function Dao<VC extends PYICoreClass<PYIDao>>(tprops: VC): VC;
-export function Dao<Props = any>(
-    props: Props & any
-): <VC extends PYICoreClass<PYIDao>>(target: VC) => VC;
-export function Dao<Props extends any>(props: Props) {
-    if (props._base && props._base() === PYIDao) {
-        return props;
+export function Dao<Props = any>(props: Props & any): <VC extends PYICoreClass<PYIDao>>(target: VC) => VC;
+export function Dao<Props extends any>() {
+    const [target] = arguments;
+    if (target._base && target._base() === PYIDao) {
+        return target;
     } else {
-        return (target: PYIApp) => {
-            target.prototype.props = props;
+        return (target: PYICoreClass<PYIDao>) => {
             return target;
         };
     }
 }
 
-export interface PYIDaoThrow {
-    throw: (errors: ValidationError[]) => any;
-}
-
 export class PYIDao<Props = any> extends PYICore {
-    public static swaggerDocument: any;
-    public static _base(): PYIApp {
+    public static _base() {
         return PYIDao;
     }
-
-    public props!: Props;
 }

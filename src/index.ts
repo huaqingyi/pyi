@@ -1,4 +1,9 @@
-import 'reflect-metadata';
+/*
+ * @Author: huaqingyi
+ * @LastEditors: huaqingyi
+ * @Description: zeconding ...
+ */
+import 'tsconfig-paths';
+export * from './composition';
 export * from './decorators';
-export * from './core';
-export * from './libs';
+export * from './extensions';

@@ -3,4 +3,4 @@
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
-export * from './loaded';
+export * from './execption';

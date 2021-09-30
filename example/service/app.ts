@@ -1,6 +1,10 @@
+import { PYIService } from 'pyi';
+
 /*
  * @Author: huaqingyi
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
-export * from './loaded';
+export class AppService extends PYIService {
+
+}

@@ -1,24 +1,20 @@
 {
   "name": "pyi",
-  "version": "1.3.2",
-  "description": "pyi freamwork",
+  "version": "1.0.0",
+  "description": "",
   "main": "dist/index.js",
-  "bin": {
-    "pyi": "dist/cli/index.js"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon example/app.ts --mode development"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/huaqingyi/pyi.git"
   },
   "keywords": [
-    "pyi",
-    "ts",
-    "typescript",
     "server",
-    "freamwork"
+    "koa",
+    "pyi"
   ],
   "author": "huaqingyi",
   "license": "ISC",
@@ -27,43 +23,13 @@
   },
   "homepage": "https://github.com/huaqingyi/pyi#readme",
   "dependencies": {
-    "args": "^5.0.1",
-    "chokidar": "^3.3.0",
-    "class-transformer": "^0.2.3",
-    "class-validator": "^0.11.0",
-    "colors": "^1.4.0",
-    "fs-extra": "^9.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "koa": "^2.11.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-logger": "^3.2.1",
-    "koa-router": "^8.0.0-alpha.1",
-    "lodash": "^4.17.15",
-    "mysql2": "^2.0.1",
-    "node-emoji": "^1.10.0",
-    "path-to-regexp": "^1.1.1",
-    "pyi-swagger": "^1.0.3",
-    "reflect-metadata": "^0.1.13",
-    "request": "^2.88.2",
-    "routing-controllers": "^0.8.0",
-    "rxjs": "^6.5.5",
-    "sequelize": "^5.21.2",
-    "sequelize-typescript": "^1.0.0",
-    "signale": "^1.4.0",
-    "typescript": "^3.7.2",
-    "unzip": "^0.1.11"
+    "chokidar": "^3.5.2",
+    "dotenv": "^10.0.0",
+    "koa": "^2.13.3",
+    "tsconfig-paths": "^3.11.0"
   },
   "devDependencies": {
-    "@types/chokidar": "^2.1.3",
-    "@types/colors": "^1.2.1",
-    "@types/koa": "^2.11.0",
-    "@types/lodash": "^4.14.149",
-    "@types/node-emoji": "^1.8.1",
-    "@types/signale": "^1.2.1",
-    "@typescript-eslint/eslint-plugin": "^2.9.0",
-    "@typescript-eslint/parser": "^2.9.0",
-    "eslint": "^6.7.1",
-    "gyi": "^1.0.3",
-    "socket.io": "^2.3.0"
+    "@types/koa": "^2.13.4",
+    "nodemon": "^2.0.13"
   }
 }

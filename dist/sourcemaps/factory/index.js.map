@@ -1,1 +1,0 @@
-{"version":3,"sources":["factory/index.ts"],"names":[],"mappings":";;;;;AAAA,yCAAoC","file":"../../factory/index.js","sourcesContent":["export * from './factory.component';\n"]}

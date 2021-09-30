@@ -3,4 +3,6 @@
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
-export * from './loaded';
+export function PYIExecption(execption: Function): any {
+    return execption;
+}
