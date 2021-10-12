@@ -25,11 +25,15 @@
   "dependencies": {
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
+    "fs-extra": "^10.0.0",
     "koa": "^2.13.3",
+    "lodash": "^4.17.21",
     "tsconfig-paths": "^3.11.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
     "@types/koa": "^2.13.4",
+    "@types/lodash": "^4.14.175",
     "nodemon": "^2.0.13"
   }
 }

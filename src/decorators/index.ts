@@ -4,6 +4,7 @@
  * @Description: zeconding ...
  */
 export * from './application';
+export * from './properties';
 export * from './component';
 export * from './configuration';
 export * from './controller';
