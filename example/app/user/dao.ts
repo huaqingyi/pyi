@@ -1,4 +1,4 @@
-import { Dao, PYIDao } from 'pyi';
+import { Dao, PYIDao } from '../../../src';
 
 /*
  * @Author: huaqingyi

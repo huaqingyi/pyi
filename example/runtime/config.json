@@ -1,0 +1,14 @@
+{
+    "APP_AUOTLOAD": [
+        "ts",
+        "tsx",
+        "js",
+        "jsx",
+        "ejs"
+    ],
+    "APP_RUNTIME": "runtime",
+    "PORT": 4001,
+    "DATABASE_HOST": "0.0.0.0",
+    "DATABASE_PORT": 3306,
+    "DATABASE_DB": "test"
+}

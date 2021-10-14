@@ -1,0 +1,30 @@
+[
+    {
+        "regexp": false,
+        "path": "/user/controller/test",
+        "controller": "/Users/yihuaqing/Desktop/yihq/pyi/example/app/user/controller.ts",
+        "action": "test",
+        "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "COPY"
+        ]
+    },
+    {
+        "regexp": false,
+        "path": "/sys/controller/test",
+        "controller": "/Users/yihuaqing/Desktop/yihq/pyi/example/app/sys/controller.ts",
+        "action": "test",
+        "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "COPY"
+        ]
+    }
+]

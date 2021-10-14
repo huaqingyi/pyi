@@ -14,6 +14,7 @@ export abstract class PYICoreApp {
 
 export class PYICore extends PYICoreApp implements PYICoreApp {
     public static __proto__: any;
+    public static _path: string;
 
     public static _root(): typeof PYICore {
         return PYICore;

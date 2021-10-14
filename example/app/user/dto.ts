@@ -1,4 +1,4 @@
-import { Dto, PYIDto } from 'pyi';
+import { Dto, PYIDto } from '../../../src';
 
 /*
  * @Author: huaqingyi

@@ -1,15 +1,21 @@
-import { GFile, Task, TSC } from 'gyi';
 import { join } from 'path';
+import {
+    GFile, Core, Task, TSC, IDoneFunction,
+    write, createProject,
+} from 'gyi';
 
 @GFile
-export class GulpFile {
+export class GulpFile extends Core {
 
-    @Task({
-        src: join(__dirname, 'src/**/*.ts'),
-        dest: join(__dirname, 'dist')
-    })
-    // tslint:disable-next-line:no-shadowed-variable
+    @Task({ description: '编译任务 .' })
     public async build(tsc: TSC) {
-        tsc.runtime();
+        console.log('build ...');
+        return await tsc.src([
+            join(__dirname, 'src/**/*.ts'),
+        ]).config({
+            sourcemaps: write('./.sourcemaps'),
+            typescript: createProject(join(__dirname, 'tsconfig.json')),
+            declaration: true,
+        }).dest(join(__dirname, 'dist')).run();
     }
 }

@@ -1,4 +1,4 @@
-import { PYIComponent } from 'pyi';
+import { PYIComponent } from '../../src';
 
 /*
  * @Author: huaqingyi

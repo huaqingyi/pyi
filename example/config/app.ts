@@ -1,4 +1,4 @@
-import { PYIConfiguration } from 'pyi';
+import { PYIConfiguration } from '../../src';
 
 /*
  * @Author: huaqingyi

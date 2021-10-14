@@ -1,4 +1,4 @@
-import { PYIService } from 'pyi';
+import { PYIService } from '../../src';
 
 /*
  * @Author: huaqingyi

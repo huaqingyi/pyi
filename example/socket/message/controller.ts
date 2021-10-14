@@ -1,4 +1,4 @@
-import { PYIController, RequestMapping, PYIExecption, Controller } from '../../../src';
+import { PYITCPController, PYIExecption, TCPController } from '../../../src';
 import { TestDao } from './dao';
 
 /*
@@ -6,10 +6,9 @@ import { TestDao } from './dao';
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
-@Controller
-export default class extends PYIController {
+@TCPController
+export default class extends PYITCPController {
 
-    @RequestMapping
     public test(): TestDao {
         return PYIExecption(() => {
             return {};

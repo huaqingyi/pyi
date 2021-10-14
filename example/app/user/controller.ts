@@ -1,4 +1,4 @@
-import { PYIController, PYIExecption } from 'pyi';
+import { PYIController, RequestMapping, PYIExecption, Controller } from '../../../src';
 import { TestDao } from './dao';
 
 /*
@@ -6,8 +6,10 @@ import { TestDao } from './dao';
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
+@Controller
 export default class extends PYIController {
 
+    @RequestMapping
     public test(): TestDao {
         return PYIExecption(() => {
             return {};

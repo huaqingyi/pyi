@@ -5,6 +5,8 @@
  */
 export interface ConfigurationProperties {
     [x: string]: any;
+    APP_AUOTLOAD: string[];
+    APP_RUNTIME: string;
 }
 
 export function useProperties() {
