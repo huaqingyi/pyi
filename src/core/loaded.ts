@@ -1,17 +1,16 @@
-import { config } from 'dotenv';
 import { dirname, join } from 'path';
-import { ConfigurationProperties } from '../decorators/properties';
+import { ConfigurationProperties, PROPERTIES } from '../decorators/configuration';
 import { existsSync, mkdirpSync, writeFileSync, statSync } from 'fs-extra';
 import { map, isNaN, isFunction, isRegExp } from 'lodash';
 import { watch } from 'chokidar';
-import { ApplicationConfiguration } from '../configuration/application';
 import { PYIController, CONTROLLER_ACTION_KEY, CONTROLLER_KEY, REQUESTMAPPING_KEY, RequestMappingMethod } from '../decorators/controller';
 import { PYITCPController, TCPCONTROLLER_ACTION_KEY, TCPCONTROLLER_KEY, TCPREQUESTMAPPING_KEY } from '../decorators/tcpcontroller';
 import { PYIComponent } from '../decorators/component';
-import { PYIConfiguration } from '../decorators/configuration';
 import { PYIDao } from '../decorators/dao';
 import { PYIDto } from '../decorators/dto';
 import { PYIService } from '../decorators/service';
+import { useConfiguraion } from '../composition/properties';
+import { Container } from 'typedi';
 
 /*
  * @Author: huaqingyi
@@ -26,7 +25,7 @@ export class ApplicationLoadedPacket {
     public controllers: LoadedPacket<PYIController>;
     public tcpcontrols: LoadedPacket<PYITCPController>;
     public components: PYIComponent[];
-    public configurations: PYIConfiguration[];
+    public configurations: any[];
     public daos: PYIDao[];
     public dtos: PYIDto[];
     public services: PYIService[];
@@ -43,7 +42,7 @@ export class ApplicationLoadedPacket {
 
 export class ApplicationLoaded {
 
-    public configuration!: ConfigurationProperties;
+    public configuration: ConfigurationProperties;
     public APP_PATH: string;
     public APPLICATION_PATH: string;
 
@@ -51,38 +50,32 @@ export class ApplicationLoaded {
         const [_node, path] = process.argv;
         this.APPLICATION_PATH = path;
         this.APP_PATH = dirname(this.APPLICATION_PATH);
+        this.configuration = useConfiguraion();
         this.dotenv();
-        global.pyi.configuration = this.configuration;
     }
 
     public dotenv() {
-        // loaded env config
-        let mode = 'development';
-        const [_node, _path, ...args] = process.argv;
-        const idx = args.indexOf('--mode');
-        if (idx !== -1) mode = args.slice(idx + 1, idx + 2).pop() || 'development';
-        const env = join(this.APP_PATH, `.env.${mode}`);
-        let configuration: any = config({ path: env })?.parsed || {};
-        const cts = Object.keys(configuration).map(v => `'${v}'`).join(' | ');
+        const cts = Object.keys(this.configuration).map(v => `'${v}'`).join(' | ');
         // create config .d.ts template
         const template = [
             `import { useProperties, properties, ConfigurationProperties } from 'pyi';`, ``,
             `declare module 'pyi' {`,
             `    interface ConfigurationProperties {`,
-            ...Object.keys(configuration).map(c => {
+            ...Object.keys(this.configuration).map(c => {
                 let type = 'string';
-                if (['true', 'false'].indexOf(configuration[c]) !== -1) {
+                if (['true', 'false'].indexOf(this.configuration[c]) !== -1) {
                     type = 'boolean';
-                    configuration[c] = 'true' === configuration[c] ? true : false;
+                    this.configuration[c] = 'true' === this.configuration[c] ? true : false;
                 };
-                if (!isNaN(Number(configuration[c]))) {
+                if (!isNaN(Number(this.configuration[c]))) {
                     type = 'number';
-                    configuration[c] = Number(configuration[c]);
+                    this.configuration[c] = Number(this.configuration[c]);
                 }
                 try {
-                    type = typeof (JSON.parse(configuration[c]));
-                    configuration[c] = JSON.parse(configuration[c]);
+                    type = typeof (JSON.parse(this.configuration[c]));
+                    this.configuration[c] = JSON.parse(this.configuration[c]);
                 } catch (err) { type = 'string'; }
+                Container.set(c, this.configuration[c]);
                 return `        ${c}: ${type};`;
             }),
             `    }`,
@@ -92,19 +85,12 @@ export class ApplicationLoaded {
             `    function properties(target: any, key: string);`,
             `}`,
         ];
-
-        // MERGE DEFAULT APPLICATION CONFIGRUATION ...
-        configuration = { ...new ApplicationConfiguration(), ...configuration };
+        Container.set(PROPERTIES.toString(), this.configuration);
 
         const types = join(this.APP_PATH, 'types');
         if (!existsSync(types)) mkdirpSync(types);
         writeFileSync(join(types, '_config.d.ts'), template.join('\n'));
-        const runtime = join(this.APP_PATH, configuration.APP_RUNTIME);
-        global.pyi.RUNTIME_PATH = runtime;
-        if (!existsSync(runtime)) mkdirpSync(runtime);
-        writeFileSync(join(runtime, 'config.json'), JSON.stringify(configuration, null, 4));
-        this.configuration = configuration;
-        return configuration;
+        return this.configuration;
     }
 
     public loadedBase(packet: any) {
@@ -132,21 +118,23 @@ export class ApplicationLoaded {
                     if (this.loadedBase(packets.default) === PYIController) return alps.controllers[path] = packets.default;
                     if (this.loadedBase(packets.default) === PYITCPController) return alps.tcpcontrols[path] = packets.default;
                 }
-                return map(packets, packet => {
-                    switch (this.loadedBase(packet)) {
-                        case PYIComponent: return alps.components.push(packet);
-                        case PYIConfiguration: return alps.configurations.push(packet);
-                        case PYIDao: return alps.daos.push(packet);
-                        case PYIDto: return alps.dtos.push(packet);
-                        case PYIService: return alps.services.push(packet);
-                    }
-                });
+                // return map(packets, packet => {
+                //     switch (this.loadedBase(packet)) {
+                //         case PYIComponent: return alps.components.push(packet);
+                //         case PYIConfiguration: return alps.configurations.push(packet);
+                //         case PYIDao: return alps.daos.push(packet);
+                //         case PYIDto: return alps.dtos.push(packet);
+                //         case PYIService: return alps.services.push(packet);
+                //     }
+                // });
             } catch (err) { console.log(err) }
         }).on('ready', r));
         watcher.close();
         const routes: any[] = [];
         map(alps.controllers, (controller, path) => {
-            const baseURL = path.replace(join(this.APP_PATH, 'app'), '').replace(new RegExp(`.(${this.configuration.APP_AUOTLOAD.join('|')})$`, 'gi'), '');
+            let baseURL = path.replace(join(this.APP_PATH, 'app'), '').replace(new RegExp(`\/controller.(${this.configuration.APP_AUOTLOAD.join('|')})$`, 'gi'), '');
+            baseURL = baseURL.replace(new RegExp(`\/index.(${this.configuration.APP_AUOTLOAD.join('|')})$`, 'gi'), '');
+            baseURL = baseURL.replace(new RegExp(`.(${this.configuration.APP_AUOTLOAD.join('|')})$`, 'gi'), '');
             const actions = Reflect.getMetadata(CONTROLLER_ACTION_KEY, controller);
             const m = Reflect.getMetadata(CONTROLLER_KEY, controller);
             map(actions, action => {

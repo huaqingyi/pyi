@@ -248,6 +248,11 @@
   "resolved" "http://registry.talefun.com:4873/@sindresorhus%2fis/-/is-0.14.0.tgz"
   "version" "0.14.0"
 
+"@sqltools/formatter@^1.2.2":
+  "integrity" "sha1-EYVyZhCsw3MX3asRw8f5BmlmvSA="
+  "resolved" "http://registry.talefun.com:4873/@sqltools%2fformatter/-/formatter-1.2.3.tgz"
+  "version" "1.2.3"
+
 "@szmarczak/http-timer@^1.1.2":
   "integrity" "sha1-sWZeLEYaLNkvTBu/UNVFTeDUtCE="
   "resolved" "http://registry.talefun.com:4873/@szmarczak%2fhttp-timer/-/http-timer-1.1.2.tgz"
@@ -403,6 +408,13 @@
   dependencies:
     "@types/koa" "*"
 
+"@types/koa-router@^7.4.4":
+  "integrity" "sha1-23K942FjZddPABeNXyQ8T859pXI="
+  "resolved" "http://registry.talefun.com:4873/@types%2fkoa-router/-/koa-router-7.4.4.tgz"
+  "version" "7.4.4"
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa@*", "@types/koa@^2.13.4":
   "integrity" "sha1-EGILPySoAn71y66Is5PRsxIFcms="
   "resolved" "http://registry.talefun.com:4873/@types%2fkoa/-/koa-2.13.4.tgz"
@@ -490,6 +502,11 @@
   dependencies:
     "@types/expect" "^1.20.4"
     "@types/node" "*"
+
+"@types/zen-observable@0.8.3":
+  "integrity" "sha1-eB02DCgkNklLMv59n3+OZLMRiqM="
+  "resolved" "http://registry.talefun.com:4873/@types%2fzen-observable/-/zen-observable-0.8.3.tgz"
+  "version" "0.8.3"
 
 "abbrev@1":
   "integrity" "sha1-+PLIh60Qv2f2NPAFtph/7TF5qsg="
@@ -599,6 +616,11 @@
   "resolved" "http://registry.talefun.com:4873/ansi-wrap/-/ansi-wrap-0.1.0.tgz"
   "version" "0.1.0"
 
+"any-promise@^1.0.0":
+  "integrity" "sha1-q8av7tzqUugJzcA3au0845Y10X8="
+  "resolved" "http://registry.talefun.com:4873/any-promise/-/any-promise-1.3.0.tgz"
+  "version" "1.3.0"
+
 "anymatch@^2.0.0":
   "integrity" "sha1-vLJLTzeTTZqnrBe0ra+J58du8us="
   "resolved" "http://registry.talefun.com:4873/anymatch/-/anymatch-2.0.0.tgz"
@@ -614,6 +636,11 @@
   dependencies:
     "normalize-path" "^3.0.0"
     "picomatch" "^2.0.4"
+
+"app-root-path@^3.0.0":
+  "integrity" "sha1-IQtvQ4cyJ+GKS4EKAyKDMRVV1a0="
+  "resolved" "http://registry.talefun.com:4873/app-root-path/-/app-root-path-3.0.0.tgz"
+  "version" "3.0.0"
 
 "append-buffer@^1.0.2":
   "integrity" "sha1-2CIM9GYIFSXv6lBhTz3mUU36WPE="
@@ -631,6 +658,11 @@
   "integrity" "sha1-Jp/HrVuOQstjyJbVZmAXJhwUQIk="
   "resolved" "http://registry.talefun.com:4873/arg/-/arg-4.1.3.tgz"
   "version" "4.1.3"
+
+"argparse@^2.0.1":
+  "integrity" "sha1-JG9Q88p4oyQPbJl+ipvR6sSeSzg="
+  "resolved" "http://registry.talefun.com:4873/argparse/-/argparse-2.0.1.tgz"
+  "version" "2.0.1"
 
 "arr-diff@^4.0.0":
   "integrity" "sha1-1kYQdP6/7HHn4VI1dhoyml3HxSA="
@@ -770,6 +802,11 @@
     "mixin-deep" "^1.2.0"
     "pascalcase" "^0.1.1"
 
+"base64-js@^1.3.1":
+  "integrity" "sha1-GxtEAWClv3rUC2UPCVljSBkDkwo="
+  "resolved" "http://registry.talefun.com:4873/base64-js/-/base64-js-1.5.1.tgz"
+  "version" "1.5.1"
+
 "binary-extensions@^1.0.0":
   "integrity" "sha1-WYr+VHVbKGilMw0q/51Ou1Mgm2U="
   "resolved" "http://registry.talefun.com:4873/binary-extensions/-/binary-extensions-1.13.1.tgz"
@@ -852,6 +889,14 @@
   "integrity" "sha1-KxRqb9cugLT1XSVfNe1Zo6mkG9U="
   "resolved" "http://registry.talefun.com:4873/buffer-from/-/buffer-from-1.1.2.tgz"
   "version" "1.1.2"
+
+"buffer@^6.0.3":
+  "integrity" "sha1-Ks5XhFnMj74qcKqo9S7mO2p0xsY="
+  "resolved" "http://registry.talefun.com:4873/buffer/-/buffer-6.0.3.tgz"
+  "version" "6.0.3"
+  dependencies:
+    "base64-js" "^1.3.1"
+    "ieee754" "^1.2.1"
 
 "cache-base@^1.0.1":
   "integrity" "sha1-Cn9GQWgxyLZi7jb+TnxZ129marI="
@@ -943,7 +988,7 @@
     "escape-string-regexp" "^1.0.5"
     "supports-color" "^5.3.0"
 
-"chalk@^4.1.0":
+"chalk@^4.0.0", "chalk@^4.1.0":
   "integrity" "sha1-qsTit3NKdAhnrrFr8CqtVWoeegE="
   "resolved" "http://registry.talefun.com:4873/chalk/-/chalk-4.1.2.tgz"
   "version" "4.1.2"
@@ -1005,6 +1050,18 @@
   "resolved" "http://registry.talefun.com:4873/cli-boxes/-/cli-boxes-2.2.1.tgz"
   "version" "2.2.1"
 
+"cli-highlight@^2.1.11":
+  "integrity" "sha1-SXNvpFLwqvT65YDjCssmgo0twb8="
+  "resolved" "http://registry.talefun.com:4873/cli-highlight/-/cli-highlight-2.1.11.tgz"
+  "version" "2.1.11"
+  dependencies:
+    "chalk" "^4.0.0"
+    "highlight.js" "^10.7.1"
+    "mz" "^2.4.0"
+    "parse5" "^5.1.1"
+    "parse5-htmlparser2-tree-adapter" "^6.0.0"
+    "yargs" "^16.0.0"
+
 "cliui@^3.2.0":
   "integrity" "sha1-EgYBU3qRbSmUD5NNo7SNWFo5IT0="
   "resolved" "http://registry.talefun.com:4873/cliui/-/cliui-3.2.0.tgz"
@@ -1013,6 +1070,15 @@
     "string-width" "^1.0.1"
     "strip-ansi" "^3.0.1"
     "wrap-ansi" "^2.0.0"
+
+"cliui@^7.0.2":
+  "integrity" "sha1-oCZe5lVHb8gHrqnfPfjfd4OAi08="
+  "resolved" "http://registry.talefun.com:4873/cliui/-/cliui-7.0.4.tgz"
+  "version" "7.0.4"
+  dependencies:
+    "string-width" "^4.2.0"
+    "strip-ansi" "^6.0.0"
+    "wrap-ansi" "^7.0.0"
 
 "clone-buffer@^1.0.0":
   "integrity" "sha1-4+JbIHrE5wGvch4staFnksrD3Fg="
@@ -1256,6 +1322,13 @@
   dependencies:
     "ms" "2.1.2"
 
+"debug@^4.3.1":
+  "integrity" "sha1-8KScGKyHeeMdSgxgKd+3aHPHQos="
+  "resolved" "http://registry.talefun.com:4873/debug/-/debug-4.3.2.tgz"
+  "version" "4.3.2"
+  dependencies:
+    "ms" "2.1.2"
+
 "debug@^4.3.2":
   "integrity" "sha1-8KScGKyHeeMdSgxgKd+3aHPHQos="
   "resolved" "http://registry.talefun.com:4873/debug/-/debug-4.3.2.tgz"
@@ -1394,6 +1467,11 @@
   "integrity" "sha1-PUInuPuV+BCWzdK2ZlP7LHCFuoE="
   "resolved" "http://registry.talefun.com:4873/dotenv/-/dotenv-10.0.0.tgz"
   "version" "10.0.0"
+
+"dotenv@^8.2.0":
+  "integrity" "sha1-Bhr2ZNGff02PxuT/m1hM4jety4s="
+  "resolved" "http://registry.talefun.com:4873/dotenv/-/dotenv-8.6.0.tgz"
+  "version" "8.6.0"
 
 "duplexer3@^0.1.4":
   "integrity" "sha1-7gHdHKwO08vH/b6jfcCo8c4ALOI="
@@ -1600,6 +1678,11 @@
   "resolved" "http://registry.talefun.com:4873/fast-levenshtein/-/fast-levenshtein-1.1.4.tgz"
   "version" "1.1.4"
 
+"figlet@^1.1.1":
+  "integrity" "sha1-3aNP8jPJpI42/P9nQa61uv5JtjQ="
+  "resolved" "http://registry.talefun.com:4873/figlet/-/figlet-1.5.2.tgz"
+  "version" "1.5.2"
+
 "file-uri-to-path@1.0.0":
   "integrity" "sha1-VTp7hEb/b2hDWcRF8eN6BdrMM90="
   "resolved" "http://registry.talefun.com:4873/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz"
@@ -1764,6 +1847,11 @@
   "resolved" "http://registry.talefun.com:4873/get-caller-file/-/get-caller-file-1.0.3.tgz"
   "version" "1.0.3"
 
+"get-caller-file@^2.0.5":
+  "integrity" "sha1-T5RBKoLbMvNuOwuXQfipf+sDH34="
+  "resolved" "http://registry.talefun.com:4873/get-caller-file/-/get-caller-file-2.0.5.tgz"
+  "version" "2.0.5"
+
 "get-intrinsic@^1.0.2":
   "integrity" "sha1-FfWfN2+FXERpY5SPDSTNNje0q8Y="
   "resolved" "http://registry.talefun.com:4873/get-intrinsic/-/get-intrinsic-1.1.1.tgz"
@@ -1847,7 +1935,7 @@
     "once" "^1.3.0"
     "path-is-absolute" "^1.0.0"
 
-"glob@^7.1.1":
+"glob@^7.1.1", "glob@^7.1.6":
   "integrity" "sha1-0VU1r3cy4C6Uj0xBYovZECk/YCM="
   "resolved" "http://registry.talefun.com:4873/glob/-/glob-7.2.0.tgz"
   "version" "7.2.0"
@@ -2083,6 +2171,11 @@
   dependencies:
     "function-bind" "^1.1.1"
 
+"highlight.js@^10.7.1":
+  "integrity" "sha1-aXJy45kTVuQMPKxWanTu9oF1ZTE="
+  "resolved" "http://registry.talefun.com:4873/highlight.js/-/highlight.js-10.7.3.tgz"
+  "version" "10.7.3"
+
 "homedir-polyfill@^1.0.1":
   "integrity" "sha1-dDKYzvTlrz4ZQWH7rcwhUdOgWOg="
   "resolved" "http://registry.talefun.com:4873/homedir-polyfill/-/homedir-polyfill-1.0.3.tgz"
@@ -2118,6 +2211,11 @@
     "setprototypeof" "1.2.0"
     "statuses" ">= 1.5.0 < 2"
     "toidentifier" "1.0.0"
+
+"ieee754@^1.2.1":
+  "integrity" "sha1-jrehCmP/8l0VpXsAFYbRd9Gw01I="
+  "resolved" "http://registry.talefun.com:4873/ieee754/-/ieee754-1.2.1.tgz"
+  "version" "1.2.1"
 
 "ignore-by-default@^1.0.1":
   "integrity" "sha1-SMptcvbGo68Aqa1K5odr44ieKwk="
@@ -2436,6 +2534,13 @@
   "integrity" "sha1-GSA/tZmR35jjoocFDUZHzerzJJk="
   "resolved" "http://registry.talefun.com:4873/js-tokens/-/js-tokens-4.0.0.tgz"
   "version" "4.0.0"
+
+"js-yaml@^4.0.0":
+  "integrity" "sha1-wftl+PUBeQHN0slRhkuhhFihBgI="
+  "resolved" "http://registry.talefun.com:4873/js-yaml/-/js-yaml-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "argparse" "^2.0.1"
 
 "jsesc@^2.5.1":
   "integrity" "sha1-gFZNLkg9rPbo7yCWUKZ98/DCg6Q="
@@ -2821,6 +2926,11 @@
     "for-in" "^1.0.2"
     "is-extendable" "^1.0.1"
 
+"mkdirp@^1.0.4":
+  "integrity" "sha1-PrXtYmInVteaXw4qIh3+utdcL34="
+  "resolved" "http://registry.talefun.com:4873/mkdirp/-/mkdirp-1.0.4.tgz"
+  "version" "1.0.4"
+
 "ms@^2.1.1":
   "integrity" "sha1-V0yBOM4dK1hh8LRFedut1gxmFbI="
   "resolved" "http://registry.talefun.com:4873/ms/-/ms-2.1.3.tgz"
@@ -2840,6 +2950,15 @@
   "integrity" "sha1-rLAwDrTeI6fd7sAU4+lgRLNHIzE="
   "resolved" "http://registry.talefun.com:4873/mute-stdout/-/mute-stdout-1.0.1.tgz"
   "version" "1.0.1"
+
+"mz@^2.4.0":
+  "integrity" "sha1-lQCAV6Vsr63CvGPd5/n/aVWUjjI="
+  "resolved" "http://registry.talefun.com:4873/mz/-/mz-2.7.0.tgz"
+  "version" "2.7.0"
+  dependencies:
+    "any-promise" "^1.0.0"
+    "object-assign" "^4.0.1"
+    "thenify-all" "^1.0.0"
 
 "nan@^2.12.1":
   "integrity" "sha1-PzSkc/8Y4VwbVia2KQO1rW5mX+4="
@@ -2957,7 +3076,7 @@
   "resolved" "http://registry.talefun.com:4873/number-is-nan/-/number-is-nan-1.0.1.tgz"
   "version" "1.0.1"
 
-"object-assign@4.X":
+"object-assign@^4.0.1", "object-assign@4.X":
   "integrity" "sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM="
   "resolved" "http://registry.talefun.com:4873/object-assign/-/object-assign-4.1.1.tgz"
   "version" "4.1.1"
@@ -3093,6 +3212,11 @@
     "registry-url" "^5.0.0"
     "semver" "^6.2.0"
 
+"parent-require@^1.0.0":
+  "integrity" "sha1-dGoWdjgIOoYLDu9nMssn7UbDKXc="
+  "resolved" "http://registry.talefun.com:4873/parent-require/-/parent-require-1.0.0.tgz"
+  "version" "1.0.0"
+
 "parse-filepath@^1.0.1":
   "integrity" "sha1-pjISf1Oq89FYdvWHLz/6x2PWyJE="
   "resolved" "http://registry.talefun.com:4873/parse-filepath/-/parse-filepath-1.0.2.tgz"
@@ -3118,6 +3242,23 @@
   "integrity" "sha1-bVuTSkVpk7I9N/QKOC1vFmao5cY="
   "resolved" "http://registry.talefun.com:4873/parse-passwd/-/parse-passwd-1.0.0.tgz"
   "version" "1.0.0"
+
+"parse5-htmlparser2-tree-adapter@^6.0.0":
+  "integrity" "sha1-LN+a2CMyEUA3DU2/XT6Sx8jdxuY="
+  "resolved" "http://registry.talefun.com:4873/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-6.0.1.tgz"
+  "version" "6.0.1"
+  dependencies:
+    "parse5" "^6.0.1"
+
+"parse5@^5.1.1":
+  "integrity" "sha1-9o5OW6GFKsLK3AD0VV//bCq7YXg="
+  "resolved" "http://registry.talefun.com:4873/parse5/-/parse5-5.1.1.tgz"
+  "version" "5.1.1"
+
+"parse5@^6.0.1":
+  "integrity" "sha1-4aHAhcVps9wIMhGE8Zo5zCf3wws="
+  "resolved" "http://registry.talefun.com:4873/parse5/-/parse5-6.0.1.tgz"
+  "version" "6.0.1"
 
 "parseurl@^1.3.2":
   "integrity" "sha1-naGee+6NEt/wUT7Vt2lXeTvC6NQ="
@@ -3503,15 +3644,15 @@
   "resolved" "http://registry.talefun.com:4873/ret/-/ret-0.1.15.tgz"
   "version" "0.1.15"
 
+"safe-buffer@^5.0.1", "safe-buffer@~5.1.0", "safe-buffer@~5.1.1", "safe-buffer@5.1.2":
+  "integrity" "sha1-mR7GnSluAxN0fVm9/St0XDX4go0="
+  "resolved" "http://registry.talefun.com:4873/safe-buffer/-/safe-buffer-5.1.2.tgz"
+  "version" "5.1.2"
+
 "safe-buffer@^5.1.0":
   "integrity" "sha1-Hq+fqb2x/dTsdfWPnNtOa3gn7sY="
   "resolved" "http://registry.talefun.com:4873/safe-buffer/-/safe-buffer-5.2.1.tgz"
   "version" "5.2.1"
-
-"safe-buffer@~5.1.0", "safe-buffer@~5.1.1", "safe-buffer@5.1.2":
-  "integrity" "sha1-mR7GnSluAxN0fVm9/St0XDX4go0="
-  "resolved" "http://registry.talefun.com:4873/safe-buffer/-/safe-buffer-5.1.2.tgz"
-  "version" "5.1.2"
 
 "safe-buffer@~5.2.0":
   "integrity" "sha1-Hq+fqb2x/dTsdfWPnNtOa3gn7sY="
@@ -3531,6 +3672,11 @@
   "version" "1.6.3"
   dependencies:
     "truncate-utf8-bytes" "^1.0.0"
+
+"sax@>=0.6.0":
+  "integrity" "sha1-KBYjTiN4vdxOU1T6tcqold9xANk="
+  "resolved" "http://registry.talefun.com:4873/sax/-/sax-1.2.4.tgz"
+  "version" "1.2.4"
 
 "semver-diff@^3.1.1":
   "integrity" "sha1-Bfd85Z8yXgDicGr9Z7tQbdscoys="
@@ -3592,6 +3738,14 @@
   "integrity" "sha1-ZsmiSnP5/CjL5msJ/tPTPcrxtCQ="
   "resolved" "http://registry.talefun.com:4873/setprototypeof/-/setprototypeof-1.2.0.tgz"
   "version" "1.2.0"
+
+"sha.js@^2.4.11":
+  "integrity" "sha1-N6XPC4HsvGlD3hCbopYNGyZYSuc="
+  "resolved" "http://registry.talefun.com:4873/sha.js/-/sha.js-2.4.11.tgz"
+  "version" "2.4.11"
+  dependencies:
+    "inherits" "^2.0.1"
+    "safe-buffer" "^5.0.1"
 
 "shallow-clone@^3.0.0":
   "integrity" "sha1-jymBrZJTH1UDWwH7IwdppA4C76M="
@@ -3799,7 +3953,7 @@
     "is-fullwidth-code-point" "^1.0.0"
     "strip-ansi" "^3.0.0"
 
-"string-width@^4.0.0", "string-width@^4.1.0", "string-width@^4.2.2":
+"string-width@^4.0.0", "string-width@^4.1.0", "string-width@^4.2.0", "string-width@^4.2.2":
   "integrity" "sha1-JpxxF9J7Ba0uU2gwqOyJXvnG0BA="
   "resolved" "http://registry.talefun.com:4873/string-width/-/string-width-4.2.3.tgz"
   "version" "4.2.3"
@@ -3889,6 +4043,20 @@
   dependencies:
     "es6-iterator" "^2.0.1"
     "es6-symbol" "^3.1.1"
+
+"thenify-all@^1.0.0":
+  "integrity" "sha1-GhkY1ALY/D+Y+/I02wvMjMEOlyY="
+  "resolved" "http://registry.talefun.com:4873/thenify-all/-/thenify-all-1.6.0.tgz"
+  "version" "1.6.0"
+  dependencies:
+    "thenify" ">= 3.1.0 < 4"
+
+"thenify@>= 3.1.0 < 4":
+  "integrity" "sha1-iTLmhqQGYDigFt2eLKRq3Zg4qV8="
+  "resolved" "http://registry.talefun.com:4873/thenify/-/thenify-3.3.1.tgz"
+  "version" "3.3.1"
+  dependencies:
+    "any-promise" "^1.0.0"
 
 "through2-filter@^3.0.0":
   "integrity" "sha1-cA54bfI2fCyIzYqlvkz5weeDElQ="
@@ -4041,6 +4209,11 @@
     "strip-bom" "^2.0.0"
     "xtend" "^4.0.0"
 
+"tslib@^2.1.0":
+  "integrity" "sha1-6KM1rdXOrlGqJh0ypJAVjvBC7wE="
+  "resolved" "http://registry.talefun.com:4873/tslib/-/tslib-2.3.1.tgz"
+  "version" "2.3.1"
+
 "tsscmp@1.0.6":
   "integrity" "sha1-hbmVg6w1iexL/vgltQAKqRHWBes="
   "resolved" "http://registry.talefun.com:4873/tsscmp/-/tsscmp-1.0.6.tgz"
@@ -4080,6 +4253,34 @@
   "integrity" "sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c="
   "resolved" "http://registry.talefun.com:4873/typedarray/-/typedarray-0.0.6.tgz"
   "version" "0.0.6"
+
+"typedi@^0.10.0":
+  "integrity" "sha1-6Pml7hALhK3b37V/6Q2NntKiHeo="
+  "resolved" "http://registry.talefun.com:4873/typedi/-/typedi-0.10.0.tgz"
+  "version" "0.10.0"
+
+"typeorm@^0.2.38":
+  "integrity" "sha1-KvCAeZGfarBM0XAX+fqiyNXNVm8="
+  "resolved" "http://registry.talefun.com:4873/typeorm/-/typeorm-0.2.38.tgz"
+  "version" "0.2.38"
+  dependencies:
+    "@sqltools/formatter" "^1.2.2"
+    "app-root-path" "^3.0.0"
+    "buffer" "^6.0.3"
+    "chalk" "^4.1.0"
+    "cli-highlight" "^2.1.11"
+    "debug" "^4.3.1"
+    "dotenv" "^8.2.0"
+    "glob" "^7.1.6"
+    "js-yaml" "^4.0.0"
+    "mkdirp" "^1.0.4"
+    "reflect-metadata" "^0.1.13"
+    "sha.js" "^2.4.11"
+    "tslib" "^2.1.0"
+    "xml2js" "^0.4.23"
+    "yargonaut" "^1.1.4"
+    "yargs" "^17.0.1"
+    "zen-observable-ts" "^1.0.0"
 
 "typescript-node@^0.1.3":
   "integrity" "sha1-g2KfoufWQrXvu3hrHC7zjCrnp88="
@@ -4379,6 +4580,19 @@
   "resolved" "http://registry.talefun.com:4873/xdg-basedir/-/xdg-basedir-4.0.0.tgz"
   "version" "4.0.0"
 
+"xml2js@^0.4.23":
+  "integrity" "sha1-oMaVFnUkIesqx1juTUzPWIQ+rGY="
+  "resolved" "http://registry.talefun.com:4873/xml2js/-/xml2js-0.4.23.tgz"
+  "version" "0.4.23"
+  dependencies:
+    "sax" ">=0.6.0"
+    "xmlbuilder" "~11.0.0"
+
+"xmlbuilder@~11.0.0":
+  "integrity" "sha1-vpuuHIoEbnazESdyY0fQrXACvrM="
+  "resolved" "http://registry.talefun.com:4873/xmlbuilder/-/xmlbuilder-11.0.1.tgz"
+  "version" "11.0.1"
+
 "xtend@^4.0.0", "xtend@~4.0.0", "xtend@~4.0.1":
   "integrity" "sha1-u3J3n1+kZRhrH0OPZ0+jR/2121Q="
   "resolved" "http://registry.talefun.com:4873/xtend/-/xtend-4.0.2.tgz"
@@ -4389,10 +4603,29 @@
   "resolved" "http://registry.talefun.com:4873/y18n/-/y18n-3.2.2.tgz"
   "version" "3.2.2"
 
+"y18n@^5.0.5":
+  "integrity" "sha1-f0k00PfKjFb5UxSTndzS3ZHOHVU="
+  "resolved" "http://registry.talefun.com:4873/y18n/-/y18n-5.0.8.tgz"
+  "version" "5.0.8"
+
 "yallist@^4.0.0":
   "integrity" "sha1-m7knkNnA7/7GO+c1GeEaNQGaOnI="
   "resolved" "http://registry.talefun.com:4873/yallist/-/yallist-4.0.0.tgz"
   "version" "4.0.0"
+
+"yargonaut@^1.1.4":
+  "integrity" "sha1-xk9WQyx0ZScSIfU/XMUXiQw9bgw="
+  "resolved" "http://registry.talefun.com:4873/yargonaut/-/yargonaut-1.1.4.tgz"
+  "version" "1.1.4"
+  dependencies:
+    "chalk" "^1.1.1"
+    "figlet" "^1.1.1"
+    "parent-require" "^1.0.0"
+
+"yargs-parser@^20.2.2":
+  "integrity" "sha1-LrfcOwKJcY/ClfNidThFxBoMlO4="
+  "resolved" "http://registry.talefun.com:4873/yargs-parser/-/yargs-parser-20.2.9.tgz"
+  "version" "20.2.9"
 
 "yargs-parser@^5.0.1":
   "integrity" "sha1-ft4ynB2M274gm9Jc25kOmx67s5Q="
@@ -4401,6 +4634,32 @@
   dependencies:
     "camelcase" "^3.0.0"
     "object.assign" "^4.1.0"
+
+"yargs@^16.0.0":
+  "integrity" "sha1-HIK/D2tqZur85+8w43b0mhJHf2Y="
+  "resolved" "http://registry.talefun.com:4873/yargs/-/yargs-16.2.0.tgz"
+  "version" "16.2.0"
+  dependencies:
+    "cliui" "^7.0.2"
+    "escalade" "^3.1.1"
+    "get-caller-file" "^2.0.5"
+    "require-directory" "^2.1.1"
+    "string-width" "^4.2.0"
+    "y18n" "^5.0.5"
+    "yargs-parser" "^20.2.2"
+
+"yargs@^17.0.1":
+  "integrity" "sha1-4slbl5ag4ffzv0QnhjtC4EGBkeo="
+  "resolved" "http://registry.talefun.com:4873/yargs/-/yargs-17.2.1.tgz"
+  "version" "17.2.1"
+  dependencies:
+    "cliui" "^7.0.2"
+    "escalade" "^3.1.1"
+    "get-caller-file" "^2.0.5"
+    "require-directory" "^2.1.1"
+    "string-width" "^4.2.0"
+    "y18n" "^5.0.5"
+    "yargs-parser" "^20.2.2"
 
 "yargs@^7.1.0":
   "integrity" "sha1-Y6Cl1CFDh5/bswNwdBN04GQdVds="
@@ -4430,3 +4689,16 @@
   "integrity" "sha1-HodAGgnXZ8HV6rJqbkwYUYLS61A="
   "resolved" "http://registry.talefun.com:4873/yn/-/yn-3.1.1.tgz"
   "version" "3.1.1"
+
+"zen-observable-ts@^1.0.0":
+  "integrity" "sha1-LRqp15uHBY6bdWmLknkcGDhVH4M="
+  "resolved" "http://registry.talefun.com:4873/zen-observable-ts/-/zen-observable-ts-1.1.0.tgz"
+  "version" "1.1.0"
+  dependencies:
+    "@types/zen-observable" "0.8.3"
+    "zen-observable" "0.8.15"
+
+"zen-observable@0.8.15":
+  "integrity" "sha1-lkFcUS2OP/2SCv04iWBOMLnqrBU="
+  "resolved" "http://registry.talefun.com:4873/zen-observable/-/zen-observable-0.8.15.tgz"
+  "version" "0.8.15"

@@ -14,11 +14,9 @@ export function TCPController<Props extends any>() {
     const [target] = arguments;
     if (target._base && target._base() === PYITCPController) {
         Reflect.defineMetadata(TCPCONTROLLER_KEY, { cmd: '' }, target);
-        return target;
     } else {
         return (target: PYICoreClass<PYITCPController>) => {
             Reflect.defineMetadata(TCPCONTROLLER_KEY, { cmd: arguments[0] }, target);
-            return target;
         };
     }
 }

@@ -10,6 +10,7 @@ export interface PYICoreApp {
 }
 
 export abstract class PYICoreApp {
+    constructor(...props: any[]) { }
 }
 
 export class PYICore extends PYICoreApp implements PYICoreApp {

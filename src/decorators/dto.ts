@@ -10,10 +10,8 @@ export function Dto<Props = any>(props: Props): <VC extends PYICoreClass<PYIDto>
 export function Dto<Props extends any>() {
     const [target] = arguments;
     if (target._base && target._base() === PYIDto) {
-        return target;
     } else {
         return (target: PYICoreClass<PYIDto>) => {
-            return target;
         };
     }
 }

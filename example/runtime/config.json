@@ -8,6 +8,7 @@
     ],
     "APP_RUNTIME": "runtime",
     "PORT": 4001,
+    "HOST": "localhost",
     "DATABASE_HOST": "0.0.0.0",
     "DATABASE_PORT": 3306,
     "DATABASE_DB": "test"

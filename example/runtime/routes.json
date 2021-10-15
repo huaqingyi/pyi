@@ -1,7 +1,7 @@
 [
     {
         "regexp": false,
-        "path": "/user/controller/test",
+        "path": "/user/test",
         "controller": "/Users/yihuaqing/Desktop/yihq/pyi/example/app/user/controller.ts",
         "action": "test",
         "methods": [
@@ -15,7 +15,7 @@
     },
     {
         "regexp": false,
-        "path": "/sys/controller/test",
+        "path": "/sys/test",
         "controller": "/Users/yihuaqing/Desktop/yihq/pyi/example/app/sys/controller.ts",
         "action": "test",
         "methods": [

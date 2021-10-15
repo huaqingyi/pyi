@@ -1,5 +1,6 @@
-import { PYIController, RequestMapping, PYIExecption, Controller } from '../../../src';
+import { PYIController, RequestMapping, PYIExecption, Controller, autowired } from '../../../src';
 import { TestDao } from './dao';
+import { Database } from '../../components/database';
 
 /*
  * @Author: huaqingyi
@@ -9,8 +10,12 @@ import { TestDao } from './dao';
 @Controller
 export default class extends PYIController {
 
+    @autowired
+    public database!: Database;
+
     @RequestMapping
     public test(): TestDao {
+        console.log(this.database);
         return PYIExecption(() => {
             return {};
         });

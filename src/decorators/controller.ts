@@ -3,6 +3,8 @@
  * @LastEditors: huaqingyi
  * @Description: zeconding ...
  */
+import { Context } from 'koa';
+import { Service } from 'typedi';
 import { PYICore, PYICoreClass } from '../extensions';
 
 export enum RequestMappingMethod {
@@ -20,7 +22,7 @@ export enum RequestMappingMethod {
     MKACTIVITY = 'MKACTIVITY',
     MKCOL = 'MKCOL',
     MOVE = 'MOVE',
-    M_SEARCH = 'm-search',
+    M_SEARCH = 'M-SEARCH',
     NOTIFY = 'NOTIFY',
     OPTIONS = 'OPTIONS',
     PROPFIND = 'PROPFIND',
@@ -50,11 +52,11 @@ export function Controller<Props extends any>() {
     const [target] = arguments;
     if (target._base && target._base() === PYIController) {
         Reflect.defineMetadata(CONTROLLER_KEY, { prefix: '/', methods: [] }, target);
-        return target;
+        Service()(target);
     } else {
         return (target: PYICoreClass<PYIController>) => {
             Reflect.defineMetadata(CONTROLLER_KEY, { prefix: '/', methods: [], ...arguments[0] }, target);
-            return target;
+            Service()(target);
         };
     }
 }
@@ -63,6 +65,8 @@ export class PYIController<Props = any> extends PYICore {
     public static _base() {
         return PYIController;
     }
+    
+    public ctx!: Context;
 }
 
 export interface ControllerRequestConfiguration {

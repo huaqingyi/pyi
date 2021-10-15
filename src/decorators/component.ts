@@ -4,22 +4,22 @@
  * @Description: zeconding ...
  */
 import { PYICore, PYICoreClass } from '../extensions';
+import { Service, ServiceOptions, Inject } from 'typedi';
 
-export function Component<VC extends PYICoreClass<PYIComponent>>(tprops: VC): VC;
-export function Component<Props = any>(
-    props: Props & any
-): <VC extends PYICoreClass<PYIComponent>>(target: VC) => VC;
+export function Component(tprops: any): void;
+export function Component<Props = any>(props: ServiceOptions<Props>): (target: any) => void;
 export function Component() {
     const [target] = arguments;
     if (target._base && target._base() === PYIComponent) {
-        return target;
+        return Service()(target);
     }
     return (target: PYICoreClass<PYIComponent>) => {
-        return target;
+        return Service(arguments[0])(target);
     };
 }
 
 export function autowired(target: any, key: string) {
+    Inject()(target, key);
 }
 
 export class PYIComponent extends PYICore {

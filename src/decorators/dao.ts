@@ -10,10 +10,8 @@ export function Dao<Props = any>(props: Props & any): <VC extends PYICoreClass<P
 export function Dao<Props extends any>() {
     const [target] = arguments;
     if (target._base && target._base() === PYIDao) {
-        return target;
     } else {
         return (target: PYICoreClass<PYIDao>) => {
-            return target;
         };
     }
 }
