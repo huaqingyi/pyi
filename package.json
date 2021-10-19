@@ -33,7 +33,6 @@
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.3.0",
     "tsconfig-paths": "^3.11.0",
-    "typedi": "^0.10.0",
     "typeorm": "^0.2.38",
     "typescript-node": "^0.1.3"
   },

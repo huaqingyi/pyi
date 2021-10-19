@@ -4254,11 +4254,6 @@
   "resolved" "http://registry.talefun.com:4873/typedarray/-/typedarray-0.0.6.tgz"
   "version" "0.0.6"
 
-"typedi@^0.10.0":
-  "integrity" "sha1-6Pml7hALhK3b37V/6Q2NntKiHeo="
-  "resolved" "http://registry.talefun.com:4873/typedi/-/typedi-0.10.0.tgz"
-  "version" "0.10.0"
-
 "typeorm@^0.2.38":
   "integrity" "sha1-KvCAeZGfarBM0XAX+fqiyNXNVm8="
   "resolved" "http://registry.talefun.com:4873/typeorm/-/typeorm-0.2.38.tgz"

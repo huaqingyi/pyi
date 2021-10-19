@@ -12,7 +12,6 @@ import { readFileSync } from 'fs-extra';
 import Router from 'koa-router';
 import { map } from 'lodash';
 import { useConfiguraion, useEnv } from '../composition/properties';
-import Container from 'typedi';
 import { createServer } from 'http';
 
 declare namespace NodeJS {
@@ -51,9 +50,8 @@ export function PYIBootstrap(target: any) {
                     return await next();
                 }
                 const Controller = (await import(route.controller)).default;
-                // Controller.prototype.ctx = ctx;
-                // const controller = new Controller(ctx);
-                const controller = Container.get(Controller) as any;
+                Controller.prototype.ctx = ctx;
+                const controller = new Controller(ctx);
                 ctx.body = await controller[route.action]();
                 return await next();
             });

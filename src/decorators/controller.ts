@@ -4,7 +4,6 @@
  * @Description: zeconding ...
  */
 import { Context } from 'koa';
-import { Service } from 'typedi';
 import { PYICore, PYICoreClass } from '../extensions';
 
 export enum RequestMappingMethod {
@@ -52,11 +51,9 @@ export function Controller<Props extends any>() {
     const [target] = arguments;
     if (target._base && target._base() === PYIController) {
         Reflect.defineMetadata(CONTROLLER_KEY, { prefix: '/', methods: [] }, target);
-        Service()(target);
     } else {
         return (target: PYICoreClass<PYIController>) => {
             Reflect.defineMetadata(CONTROLLER_KEY, { prefix: '/', methods: [], ...arguments[0] }, target);
-            Service()(target);
         };
     }
 }
